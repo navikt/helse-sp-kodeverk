@@ -26,13 +26,19 @@ spec:
     application:
       enabled: true
       tenant: nav.no
-      allowAllUsers: true #TODO legg til validering mot en AD gruppe
+      allowAllUsers: false
+      claims:
+        extra:
+          - 'NAVident'
+        groups:
+          - id: 'd606f784-0335-4fbd-9879-e617b48526e0' # helseytelser-spillerom-kodeverk-admin
     sidecar:
       enabled: true
       autoLogin: true
       autoLoginIgnorePaths:
         - /_next/*
         - /public/*
+        - /api/v1/open/*
   resources:
     limits:
       memory: 350Mi
