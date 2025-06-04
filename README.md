@@ -1,8 +1,7 @@
 # Sp Kodeverk
-[![Bygg og deploy Spillerom](https://github.com/navikt/helse-spillerom/actions/workflows/workflow.yml/badge.svg)](https://github.com/navikt/helse-bakrommet/actions/workflows/main.yml)
 
 ## Beskrivelse
-Frontend for backenden bakrommet
+Frontend for å redigere kodeverk brukt i spillerom
 
 ## Kjør lokalt
 `npm run dev`
