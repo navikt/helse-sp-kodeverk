@@ -8,7 +8,7 @@ import { ExpansionCard } from '@navikt/ds-react'
 import { type Kodeverk, type Vilkår, type Årsak, type Vilkårshjemmel } from '@components/kodeverk'
 
 const fetchKodeverk = async (): Promise<Kodeverk> => {
-    const response = await fetch('/api/v1/kodeverk')
+    const response = await fetch('/api/v1/open/kodeverk')
     if (!response.ok) {
         throw new Error('Failed to fetch kodeverk')
     }
