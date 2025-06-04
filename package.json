@@ -1,0 +1,75 @@
+{
+    "name": "spillerom",
+    "version": "0.1.0",
+    "private": true,
+    "engines": {
+        "node": "22"
+    },
+    "scripts": {
+        "dev": "next dev --turbopack",
+        "build": "next build",
+        "start": "next start",
+        "start:e2e": "NEXT_PUBLIC_IS_E2E=true NEXT_PUBLIC_BASE_PATH= NEXT_PUBLIC_ASSET_PREFIX= node .next/standalone/server.js | pino-pretty",
+        "build:e2e": "NEXT_PUBLIC_IS_E2E=true NEXT_PUBLIC_BASE_PATH= NEXT_PUBLIC_ASSET_PREFIX= next build",
+        "prettier:write": "prettier --write .",
+        "prettier:check": "prettier --check .",
+        "tsc": "tsc",
+        "play": "npx playwright test --ui",
+        "play-headless": "npx playwright test",
+        "lint": "eslint --ext=ts,tsx src",
+        "test": "vitest --config vitest.config.mts",
+        "lint:fix": "eslint --ext=ts,tsx src --fix",
+        "format": "npm run prettier:write && npm run lint:fix",
+        "kodeverk": "ts-node --project scripts/tsconfig.json scripts/kodeverkTilExcel.ts"
+    },
+    "dependencies": {
+        "@faker-js/faker": "^9.7.0",
+        "@hookform/resolvers": "^5.0.1",
+        "@navikt/aksel-icons": "^7.20.0",
+        "@navikt/ds-css": "^7.20.0",
+        "@navikt/ds-react": "^7.20.0",
+        "@navikt/ds-tailwind": "7.20.0",
+        "@navikt/ds-tokens": "^7.20.0",
+        "@navikt/next-api-proxy": "^4.1.3",
+        "@navikt/next-logger": "^2.1.0",
+        "@navikt/oasis": "^3.8.0",
+        "@tanstack/react-query": "^5.74.3",
+        "clsx": "^2.1.1",
+        "dayjs": "^1.11.13",
+        "motion": "^12.7.3",
+        "next": "^15.3.0",
+        "nextleton": "^0.6.1",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "react-hook-form": "^7.56.1",
+        "remeda": "^2.21.3",
+        "tailwind-merge": "^3.2.0",
+        "uuid": "^11.1.0",
+        "zod": "^3.24.3"
+    },
+    "devDependencies": {
+        "@navikt/eslint-config-teamsykmelding": "^7.1.0",
+        "@tailwindcss/postcss": "^4.1.4",
+        "@types/node": "^22.14.1",
+        "@types/react": "^19.1.2",
+        "@types/react-dom": "^19.1.2",
+        "eslint": "^8.57.1",
+        "eslint-config-next": "^15.3.0",
+        "postcss": "^8.5.3",
+        "prettier-plugin-tailwindcss": "^0.6.11",
+        "tailwindcss": "^4.1.4",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3",
+        "vitest": "^3.1.1",
+        "xlsx": "^0.18.5"
+    },
+    "eslintConfig": {
+        "extends": [
+            "@navikt/eslint-config-teamsykmelding",
+            "next/core-web-vitals"
+        ],
+        "rules": {
+            "@typescript-eslint/explicit-function-return-type": "off"
+        }
+    }
+}

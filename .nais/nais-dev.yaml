@@ -1,0 +1,48 @@
+apiVersion: 'nais.io/v1alpha1'
+kind: 'Application'
+metadata:
+  name: sp-kodeverk
+  namespace: speilvendt
+  annotations:
+    snorlax.nais.io/enabled: 'false'
+  labels:
+    team: speilvendt
+spec:
+  image: {{image}}
+  port: 3000
+  ingresses:
+    - https://sp-kodeverk.ekstern.dev.nav.no
+  replicas:
+    min: 1
+    max: 1
+    scalingStrategy:
+      cpu:
+        thresholdPercentage: 90
+  preStopHook:
+    http:
+      path: /api/internal/preStop
+      port: 3000
+  azure:
+    application:
+      enabled: true
+      tenant: nav.no
+      allowAllUsers: true #TODO legg til validering mot en AD gruppe
+    sidecar:
+      enabled: true
+      autoLogin: true
+      autoLoginIgnorePaths:
+        - /_next/*
+        - /public/*
+  resources:
+    limits:
+      memory: 350Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
+  liveness:
+    path: /api/internal/isAlive
+  readiness:
+    path: /api/internal/isAlive
+  startup:
+    path: /api/internal/isAlive
+    initialDelay: 10
