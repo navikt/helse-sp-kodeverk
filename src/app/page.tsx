@@ -101,6 +101,7 @@ const Page = () => {
         const newVilkår: Vilkår = {
             vilkårskode: '',
             beskrivelse: '',
+            kategori: '',
             vilkårshjemmel: {
                 lovverk: '',
                 lovverksversjon: '',
@@ -249,6 +250,15 @@ const Page = () => {
                                     type="text"
                                     value={vilkår.vilkårskode}
                                     onChange={(e) => handleVilkårChange(vilkårIndex, 'vilkårskode', e.target.value)}
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label className="mb-1 block text-sm font-medium">Kategori</label>
+                                <input
+                                    type="text"
+                                    value={vilkår.kategori}
+                                    onChange={(e) => handleVilkårChange(vilkårIndex, 'kategori', e.target.value)}
                                     className="w-full rounded border p-2"
                                 />
                             </div>

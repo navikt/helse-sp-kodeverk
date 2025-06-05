@@ -23,6 +23,7 @@ export const vilkårSchema = z.object({
     vilkårshjemmel: vilkårshjemmelSchema,
     vilkårskode: z.string(),
     beskrivelse: z.string(),
+    kategori: z.string(),
     mulige_resultater: z.object({
         OPPFYLT: z.array(årsakSchema),
         IKKE_OPPFYLT: z.array(årsakSchema),
@@ -50,6 +51,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'MAA_SOKE_INNEN_TRE_MAANEDER',
         beskrivelse: 'En ytelse gis for opptil tre måneder før den måneden da kravet ble satt fram',
+        kategori: '',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -77,6 +79,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'BOINO',
         beskrivelse: 'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
+        kategori: '',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -104,6 +107,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'ARBUFOR',
         beskrivelse: 'Arbeidsufør',
+        kategori: '',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -131,6 +135,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'OPPTJT',
         beskrivelse: 'Opptjeningstid',
+        kategori: '',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -218,6 +223,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'MINSTEINNT',
         beskrivelse: 'Har opparbeidet minste inntekt (1/2G) - inntektsgrunnlaget',
+        kategori: '',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -245,6 +251,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'INNTAP',
         beskrivelse: 'Har tapt pensjonsgivende inntekt på grunn av arbeidsuførhet',
+        kategori: '',
         mulige_resultater: {
             OPPFYLT: [
                 {
