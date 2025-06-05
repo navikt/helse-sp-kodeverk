@@ -268,3 +268,9 @@ export const kodeverk: Kodeverk = [
         },
     },
 ]
+
+export const kodeverkFormSchema = z.object({
+    vilkar: kodeverkSchema,
+})
+
+export type KodeverkForm = z.infer<typeof kodeverkFormSchema>

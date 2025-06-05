@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
 
+import { kodeverkSchema } from '@/kodeverk/kodeverk'
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
 
 const storage = new Storage()
@@ -11,12 +12,22 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
     return await beskyttetApi<object>(request, async (payload): Promise<NextResponse<object>> => {
         try {
             const body = await request.json()
+
+            // Validate request body against schema
+            const validationResult = kodeverkSchema.safeParse(body)
+            if (!validationResult.success) {
+                return NextResponse.json(
+                    { error: 'Invalid kodeverk format', details: validationResult.error.format() },
+                    { status: 400 },
+                )
+            }
+
             // filename is current timestamp
             const fileName = `kodeverk-${Date.now()}.json`
             const bucket = storage.bucket(bucketName)
             const file = bucket.file(fileName)
 
-            await file.save(JSON.stringify(body), {
+            await file.save(JSON.stringify(validationResult.data), {
                 contentType: 'application/json',
                 metadata: {
                     metadata: {
