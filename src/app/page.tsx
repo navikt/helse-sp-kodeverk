@@ -16,7 +16,6 @@ import {
     DragEndEvent,
 } from '@dnd-kit/core'
 import {
-    arrayMove,
     SortableContext,
     sortableKeyboardCoordinates,
     useSortable,
@@ -65,8 +64,28 @@ const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCard
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <ExpansionCard {...props}>{children}</ExpansionCard>
+        <div ref={setNodeRef} style={style} className="flex items-start gap-2">
+            <div
+                {...attributes}
+                {...listeners}
+                className="mt-6 cursor-grab rounded p-2 hover:bg-gray-100"
+                role="button"
+                tabIndex={0}
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-500"
+                >
+                    <path d="M8 10H16M8 14H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+            </div>
+            <div className="flex-1">
+                <ExpansionCard {...props}>{children}</ExpansionCard>
+            </div>
         </div>
     )
 }
@@ -97,7 +116,7 @@ const Page = () => {
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
-        })
+        }),
     )
 
     const handleDragEnd = (event: DragEndEvent) => {
