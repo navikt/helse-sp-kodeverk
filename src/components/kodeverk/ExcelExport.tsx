@@ -64,7 +64,11 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
                 årsakKode: res.årsakKode,
                 årsakBeskrivelse: res.årsakBeskrivelse,
                 årsakLovverk: res.årsakLovverk,
+                årsakLovverkversjon: res.årsakLovverkversjon,
                 årsakParagraf: res.årsakParagraf,
+                årsakLedd: res.årsakLedd,
+                årsakSetning: res.årsakSetning,
+                årsakBokstav: res.årsakBokstav,
             })
         })
     }
