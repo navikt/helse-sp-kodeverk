@@ -1,32 +1,41 @@
-import { Maybe } from '@utils/tsUtils'
+import { z } from 'zod'
 
-export type Vilkårshjemmel = {
-    lovverk: string
-    lovverksversjon: string
-    paragraf: string
-    ledd: Maybe<string>
-    setning: Maybe<string>
-    bokstav: Maybe<string>
-}
+// Basert på Maybe<T> = T | null | undefined
+const maybeString = z.string().nullable().optional()
 
-export type Årsak = {
-    kode: string
-    beskrivelse: string
-    vilkårshjemmel?: Vilkårshjemmel
-}
+export const vilkårshjemmelSchema = z.object({
+    lovverk: z.string(),
+    lovverksversjon: z.string(), // evt. valider som datoformat om ønskelig
+    paragraf: z.string(),
+    ledd: maybeString,
+    setning: maybeString,
+    bokstav: maybeString,
+})
 
-export type Vilkår = {
-    vilkårshjemmel: Vilkårshjemmel
-    vilkårskode: string
-    beskrivelse: string
-    mulige_resultater: {
-        OPPFYLT: Årsak[]
-        IKKE_OPPFYLT: Årsak[]
-        IKKE_RELEVANT?: Årsak[]
-    }
-}
+export const årsakSchema = z.object({
+    kode: z.string(),
+    beskrivelse: z.string(),
+    vilkårshjemmel: vilkårshjemmelSchema.optional(), // noen Årsak-er har dette
+})
+export type Årsak = z.infer<typeof årsakSchema>
 
-export type Kodeverk = Vilkår[]
+export const vilkårSchema = z.object({
+    vilkårshjemmel: vilkårshjemmelSchema,
+    vilkårskode: z.string(),
+    beskrivelse: z.string(),
+    mulige_resultater: z.object({
+        OPPFYLT: z.array(årsakSchema),
+        IKKE_OPPFYLT: z.array(årsakSchema),
+        IKKE_RELEVANT: z.array(årsakSchema).optional(),
+    }),
+})
+
+export type Vilkår = z.infer<typeof vilkårSchema>
+export type Vilkårshjemmel = z.infer<typeof vilkårshjemmelSchema>
+
+// Hele kodeverket
+export const kodeverkSchema = z.array(vilkårSchema)
+export type Kodeverk = z.infer<typeof kodeverkSchema>
 
 export const kodeverk: Kodeverk = [
     // Ftrl 22-13 3

@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 
-import { type Kodeverk, type Vilkår, type Årsak, type Vilkårshjemmel } from '@components/kodeverk'
+import { Kodeverk, Vilkår, Vilkårshjemmel, Årsak } from '@/kodeverk/kodeverk'
 
 const fetchKodeverk = async (): Promise<Kodeverk> => {
     const response = await fetch('/api/v1/open/kodeverk')

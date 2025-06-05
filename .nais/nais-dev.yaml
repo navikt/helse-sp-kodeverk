@@ -39,6 +39,9 @@ spec:
         - /_next/*
         - /public/*
         - /api/v1/open/*
+  gcp:
+    buckets:
+      - name: helse-sp-kodeverk
   resources:
     limits:
       memory: 350Mi
