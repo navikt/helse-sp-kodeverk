@@ -22,9 +22,20 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { DragVerticalIcon } from '@navikt/aksel-icons'
 
-import { Vilkår, kodeverkFormSchema, KodeverkForm } from '@/kodeverk/kodeverk'
+import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/kodeverk/kodeverk'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
+import { ExcelExport } from '@/components/kodeverk/ExcelExport'
+
+const formatParagraf = (hjemmel: Vilkårshjemmel) => {
+    const { lovverk, paragraf, ledd, setning, bokstav } = hjemmel
+    let result = `${lovverk} § ${paragraf}`
+    if (ledd) result += ` ${ledd}. ledd`
+    if (setning) result += ` ${setning}. setning`
+    if (bokstav) result += ` bokstav ${bokstav}`
+    return result
+}
 
 const fetchKodeverk = async (): Promise<KodeverkForm> => {
     const response = await fetch('/api/v1/open/kodeverk')
@@ -72,16 +83,7 @@ const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCard
                 role="button"
                 tabIndex={0}
             >
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-gray-500"
-                >
-                    <path d="M8 10H16M8 14H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+                <DragVerticalIcon className="h-5 w-5 text-gray-400" />
             </div>
             <div className="flex-1">
                 <ExpansionCard {...props}>{children}</ExpansionCard>
@@ -197,9 +199,12 @@ const Page = () => {
                     <Heading level="1" size="large">
                         Rediger Kodeverk
                     </Heading>
-                    <Button type="button" onClick={addVilkår} variant="primary">
-                        Legg til vilkår
-                    </Button>
+                    <div className="flex gap-4">
+                        <ExcelExport kodeverk={{ vilkar: fields }} />
+                        <Button type="button" onClick={addVilkår} variant="primary">
+                            Legg til vilkår
+                        </Button>
+                    </div>
                 </div>
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
@@ -207,6 +212,9 @@ const Page = () => {
                             <SortableExpansionCard key={field.id} id={field.id} aria-label="Vilkår" className="mb-4">
                                 <ExpansionCard.Header>
                                     <ExpansionCard.Title>{field.beskrivelse || 'Nytt vilkår'}</ExpansionCard.Title>
+                                    <ExpansionCard.Description>
+                                        {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
+                                    </ExpansionCard.Description>
                                 </ExpansionCard.Header>
                                 <ExpansionCard.Content>
                                     <VilkårForm
