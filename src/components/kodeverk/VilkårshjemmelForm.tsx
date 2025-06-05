@@ -10,85 +10,49 @@ interface VilkårshjemmelFormProps {
     control: Control<KodeverkForm>
     index: number
     errors: FieldErrors<KodeverkForm>
+    resultIndex?: number
+    resultType?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'IKKE_RELEVANT'
 }
 
-export const VilkårshjemmelForm = ({ control, index, errors }: VilkårshjemmelFormProps) => {
+type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'paragraf' | 'ledd' | 'setning' | 'bokstav'
+
+export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resultType }: VilkårshjemmelFormProps) => {
+    const getFieldName = (field: VilkårshjemmelField) => {
+        if (resultIndex !== undefined && resultType) {
+            return `vilkar.${index}.mulige_resultater.${resultType}.${resultIndex}.vilkårshjemmel.${field}` as const
+        }
+        return `vilkar.${index}.vilkårshjemmel.${field}` as const
+    }
+
+    const getError = (field: VilkårshjemmelField) => {
+        if (resultIndex !== undefined && resultType) {
+            const resultErrors = errors?.vilkar?.[index]?.mulige_resultater?.[resultType]?.[resultIndex]?.vilkårshjemmel
+            return resultErrors?.[field]?.message
+        }
+        return errors?.vilkar?.[index]?.vilkårshjemmel?.[field]?.message
+    }
+
+    const fields: VilkårshjemmelField[] = ['lovverk', 'lovverksversjon', 'paragraf', 'ledd', 'setning', 'bokstav']
+
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-semibold">Vilkårshjemmel</h3>
             <div className="grid grid-cols-2 gap-4">
-                <Controller
-                    name={`vilkar.${index}.vilkårshjemmel.lovverk` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Lovverk"
-                            error={errors?.vilkar?.[index]?.vilkårshjemmel?.lovverk?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
-                <Controller
-                    name={`vilkar.${index}.vilkårshjemmel.lovverksversjon` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Lovverksversjon"
-                            error={errors?.vilkar?.[index]?.vilkårshjemmel?.lovverksversjon?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
-                <Controller
-                    name={`vilkar.${index}.vilkårshjemmel.paragraf` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Paragraf"
-                            error={errors?.vilkar?.[index]?.vilkårshjemmel?.paragraf?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
-                <Controller
-                    name={`vilkar.${index}.vilkårshjemmel.ledd` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Ledd"
-                            error={errors?.vilkar?.[index]?.vilkårshjemmel?.ledd?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
-                <Controller
-                    name={`vilkar.${index}.vilkårshjemmel.setning` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Setning"
-                            error={errors?.vilkar?.[index]?.vilkårshjemmel?.setning?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
-                <Controller
-                    name={`vilkar.${index}.vilkårshjemmel.bokstav` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Bokstav"
-                            error={errors?.vilkar?.[index]?.vilkårshjemmel?.bokstav?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
+                {fields.map((field) => (
+                    <Controller
+                        key={field}
+                        name={getFieldName(field)}
+                        control={control}
+                        render={({ field: { value, ...fieldProps } }) => (
+                            <TextField
+                                {...fieldProps}
+                                label={field.charAt(0).toUpperCase() + field.slice(1)}
+                                error={getError(field)}
+                                value={value || ''}
+                            />
+                        )}
+                    />
+                ))}
             </div>
         </div>
     )

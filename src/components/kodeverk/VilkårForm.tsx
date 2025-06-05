@@ -212,49 +212,62 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     <div>
                         <h4 className="text-md mb-2 font-medium">Ikke Relevante</h4>
                         {ikkeRelevantFields.map((field, resultIndex) => (
-                            <div key={field.id} className="mb-4 flex items-start gap-4">
-                                <Controller
-                                    name={
-                                        `vilkar.${index}.mulige_resultater.IKKE_RELEVANT.${resultIndex}.kode` as const
-                                    }
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label="Kode"
-                                            error={
-                                                errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[resultIndex]
-                                                    ?.kode?.message
-                                            }
-                                            value={field.value || ''}
-                                        />
-                                    )}
-                                />
-                                <Controller
-                                    name={
-                                        `vilkar.${index}.mulige_resultater.IKKE_RELEVANT.${resultIndex}.beskrivelse` as const
-                                    }
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label="Beskrivelse"
-                                            error={
-                                                errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[resultIndex]
-                                                    ?.beskrivelse?.message
-                                            }
-                                            value={field.value || ''}
-                                        />
-                                    )}
-                                />
-                                <Button
-                                    type="button"
-                                    variant="tertiary"
-                                    onClick={() => removeIkkeRelevant(resultIndex)}
-                                    className="mt-6"
-                                >
-                                    Fjern
-                                </Button>
+                            <div key={field.id} className="mb-4 flex flex-col gap-4">
+                                <div className="flex items-start gap-4">
+                                    <Controller
+                                        name={
+                                            `vilkar.${index}.mulige_resultater.IKKE_RELEVANT.${resultIndex}.kode` as const
+                                        }
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                label="Kode"
+                                                error={
+                                                    errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[
+                                                        resultIndex
+                                                    ]?.kode?.message
+                                                }
+                                                value={field.value || ''}
+                                            />
+                                        )}
+                                    />
+                                    <Controller
+                                        name={
+                                            `vilkar.${index}.mulige_resultater.IKKE_RELEVANT.${resultIndex}.beskrivelse` as const
+                                        }
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                label="Beskrivelse"
+                                                error={
+                                                    errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[
+                                                        resultIndex
+                                                    ]?.beskrivelse?.message
+                                                }
+                                                value={field.value || ''}
+                                            />
+                                        )}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="tertiary"
+                                        onClick={() => removeIkkeRelevant(resultIndex)}
+                                        className="mt-6"
+                                    >
+                                        Fjern
+                                    </Button>
+                                </div>
+                                <div className="ml-4">
+                                    <VilkårshjemmelForm
+                                        control={control}
+                                        index={index}
+                                        errors={errors}
+                                        resultIndex={resultIndex}
+                                        resultType="IKKE_RELEVANT"
+                                    />
+                                </div>
                             </div>
                         ))}
                         <Button
@@ -264,6 +277,14 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                 appendIkkeRelevant({
                                     kode: '',
                                     beskrivelse: '',
+                                    vilkårshjemmel: {
+                                        lovverk: '',
+                                        lovverksversjon: '',
+                                        paragraf: '',
+                                        ledd: null,
+                                        setning: null,
+                                        bokstav: null,
+                                    },
                                 })
                             }
                         >
