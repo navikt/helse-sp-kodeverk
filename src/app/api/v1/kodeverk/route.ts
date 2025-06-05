@@ -1,14 +1,36 @@
 import { NextResponse } from 'next/server'
+import { Storage } from '@google-cloud/storage'
 
-import { ErrorResponse } from '@/auth/beskyttetApi'
+import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
 
-export async function POST(): Promise<NextResponse<object | ErrorResponse>> {
-    try {
-        //  const body = await request.json()
-        // Here you would typically save the kodeverk to a database
-        // For now, we'll just return success
-        return NextResponse.json({ success: true })
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to save kodeverk' }, { status: 500 })
-    }
+const storage = new Storage()
+
+const bucketName = 'helse-sp-kodeverk'
+
+export async function POST(request: Request): Promise<NextResponse<object | ErrorResponse>> {
+    return await beskyttetApi<object>(request, async (payload): Promise<NextResponse<object>> => {
+        try {
+            const body = await request.json()
+            // filename is current timestamp
+            const fileName = `kodeverk-${Date.now()}.json`
+            const bucket = storage.bucket(bucketName)
+            const file = bucket.file(fileName)
+
+            await file.save(JSON.stringify(body), {
+                contentType: 'application/json',
+                metadata: {
+                    metadata: {
+                        // <--- dette er custom metadata
+                        createdBy: payload.preferred_username || 'unknown',
+                        createdAt: new Date().toISOString(),
+                    },
+                },
+            })
+            // Here you would typically save the kodeverk to a database
+            // For now, we'll just return success
+            return NextResponse.json({ success: true })
+        } catch (error) {
+            return NextResponse.json({ error: 'Failed to save kodeverk' }, { status: 500 })
+        }
+    })
 }

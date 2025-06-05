@@ -11,7 +11,7 @@ export interface ErrorResponse {
 
 export async function beskyttetApi<T>(
     req: Request,
-    handler: (payload: Partial<AzurePayload>) => NextResponse<T>,
+    handler: (payload: Partial<AzurePayload>) => Promise<NextResponse<T>>,
 ): Promise<NextResponse<ErrorResponse | T>> {
     if (erLokalEllerDemo) {
         return handler({ NAVident: 'D123456', name: 'Saks Behandlersen', preferred_username: 'test.testesen@nav.no' })
