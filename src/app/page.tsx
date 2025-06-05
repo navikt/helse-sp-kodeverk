@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@navikt/ds-react'
+import { Button, ErrorSummary, TextField, Textarea, Heading, Box } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 
 import { Kodeverk, Vilkår, Vilkårshjemmel, Årsak, kodeverkSchema } from '@/kodeverk/kodeverk'
@@ -171,10 +171,9 @@ const Page = () => {
     return (
         <div className="p-6">
             {validationError && (
-                <div className="mb-4 rounded bg-red-100 p-4 text-red-700">
-                    <p className="font-medium">Valideringsfeil:</p>
-                    <p>{validationError}</p>
-                </div>
+                <ErrorSummary heading="For å gå videre må du rette opp følgende:">
+                    <ErrorSummary.Item>{validationError}</ErrorSummary.Item>
+                </ErrorSummary>
             )}
             {hasUnsavedChanges && (
                 <div className="fixed right-4 bottom-4 z-50">
@@ -188,130 +187,110 @@ const Page = () => {
                 </div>
             )}
             <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Rediger Kodeverk</h1>
-                <button onClick={addVilkår} className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+                <Heading level="1" size="large">
+                    Rediger Kodeverk
+                </Heading>
+                <Button onClick={addVilkår} variant="primary">
                     Legg til vilkår
-                </button>
+                </Button>
             </div>
             {localKodeverk.map((vilkår, vilkårIndex) => (
-                <ExpansionCard key={vilkårIndex} aria-label="sdfgsdf" className="mb-4">
+                <ExpansionCard key={vilkårIndex} aria-label="Vilkår" className="mb-4">
                     <ExpansionCard.Header>
                         <ExpansionCard.Title>{vilkår.beskrivelse}</ExpansionCard.Title>
                     </ExpansionCard.Header>
                     <ExpansionCard.Content>
-                        <div className="mb-4 flex items-center justify-between">
-                            <button
-                                onClick={() => removeVilkår(vilkårIndex)}
-                                className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
-                            >
-                                Fjern vilkår
-                            </button>
-                        </div>
+                        <Box padding="4">
+                            <div className="mb-4 flex items-center justify-between">
+                                <Button onClick={() => removeVilkår(vilkårIndex)} variant="danger" size="small">
+                                    Fjern vilkår
+                                </Button>
+                            </div>
 
-                        {/* Vilkårshjemmel */}
-                        <div className="mb-4">
-                            <h3 className="mb-2 font-medium">Vilkårshjemmel</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="mb-1 block text-sm font-medium">Lovverk</label>
-                                    <input
-                                        type="text"
+                            {/* Vilkårshjemmel */}
+                            <div className="mb-4">
+                                <Heading level="3" size="small" className="mb-2">
+                                    Vilkårshjemmel
+                                </Heading>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <TextField
+                                        label="Lovverk"
                                         value={vilkår.vilkårshjemmel.lovverk}
                                         onChange={(e) =>
                                             handleVilkårshjemmelChange(vilkårIndex, 'lovverk', e.target.value)
                                         }
-                                        className="w-full rounded border p-2"
                                     />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-sm font-medium">Lovverksversjon</label>
-                                    <input
-                                        type="text"
+                                    <TextField
+                                        label="Lovverksversjon"
                                         value={vilkår.vilkårshjemmel.lovverksversjon}
                                         onChange={(e) =>
                                             handleVilkårshjemmelChange(vilkårIndex, 'lovverksversjon', e.target.value)
                                         }
-                                        className="w-full rounded border p-2"
                                     />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-sm font-medium">Paragraf</label>
-                                    <input
-                                        type="text"
+                                    <TextField
+                                        label="Paragraf"
                                         value={vilkår.vilkårshjemmel.paragraf}
                                         onChange={(e) =>
                                             handleVilkårshjemmelChange(vilkårIndex, 'paragraf', e.target.value)
                                         }
-                                        className="w-full rounded border p-2"
                                     />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-sm font-medium">Ledd</label>
-                                    <input
-                                        type="text"
+                                    <TextField
+                                        label="Ledd"
                                         value={vilkår.vilkårshjemmel.ledd || ''}
                                         onChange={(e) =>
                                             handleVilkårshjemmelChange(vilkårIndex, 'ledd', e.target.value || null)
                                         }
-                                        className="w-full rounded border p-2"
                                     />
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Vilkårskode og beskrivelse */}
-                        <div className="mb-4">
-                            <div className="mb-2">
-                                <label className="mb-1 block text-sm font-medium">Vilkårskode</label>
-                                <input
-                                    type="text"
+                            {/* Vilkårskode og beskrivelse */}
+                            <div className="mb-4">
+                                <TextField
+                                    label="Vilkårskode"
                                     value={vilkår.vilkårskode}
                                     onChange={(e) => handleVilkårChange(vilkårIndex, 'vilkårskode', e.target.value)}
-                                    className="w-full rounded border p-2"
+                                    className="mb-2"
                                 />
-                            </div>
-                            <div className="mb-2">
-                                <label className="mb-1 block text-sm font-medium">Kategori</label>
-                                <input
-                                    type="text"
+                                <TextField
+                                    label="Kategori"
                                     value={vilkår.kategori}
                                     onChange={(e) => handleVilkårChange(vilkårIndex, 'kategori', e.target.value)}
-                                    className="w-full rounded border p-2"
+                                    className="mb-2"
                                 />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm font-medium">Beskrivelse</label>
-                                <textarea
+                                <Textarea
+                                    label="Beskrivelse"
                                     value={vilkår.beskrivelse}
                                     onChange={(e) => handleVilkårChange(vilkårIndex, 'beskrivelse', e.target.value)}
-                                    className="w-full rounded border p-2"
                                     rows={3}
                                 />
                             </div>
-                        </div>
 
-                        {/* Mulige resultater */}
-                        <div>
-                            <h3 className="mb-2 font-medium">Mulige resultater</h3>
-                            {(['OPPFYLT', 'IKKE_OPPFYLT', 'IKKE_RELEVANT'] as const).map((resultatType) => (
-                                <div key={resultatType} className="mb-4">
-                                    <div className="mb-2 flex items-center justify-between">
-                                        <h4 className="font-medium">{resultatType}</h4>
-                                        <button
-                                            onClick={() => addÅrsak(vilkårIndex, resultatType)}
-                                            className="rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600"
-                                        >
-                                            Legg til årsak
-                                        </button>
-                                    </div>
-                                    {vilkår.mulige_resultater[resultatType]?.map((årsak, årsakIndex) => (
-                                        <div key={årsakIndex} className="mb-2 rounded border p-2">
-                                            <div className="mb-2 flex items-start justify-between">
-                                                <div className="flex-grow">
-                                                    <div className="mb-2">
-                                                        <label className="mb-1 block text-sm font-medium">Kode</label>
-                                                        <input
-                                                            type="text"
+                            {/* Mulige resultater */}
+                            <div>
+                                <Heading level="3" size="small" className="mb-2">
+                                    Mulige resultater
+                                </Heading>
+                                {(['OPPFYLT', 'IKKE_OPPFYLT', 'IKKE_RELEVANT'] as const).map((resultatType) => (
+                                    <div key={resultatType} className="mb-4">
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <Heading level="4" size="xsmall">
+                                                {resultatType}
+                                            </Heading>
+                                            <Button
+                                                onClick={() => addÅrsak(vilkårIndex, resultatType)}
+                                                variant="secondary"
+                                                size="small"
+                                            >
+                                                Legg til årsak
+                                            </Button>
+                                        </div>
+                                        {vilkår.mulige_resultater[resultatType]?.map((årsak, årsakIndex) => (
+                                            <Box key={årsakIndex} padding="4" className="mb-2">
+                                                <div className="mb-2 flex items-start justify-between">
+                                                    <div className="flex-grow">
+                                                        <TextField
+                                                            label="Kode"
                                                             value={årsak.kode}
                                                             onChange={(e) =>
                                                                 handleÅrsakChange(
@@ -322,14 +301,10 @@ const Page = () => {
                                                                     e.target.value,
                                                                 )
                                                             }
-                                                            className="w-full rounded border p-2"
+                                                            className="mb-2"
                                                         />
-                                                    </div>
-                                                    <div>
-                                                        <label className="mb-1 block text-sm font-medium">
-                                                            Beskrivelse
-                                                        </label>
-                                                        <textarea
+                                                        <Textarea
+                                                            label="Beskrivelse"
                                                             value={årsak.beskrivelse}
                                                             onChange={(e) =>
                                                                 handleÅrsakChange(
@@ -340,23 +315,26 @@ const Page = () => {
                                                                     e.target.value,
                                                                 )
                                                             }
-                                                            className="w-full rounded border p-2"
                                                             rows={2}
                                                         />
                                                     </div>
+                                                    <Button
+                                                        onClick={() =>
+                                                            removeÅrsak(vilkårIndex, resultatType, årsakIndex)
+                                                        }
+                                                        variant="danger"
+                                                        size="small"
+                                                        className="ml-2"
+                                                    >
+                                                        Fjern
+                                                    </Button>
                                                 </div>
-                                                <button
-                                                    onClick={() => removeÅrsak(vilkårIndex, resultatType, årsakIndex)}
-                                                    className="ml-2 rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-                                                >
-                                                    Fjern
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ))}
-                        </div>
+                                            </Box>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </Box>
                     </ExpansionCard.Content>
                 </ExpansionCard>
             ))}
