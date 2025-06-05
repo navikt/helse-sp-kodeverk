@@ -6,6 +6,23 @@ import { Button, ErrorSummary, Heading } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core'
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 import { Vilkår, kodeverkFormSchema, KodeverkForm } from '@/kodeverk/kodeverk'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
@@ -32,6 +49,28 @@ const saveKodeverk = async (kodeverk: KodeverkForm): Promise<void> => {
     }
 }
 
+interface SortableExpansionCardProps {
+    id: string
+    children: React.ReactNode
+    'aria-label': string
+    className?: string
+}
+
+const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCardProps) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    }
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            <ExpansionCard {...props}>{children}</ExpansionCard>
+        </div>
+    )
+}
+
 const Page = () => {
     const queryClient = useQueryClient()
     const { data: serverKodeverk, isLoading } = useQuery({
@@ -49,10 +88,27 @@ const Page = () => {
         defaultValues: { vilkar: [] },
     })
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields, append, remove, move } = useFieldArray({
         control,
         name: 'vilkar',
     })
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    )
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event
+
+        if (over && active.id !== over.id) {
+            const oldIndex = fields.findIndex((field) => field.id === active.id)
+            const newIndex = fields.findIndex((field) => field.id === over.id)
+            move(oldIndex, newIndex)
+        }
+    }
 
     const [validationError, setValidationError] = useState<string | null>(null)
 
@@ -126,21 +182,25 @@ const Page = () => {
                         Legg til vilkår
                     </Button>
                 </div>
-                {fields.map((field, index) => (
-                    <ExpansionCard key={field.id} aria-label="Vilkår" className="mb-4">
-                        <ExpansionCard.Header>
-                            <ExpansionCard.Title>{field.beskrivelse || 'Nytt vilkår'}</ExpansionCard.Title>
-                        </ExpansionCard.Header>
-                        <ExpansionCard.Content>
-                            <VilkårForm
-                                control={control}
-                                index={index}
-                                errors={errors}
-                                onRemove={() => remove(index)}
-                            />
-                        </ExpansionCard.Content>
-                    </ExpansionCard>
-                ))}
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
+                        {fields.map((field, index) => (
+                            <SortableExpansionCard key={field.id} id={field.id} aria-label="Vilkår" className="mb-4">
+                                <ExpansionCard.Header>
+                                    <ExpansionCard.Title>{field.beskrivelse || 'Nytt vilkår'}</ExpansionCard.Title>
+                                </ExpansionCard.Header>
+                                <ExpansionCard.Content>
+                                    <VilkårForm
+                                        control={control}
+                                        index={index}
+                                        errors={errors}
+                                        onRemove={() => remove(index)}
+                                    />
+                                </ExpansionCard.Content>
+                            </SortableExpansionCard>
+                        ))}
+                    </SortableContext>
+                </DndContext>
             </form>
         </div>
     )
