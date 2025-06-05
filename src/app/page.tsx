@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 
-import { Kodeverk, Vilkår, Vilkårshjemmel, Årsak } from '@/kodeverk/kodeverk'
+import { Kodeverk, Vilkår, Vilkårshjemmel, Årsak, kodeverkSchema } from '@/kodeverk/kodeverk'
 
 const fetchKodeverk = async (): Promise<Kodeverk> => {
     const response = await fetch('/api/v1/open/kodeverk')
@@ -16,6 +16,12 @@ const fetchKodeverk = async (): Promise<Kodeverk> => {
 }
 
 const saveKodeverk = async (kodeverk: Kodeverk): Promise<void> => {
+    // Validate the kodeverk against the schema
+    const validationResult = kodeverkSchema.safeParse(kodeverk)
+    if (!validationResult.success) {
+        throw new Error(`Validation failed: ${validationResult.error.message}`)
+    }
+
     const response = await fetch('/api/v1/kodeverk', {
         method: 'POST',
         headers: {
@@ -37,12 +43,17 @@ const Page = () => {
 
     const [localKodeverk, setLocalKodeverk] = useState<Kodeverk>([])
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+    const [validationError, setValidationError] = useState<string | null>(null)
 
     const saveMutation = useMutation({
         mutationFn: saveKodeverk,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['kodeverk'] })
             setHasUnsavedChanges(false)
+            setValidationError(null)
+        },
+        onError: (error: Error) => {
+            setValidationError(error.message)
         },
     })
 
@@ -159,6 +170,12 @@ const Page = () => {
 
     return (
         <div className="p-6">
+            {validationError && (
+                <div className="mb-4 rounded bg-red-100 p-4 text-red-700">
+                    <p className="font-medium">Valideringsfeil:</p>
+                    <p>{validationError}</p>
+                </div>
+            )}
             {hasUnsavedChanges && (
                 <div className="fixed right-4 bottom-4 z-50">
                     <Button

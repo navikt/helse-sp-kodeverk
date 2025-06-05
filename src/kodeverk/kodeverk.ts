@@ -4,8 +4,8 @@ import { z } from 'zod'
 const maybeString = z.string().nullable().optional()
 
 export const vilkårshjemmelSchema = z.object({
-    lovverk: z.string(),
-    lovverksversjon: z.string(), // evt. valider som datoformat om ønskelig
+    lovverk: z.string().min(2),
+    lovverksversjon: z.string().min(2), // evt. valider som datoformat om ønskelig
     paragraf: z.string(),
     ledd: maybeString,
     setning: maybeString,
@@ -13,17 +13,17 @@ export const vilkårshjemmelSchema = z.object({
 })
 
 export const årsakSchema = z.object({
-    kode: z.string(),
-    beskrivelse: z.string(),
+    kode: z.string().min(2),
+    beskrivelse: z.string().min(2),
     vilkårshjemmel: vilkårshjemmelSchema.optional(), // noen Årsak-er har dette
 })
 export type Årsak = z.infer<typeof årsakSchema>
 
 export const vilkårSchema = z.object({
     vilkårshjemmel: vilkårshjemmelSchema,
-    vilkårskode: z.string(),
-    beskrivelse: z.string(),
-    kategori: z.string(),
+    vilkårskode: z.string().min(5),
+    beskrivelse: z.string().min(5),
+    kategori: z.string().min(2),
     mulige_resultater: z.object({
         OPPFYLT: z.array(årsakSchema),
         IKKE_OPPFYLT: z.array(årsakSchema),
