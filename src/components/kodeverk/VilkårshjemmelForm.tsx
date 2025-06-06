@@ -1,7 +1,7 @@
 'use client'
 
 import { Control, FieldErrors } from 'react-hook-form'
-import { TextField } from '@navikt/ds-react'
+import { Heading, TextField } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 
 import { KodeverkForm } from '@/kodeverk/kodeverk'
@@ -36,9 +36,11 @@ export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resul
 
     return (
         <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Vilkårshjemmel</h3>
+            <Heading size="small" level="3">
+                Vilkårshjemmel
+            </Heading>
             <div className="grid grid-cols-2 gap-4">
-                {fields.map((field) => (
+                {fields.slice(0, 2).map((field) => (
                     <Controller
                         key={field}
                         name={getFieldName(field)}
@@ -46,6 +48,25 @@ export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resul
                         render={({ field: { value, ...fieldProps } }) => (
                             <TextField
                                 {...fieldProps}
+                                size="small"
+                                label={field.charAt(0).toUpperCase() + field.slice(1)}
+                                error={getError(field)}
+                                value={value || ''}
+                            />
+                        )}
+                    />
+                ))}
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+                {fields.slice(2).map((field) => (
+                    <Controller
+                        key={field}
+                        name={getFieldName(field)}
+                        control={control}
+                        render={({ field: { value, ...fieldProps } }) => (
+                            <TextField
+                                {...fieldProps}
+                                size="small"
                                 label={field.charAt(0).toUpperCase() + field.slice(1)}
                                 error={getError(field)}
                                 value={value || ''}

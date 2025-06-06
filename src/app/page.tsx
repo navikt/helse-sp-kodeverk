@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button, ErrorSummary, Heading } from '@navikt/ds-react'
+import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -132,12 +132,35 @@ const Page = () => {
     }
 
     const [validationError, setValidationError] = useState<string | null>(null)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
 
     const saveMutation = useMutation({
         mutationFn: saveKodeverk,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['kodeverk'] })
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['kodeverk'] })
             setValidationError(null)
+
+            // Hent de oppdaterte dataene og resett skjemaet eksplisitt
+            const updatedData = queryClient.getQueryData<KodeverkForm>(['kodeverk'])
+            if (updatedData) {
+                reset(updatedData)
+            }
+
+            // Vis success-melding
+            setShowSuccess(true)
+
+            // Fjern eventuell eksisterende timer
+            if (successTimer) {
+                clearTimeout(successTimer)
+            }
+
+            // Sett ny timer for å skjule success-melding etter 4 sekunder
+            const timer = setTimeout(() => {
+                setShowSuccess(false)
+                setSuccessTimer(null)
+            }, 4000)
+            setSuccessTimer(timer)
         },
         onError: (error: Error) => {
             setValidationError(error.message)
@@ -149,6 +172,23 @@ const Page = () => {
             reset(serverKodeverk)
         }
     }, [serverKodeverk, reset])
+
+    // Cleanup timer ved unmount
+    useEffect(() => {
+        return () => {
+            if (successTimer) {
+                clearTimeout(successTimer)
+            }
+        }
+    }, [successTimer])
+
+    const handleCloseSuccess = () => {
+        setShowSuccess(false)
+        if (successTimer) {
+            clearTimeout(successTimer)
+            setSuccessTimer(null)
+        }
+    }
 
     const onSubmit = (data: KodeverkForm) => {
         // Fjern tomme IKKE_RELEVANT arrays
@@ -207,6 +247,13 @@ const Page = () => {
                     <Button onClick={handleSubmit(onSubmit)} loading={saveMutation.isPending} variant="primary">
                         Lagre endringer
                     </Button>
+                </div>
+            )}
+            {showSuccess && (
+                <div className="fixed right-4 bottom-4 z-50">
+                    <Alert variant="success" closeButton onClose={handleCloseSuccess}>
+                        Kodeverket er lagret!
+                    </Alert>
                 </div>
             )}
             <form onSubmit={handleSubmit(onSubmit)}>
