@@ -151,7 +151,22 @@ const Page = () => {
     }, [serverKodeverk, reset])
 
     const onSubmit = (data: KodeverkForm) => {
-        saveMutation.mutate(data)
+        // Fjern tomme IKKE_RELEVANT arrays
+        const cleanedData = {
+            ...data,
+            vilkar: data.vilkar.map((vilkår) => ({
+                ...vilkår,
+                mulige_resultater: {
+                    ...vilkår.mulige_resultater,
+                    IKKE_RELEVANT: vilkår.mulige_resultater.IKKE_RELEVANT?.length
+                        ? vilkår.mulige_resultater.IKKE_RELEVANT
+                        : undefined,
+                    SKAL_IKKE_VURDERES: [],
+                },
+            })),
+        }
+
+        saveMutation.mutate(cleanedData)
     }
 
     const addVilkår = () => {
