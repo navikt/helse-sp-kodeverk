@@ -3,6 +3,14 @@ import { z } from 'zod'
 // Basert på Maybe<T> = T | null | undefined
 const maybeString = z.string().nullable().optional()
 
+export const kategoriEnum = z.enum(['generelle_bestemmelser', 'arbeidstakere', 'selvstendig_næringsdrivende'])
+
+export const kategoriLabels = {
+    generelle_bestemmelser: 'Generelle bestemmelser',
+    arbeidstakere: 'Arbeidstakere',
+    selvstendig_næringsdrivende: 'Selvstendige næringsdrivende',
+} as const
+
 export const vilkårshjemmelSchema = z.object({
     lovverk: z.string().min(2),
     lovverksversjon: z.string().min(2), // evt. valider som datoformat om ønskelig
@@ -23,7 +31,7 @@ export const vilkårSchema = z.object({
     vilkårshjemmel: vilkårshjemmelSchema,
     vilkårskode: z.string().min(5),
     beskrivelse: z.string().min(5),
-    kategori: z.string().min(2),
+    kategori: kategoriEnum,
     mulige_resultater: z.object({
         OPPFYLT: z.array(årsakSchema),
         IKKE_OPPFYLT: z.array(årsakSchema),
@@ -51,7 +59,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'MAA_SOKE_INNEN_TRE_MAANEDER',
         beskrivelse: 'En ytelse gis for opptil tre måneder før den måneden da kravet ble satt fram',
-        kategori: '',
+        kategori: 'generelle_bestemmelser',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -79,7 +87,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'BOINO',
         beskrivelse: 'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
-        kategori: '',
+        kategori: 'generelle_bestemmelser',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -107,7 +115,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'ARBUFOR',
         beskrivelse: 'Arbeidsufør',
-        kategori: '',
+        kategori: 'generelle_bestemmelser',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -135,7 +143,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'OPPTJT',
         beskrivelse: 'Opptjeningstid',
-        kategori: '',
+        kategori: 'generelle_bestemmelser',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -223,7 +231,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'MINSTEINNT',
         beskrivelse: 'Har opparbeidet minste inntekt (1/2G) - inntektsgrunnlaget',
-        kategori: '',
+        kategori: 'generelle_bestemmelser',
         mulige_resultater: {
             OPPFYLT: [
                 {
@@ -251,7 +259,7 @@ export const kodeverk: Kodeverk = [
         },
         vilkårskode: 'INNTAP',
         beskrivelse: 'Har tapt pensjonsgivende inntekt på grunn av arbeidsuførhet',
-        kategori: '',
+        kategori: 'generelle_bestemmelser',
         mulige_resultater: {
             OPPFYLT: [
                 {

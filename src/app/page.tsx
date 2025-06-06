@@ -221,7 +221,7 @@ const Page = () => {
             },
             vilkårskode: '',
             beskrivelse: '',
-            kategori: '',
+            kategori: 'generelle_bestemmelser',
             mulige_resultater: {
                 OPPFYLT: [],
                 IKKE_OPPFYLT: [],

@@ -1,10 +1,10 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
-import { Button, TextField } from '@navikt/ds-react'
+import { Button, Select, TextField } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 
-import { KodeverkForm } from '@/kodeverk/kodeverk'
+import { KodeverkForm, kategoriLabels } from '@/kodeverk/kodeverk'
 
 import { VilkårshjemmelForm } from './VilkårshjemmelForm'
 
@@ -74,12 +74,19 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     name={`vilkar.${index}.kategori` as const}
                     control={control}
                     render={({ field }) => (
-                        <TextField
+                        <Select
                             {...field}
                             label="Kategori"
                             error={errors?.vilkar?.[index]?.kategori?.message}
                             value={field.value || ''}
-                        />
+                        >
+                            <option value="">Velg kategori</option>
+                            {Object.entries(kategoriLabels).map(([value, label]) => (
+                                <option key={value} value={value}>
+                                    {label}
+                                </option>
+                            ))}
+                        </Select>
                     )}
                 />
             </div>
