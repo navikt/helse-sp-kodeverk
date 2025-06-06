@@ -1,7 +1,7 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
-import { Button, Select, TextField, Modal, Heading } from '@navikt/ds-react'
+import { Button, Select, TextField, Modal, Heading, Box } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
@@ -108,9 +108,9 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
 
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Mulige resultater</h3>
-                <div className="space-y-4">
-                    <div>
-                        <h4 className="text-md mb-2 font-medium">Oppfylt</h4>
+                <div className="space-y-6">
+                    <Box padding="4" borderWidth="1" borderRadius="medium">
+                        <h4 className="text-md mb-4 font-medium">Oppfylt</h4>
                         {oppfyltFields.map((field, resultIndex) => (
                             <div key={field.id} className="mb-4 flex items-start gap-4">
                                 <Controller
@@ -137,6 +137,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                         <TextField
                                             {...field}
                                             label="Beskrivelse"
+                                            className="w-100"
                                             error={
                                                 errors?.vilkar?.[index]?.mulige_resultater?.OPPFYLT?.[resultIndex]
                                                     ?.beskrivelse?.message
@@ -167,12 +168,12 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                 })
                             }
                         >
-                            Legg til oppfylt valg
+                            Legg til
                         </Button>
-                    </div>
+                    </Box>
 
-                    <div>
-                        <h4 className="text-md mb-2 font-medium">Ikke Oppfylt</h4>
+                    <Box padding="4" borderWidth="1" borderRadius="medium">
+                        <h4 className="text-md mb-4 font-medium">Ikke oppfylt</h4>
                         {ikkeOppfyltFields.map((field, resultIndex) => (
                             <div key={field.id} className="mb-4 flex items-start gap-4">
                                 <Controller
@@ -199,6 +200,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                         <TextField
                                             {...field}
                                             label="Beskrivelse"
+                                            className="w-100"
                                             error={
                                                 errors?.vilkar?.[index]?.mulige_resultater?.IKKE_OPPFYLT?.[resultIndex]
                                                     ?.beskrivelse?.message
@@ -229,12 +231,12 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                 })
                             }
                         >
-                            Legg til ikke oppfylt valg
+                            Legg til
                         </Button>
-                    </div>
+                    </Box>
 
-                    <div>
-                        <h4 className="text-md mb-2 font-medium">Ikke relevant</h4>
+                    <Box padding="4" borderWidth="1" borderRadius="medium">
+                        <h4 className="text-md mb-4 font-medium">Ikke relevant / unntak</h4>
                         {ikkeRelevantFields.map((field, resultIndex) => (
                             <div key={field.id} className="mb-4 flex flex-col gap-4">
                                 <div className="flex items-start gap-4">
@@ -265,6 +267,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                             <TextField
                                                 {...field}
                                                 label="Beskrivelse"
+                                                className="w-100"
                                                 error={
                                                     errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[
                                                         resultIndex
@@ -314,9 +317,9 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                 })
                             }
                         >
-                            Legg til ikke relevant valg
+                            Legg til
                         </Button>
-                    </div>
+                    </Box>
                 </div>
             </div>
 
