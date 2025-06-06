@@ -1,9 +1,4 @@
-import { z } from 'zod'
-
-// Basert på Maybe<T> = T | null | undefined
-const maybeString = z.string().nullable().optional()
-
-export const kategoriEnum = z.enum(['generelle_bestemmelser', 'arbeidstakere', 'selvstendig_næringsdrivende'])
+import { type Kodeverk } from '@/schemas/kodeverk'
 
 export const kategoriLabels = {
     generelle_bestemmelser: 'Generelle bestemmelser',
@@ -11,45 +6,7 @@ export const kategoriLabels = {
     selvstendig_næringsdrivende: 'Selvstendige næringsdrivende',
 } as const
 
-export const vilkårshjemmelSchema = z.object({
-    lovverk: z.string().min(2),
-    lovverksversjon: z.string().min(2), // evt. valider som datoformat om ønskelig
-    paragraf: z.string(),
-    ledd: maybeString,
-    setning: maybeString,
-    bokstav: maybeString,
-})
-
-export const årsakSchema = z.object({
-    kode: z
-        .string()
-        .min(2)
-        .regex(/^[A-Z0-9_]+$/, 'Kode må kun inneholde store bokstaver A-Z, tall og underscore'),
-    beskrivelse: z.string().min(2),
-    vilkårshjemmel: vilkårshjemmelSchema.optional(), // noen Årsak-er har dette
-})
-export type Årsak = z.infer<typeof årsakSchema>
-
-export const vilkårSchema = z.object({
-    vilkårshjemmel: vilkårshjemmelSchema,
-    vilkårskode: z.string().min(5),
-    beskrivelse: z.string().min(5),
-    kategori: kategoriEnum,
-    mulige_resultater: z.object({
-        OPPFYLT: z.array(årsakSchema),
-        IKKE_OPPFYLT: z.array(årsakSchema),
-        IKKE_RELEVANT: z.array(årsakSchema).optional(),
-    }),
-})
-
-export type Vilkår = z.infer<typeof vilkårSchema>
-export type Vilkårshjemmel = z.infer<typeof vilkårshjemmelSchema>
-
-// Hele kodeverket
-export const kodeverkSchema = z.array(vilkårSchema)
-export type Kodeverk = z.infer<typeof kodeverkSchema>
-
-export const kodeverk: Kodeverk = [
+export const lokalUtviklingKodeverk: Kodeverk = [
     // Ftrl 22-13 3
     {
         vilkårshjemmel: {
@@ -279,9 +236,3 @@ export const kodeverk: Kodeverk = [
         },
     },
 ]
-
-export const kodeverkFormSchema = z.object({
-    vilkar: kodeverkSchema,
-})
-
-export type KodeverkForm = z.infer<typeof kodeverkFormSchema>

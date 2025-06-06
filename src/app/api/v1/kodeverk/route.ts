@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
 
-import { kodeverkSchema } from '@/kodeverk/kodeverk'
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
+import { kodeverkSchema } from '@schemas/kodeverk'
+import { kodeverkStore } from '@/mockapi/storage'
 
 const storage = new Storage()
 
@@ -20,6 +21,12 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
                     { error: 'Invalid kodeverk format', details: validationResult.error.format() },
                     { status: 400 },
                 )
+            }
+
+            // hvis development oppdater lokalt kodeverk
+            if (process.env.NODE_ENV === 'development') {
+                kodeverkStore.kodeverk = validationResult.data
+                return NextResponse.json({ success: true })
             }
 
             // filename is current timestamp

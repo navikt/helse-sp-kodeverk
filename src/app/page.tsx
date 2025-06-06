@@ -24,7 +24,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { DragVerticalIcon } from '@navikt/aksel-icons'
 
-import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/kodeverk/kodeverk'
+import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
 import { ExcelExport } from '@/components/kodeverk/ExcelExport'
 

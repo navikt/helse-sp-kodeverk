@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx'
 import { Button } from '@navikt/ds-react'
 import { DownloadIcon } from '@navikt/aksel-icons'
 
-import { KodeverkForm, Vilkår } from '@/kodeverk/kodeverk'
+import { KodeverkForm, Vilkår } from '@/schemas/kodeverk'
 
 function beregnKolonnebredder(data: Record<string, string>[]) {
     const colWidths: { wch: number }[] = []

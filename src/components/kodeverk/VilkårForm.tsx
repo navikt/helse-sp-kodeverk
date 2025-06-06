@@ -6,7 +6,8 @@ import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
 
-import { KodeverkForm, kategoriLabels } from '@/kodeverk/kodeverk'
+import { kategoriLabels } from '@/kodeverk/lokalUtviklingKodeverk'
+import { KodeverkForm } from '@schemas/kodeverk'
 
 import { VilkårshjemmelForm } from './VilkårshjemmelForm'
 

@@ -4,7 +4,7 @@ import { Control, FieldErrors } from 'react-hook-form'
 import { Heading, TextField } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 
-import { KodeverkForm } from '@/kodeverk/kodeverk'
+import { KodeverkForm } from '@schemas/kodeverk'
 
 interface VilkårshjemmelFormProps {
     control: Control<KodeverkForm>
