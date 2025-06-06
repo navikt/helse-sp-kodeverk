@@ -1,8 +1,10 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
-import { Button, Select, TextField } from '@navikt/ds-react'
+import { Button, Select, TextField, Modal, Heading } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
+import { useState } from 'react'
+import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
 
 import { KodeverkForm, kategoriLabels } from '@/kodeverk/kodeverk'
 
@@ -16,6 +18,8 @@ interface VilkårFormProps {
 }
 
 export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormProps) => {
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+
     const {
         fields: oppfyltFields,
         append: appendOppfylt,
@@ -42,6 +46,15 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
         control,
         name: `vilkar.${index}.mulige_resultater.IKKE_RELEVANT` as const,
     })
+
+    const handleDeleteConfirm = () => {
+        onRemove()
+        setShowDeleteModal(false)
+    }
+
+    const handleDeleteCancel = () => {
+        setShowDeleteModal(false)
+    }
 
     return (
         <div className="space-y-4">
@@ -145,6 +158,8 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         <Button
                             type="button"
                             variant="secondary"
+                            icon={<PlusIcon />}
+                            size="small"
                             onClick={() =>
                                 appendOppfylt({
                                     kode: '',
@@ -152,7 +167,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                 })
                             }
                         >
-                            Legg til oppfylt resultat
+                            Legg til oppfylt valg
                         </Button>
                     </div>
 
@@ -205,6 +220,8 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         <Button
                             type="button"
                             variant="secondary"
+                            icon={<PlusIcon />}
+                            size="small"
                             onClick={() =>
                                 appendIkkeOppfylt({
                                     kode: '',
@@ -212,12 +229,12 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                 })
                             }
                         >
-                            Legg til ikke oppfylt resultat
+                            Legg til ikke oppfylt valg
                         </Button>
                     </div>
 
                     <div>
-                        <h4 className="text-md mb-2 font-medium">Ikke Relevante</h4>
+                        <h4 className="text-md mb-2 font-medium">Ikke relevant</h4>
                         {ikkeRelevantFields.map((field, resultIndex) => (
                             <div key={field.id} className="mb-4 flex flex-col gap-4">
                                 <div className="flex items-start gap-4">
@@ -280,6 +297,8 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         <Button
                             type="button"
                             variant="secondary"
+                            icon={<PlusIcon />}
+                            size="small"
                             onClick={() =>
                                 appendIkkeRelevant({
                                     kode: '',
@@ -295,15 +314,42 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                 })
                             }
                         >
-                            Legg til ikke relevant resultat
+                            Legg til ikke relevant valg
                         </Button>
                     </div>
                 </div>
             </div>
 
-            <Button type="button" variant="tertiary" onClick={onRemove}>
-                Fjern vilkår
+            <Button
+                type="button"
+                variant="danger"
+                size="small"
+                icon={<TrashIcon />}
+                onClick={() => setShowDeleteModal(true)}
+            >
+                Fjern hele vilkåret
             </Button>
+
+            {showDeleteModal && (
+                <Modal open={showDeleteModal} onClose={handleDeleteCancel} aria-label="Bekreft sletting">
+                    <Modal.Header>
+                        <Heading size="medium">Bekreft sletting</Heading>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>
+                            Er du sikker på at du vil slette dette vilkåret? Alle data knyttet til vilkåret vil gå tapt.
+                        </p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="danger" onClick={handleDeleteConfirm}>
+                            Ja, slett vilkåret
+                        </Button>
+                        <Button variant="secondary" onClick={handleDeleteCancel}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            )}
         </div>
     )
 }
