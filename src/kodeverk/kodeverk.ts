@@ -21,7 +21,10 @@ export const vilkårshjemmelSchema = z.object({
 })
 
 export const årsakSchema = z.object({
-    kode: z.string().min(2),
+    kode: z
+        .string()
+        .min(2)
+        .regex(/^[A-Z0-9_]+$/, 'Kode må kun inneholde store bokstaver A-Z, tall og underscore'),
     beskrivelse: z.string().min(2),
     vilkårshjemmel: vilkårshjemmelSchema.optional(), // noen Årsak-er har dette
 })
@@ -63,13 +66,13 @@ export const kodeverk: Kodeverk = [
         mulige_resultater: {
             OPPFYLT: [
                 {
-                    kode: 'INNEN_TRE_MÅNEDER',
+                    kode: 'INNEN_TRE_MANEDER',
                     beskrivelse: 'Søknad fremsatt i tide',
                 },
             ],
             IKKE_OPPFYLT: [
                 {
-                    kode: 'IKKE_INNEN_TRE_MÅNEDER',
+                    kode: 'IKKE_INNEN_TRE_MANEDER',
                     beskrivelse: 'Søknad ikke fremsatt i tide',
                 },
             ],
@@ -91,13 +94,13 @@ export const kodeverk: Kodeverk = [
         mulige_resultater: {
             OPPFYLT: [
                 {
-                    kode: 'en_kode',
+                    kode: 'MEDLEM_FOLKETRYGDEN',
                     beskrivelse: 'Er medlem i folketrygden',
                 },
             ],
             IKKE_OPPFYLT: [
                 {
-                    kode: 'en_annen_kode',
+                    kode: 'IKKE_MEDLEM_FOLKETRYGDEN',
                     beskrivelse: 'Er ikke medlem i folketrygden',
                 },
             ],
@@ -119,13 +122,13 @@ export const kodeverk: Kodeverk = [
         mulige_resultater: {
             OPPFYLT: [
                 {
-                    kode: 'en_kode',
+                    kode: 'ER_ARBEIDSUFORE',
                     beskrivelse: 'Er arbeidsufør',
                 },
             ],
             IKKE_OPPFYLT: [
                 {
-                    kode: 'en_annen_kode',
+                    kode: 'IKKE_ARBEIDSUFORE',
                     beskrivelse: 'Er ikke arbeidsufør',
                 },
             ],
@@ -147,23 +150,23 @@ export const kodeverk: Kodeverk = [
         mulige_resultater: {
             OPPFYLT: [
                 {
-                    kode: 'hovedregel',
+                    kode: 'HOVEDREGEL',
                     beskrivelse: 'Har arbeidet i 28 dager før arbeidsuførhet inntreffer',
                 },
                 {
-                    kode: 'annen ytelse',
+                    kode: 'ANNEN_YTELSE',
                     beskrivelse:
                         'Har mottatt dagpenger, omsorgspenger, pleiepenger, opplæringspenger, svangerskapspenger eller foreldrepenger',
                 },
             ],
             IKKE_OPPFYLT: [
                 {
-                    kode: 'ikke arbeidet',
+                    kode: 'IKKE_ARBEIDET',
                     beskrivelse: 'Har ikke arbeidet i 28 dager før arbeidsuførhet inntreffer',
                 },
 
                 {
-                    kode: 'aap før foreldrepenger',
+                    kode: 'AAP_FOR_FORELDREPENGER',
                     beskrivelse: 'Har AAP før foreldrepenger og retten var brukt opp uten ny opptjening',
                 },
             ],
@@ -181,7 +184,7 @@ export const kodeverk: Kodeverk = [
                     },
                 },
                 {
-                    kode: 'fisk',
+                    kode: 'FISKER',
                     beskrivelse: 'Fisker som er tatt opp på blad B i fiskermanntallet',
                     vilkårshjemmel: {
                         lovverk: 'Folketrygdloven',
@@ -193,7 +196,7 @@ export const kodeverk: Kodeverk = [
                     },
                 },
                 {
-                    kode: 'mil',
+                    kode: 'MILITAERTJENESTE',
                     beskrivelse: 'Utført militærtjeneste hvor arbeidsuførheten oppstod under tjenesten',
                     vilkårshjemmel: {
                         lovverk: 'Folketrygdloven',
@@ -205,7 +208,7 @@ export const kodeverk: Kodeverk = [
                     },
                 },
                 {
-                    kode: 'yrk',
+                    kode: 'YRKESSKADE',
                     beskrivelse: 'Arbeidsufør på grunn av en godkjent yrkesskade',
                     vilkårshjemmel: {
                         lovverk: 'Folketrygdloven',
@@ -235,13 +238,13 @@ export const kodeverk: Kodeverk = [
         mulige_resultater: {
             OPPFYLT: [
                 {
-                    kode: 'en_kode',
+                    kode: 'HAR_MINSTE_INNTEKT',
                     beskrivelse: 'Her må det stå noe',
                 },
             ],
             IKKE_OPPFYLT: [
                 {
-                    kode: 'en_annen_kode',
+                    kode: 'IKKE_MINSTE_INNTEKT',
                     beskrivelse: 'Her må det stå noe',
                 },
             ],
@@ -263,13 +266,13 @@ export const kodeverk: Kodeverk = [
         mulige_resultater: {
             OPPFYLT: [
                 {
-                    kode: 'en_kode',
+                    kode: 'HAR_INNTEKTSTAP',
                     beskrivelse: 'Her må det stå noe',
                 },
             ],
             IKKE_OPPFYLT: [
                 {
-                    kode: 'en_annen_kode',
+                    kode: 'IKKE_INNTEKTSTAP',
                     beskrivelse: 'Her må det stå noe',
                 },
             ],
