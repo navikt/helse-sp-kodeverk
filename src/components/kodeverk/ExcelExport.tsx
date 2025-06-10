@@ -52,6 +52,7 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
         resultater.forEach((res, index) => {
             rows.push({
                 vilkårskode: index === 0 ? vilkår.vilkårskode : '',
+                spørsmålstekst: index === 0 ? vilkår.spørsmålstekst || '' : '',
                 beskrivelse: index === 0 ? vilkår.beskrivelse : '',
                 kategori: index === 0 ? vilkår.kategori : '',
                 lovverk: index === 0 ? hjemmel.lovverk : '',

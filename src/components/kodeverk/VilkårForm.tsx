@@ -73,6 +73,18 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     )}
                 />
                 <Controller
+                    name={`vilkar.${index}.spørsmålstekst` as const}
+                    control={control}
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="Spørsmålstekst (valgfritt)"
+                            error={errors?.vilkar?.[index]?.spørsmålstekst?.message}
+                            value={field.value || ''}
+                        />
+                    )}
+                />
+                <Controller
                     name={`vilkar.${index}.beskrivelse` as const}
                     control={control}
                     render={({ field }) => (

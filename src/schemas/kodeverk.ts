@@ -26,6 +26,7 @@ export const årsakSchema = z.object({
 export const vilkårSchema = z.object({
     vilkårshjemmel: vilkårshjemmelSchema,
     vilkårskode: z.string().min(5),
+    spørsmålstekst: z.string().min(3).optional().or(z.literal('')),
     beskrivelse: z.string().min(5),
     kategori: kategoriEnum,
     mulige_resultater: z.object({

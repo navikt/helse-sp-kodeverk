@@ -18,6 +18,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'MAA_SOKE_INNEN_TRE_MAANEDER',
+        spørsmålstekst: '',
         beskrivelse: 'En ytelse gis for opptil tre måneder før den måneden da kravet ble satt fram',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
@@ -46,6 +47,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'BOINO',
+        spørsmålstekst: '',
         beskrivelse: 'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
@@ -74,6 +76,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'ARBUFOR',
+        spørsmålstekst: '',
         beskrivelse: 'Arbeidsufør',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
@@ -102,6 +105,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'OPPTJT',
+        spørsmålstekst: '',
         beskrivelse: 'Opptjeningstid',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
@@ -190,6 +194,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'MINSTEINNT',
+        spørsmålstekst: '',
         beskrivelse: 'Har opparbeidet minste inntekt (1/2G) - inntektsgrunnlaget',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
@@ -218,6 +223,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'INNTAP',
+        spørsmålstekst: '',
         beskrivelse: 'Har tapt pensjonsgivende inntekt på grunn av arbeidsuførhet',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {

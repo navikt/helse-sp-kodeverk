@@ -220,6 +220,7 @@ const Page = () => {
                 bokstav: null,
             },
             vilkårskode: '',
+            spørsmålstekst: '',
             beskrivelse: '',
             kategori: 'generelle_bestemmelser',
             mulige_resultater: {
