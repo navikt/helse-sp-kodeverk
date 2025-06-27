@@ -90,7 +90,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     render={({ field }) => (
                         <TextField
                             {...field}
-                            label="Beskrivelse"
+                            label="Tekst"
                             error={errors?.vilkar?.[index]?.beskrivelse?.message}
                             value={field.value || ''}
                         />
@@ -123,7 +123,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                 <h3 className="text-lg font-semibold">Mulige resultater</h3>
                 <div className="space-y-6">
                     <Box padding="4" borderWidth="1" borderRadius="medium">
-                        <h4 className="text-md mb-4 font-medium">Oppfylt</h4>
+                        <h4 className="text-md mb-4 font-medium">Begrunnelser for oppfylt</h4>
                         {oppfyltFields.map((field, resultIndex) => (
                             <div key={field.id} className="mb-4 flex items-start gap-4">
                                 <Controller
@@ -149,7 +149,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                     render={({ field }) => (
                                         <TextField
                                             {...field}
-                                            label="Beskrivelse"
+                                            label="Tekst"
                                             className="w-100"
                                             error={
                                                 errors?.vilkar?.[index]?.mulige_resultater?.OPPFYLT?.[resultIndex]
@@ -186,7 +186,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     </Box>
 
                     <Box padding="4" borderWidth="1" borderRadius="medium">
-                        <h4 className="text-md mb-4 font-medium">Ikke oppfylt</h4>
+                        <h4 className="text-md mb-4 font-medium">Begrunnelser for ikke oppfylt</h4>
                         {ikkeOppfyltFields.map((field, resultIndex) => (
                             <div key={field.id} className="mb-4 flex items-start gap-4">
                                 <Controller
@@ -212,7 +212,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                     render={({ field }) => (
                                         <TextField
                                             {...field}
-                                            label="Beskrivelse"
+                                            label="Tekst"
                                             className="w-100"
                                             error={
                                                 errors?.vilkar?.[index]?.mulige_resultater?.IKKE_OPPFYLT?.[resultIndex]
@@ -249,7 +249,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     </Box>
 
                     <Box padding="4" borderWidth="1" borderRadius="medium">
-                        <h4 className="text-md mb-4 font-medium">Ikke relevant / unntak</h4>
+                        <h4 className="text-md mb-4 font-medium">Begrunnelser for ikke relevant / unntak</h4>
                         {ikkeRelevantFields.map((field, resultIndex) => (
                             <div key={field.id} className="mb-4 flex flex-col gap-4">
                                 <div className="flex items-start gap-4">
@@ -279,7 +279,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                         render={({ field }) => (
                                             <TextField
                                                 {...field}
-                                                label="Beskrivelse"
+                                                label="Tekst"
                                                 className="w-100"
                                                 error={
                                                     errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[
