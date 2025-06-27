@@ -1,13 +1,13 @@
 'use client'
 
-import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
+import { Control, FieldErrors, useFieldArray, useWatch, FieldArrayWithId } from 'react-hook-form'
 import { Button, Select, TextField, Modal, Heading, Box } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
 
 import { kategoriLabels } from '@/kodeverk/lokalUtviklingKodeverk'
-import { KodeverkForm } from '@schemas/kodeverk'
+import { KodeverkForm, Årsak, Vilkårshjemmel } from '@schemas/kodeverk'
 
 import { VilkårshjemmelForm } from './VilkårshjemmelForm'
 
@@ -18,8 +18,128 @@ interface VilkårFormProps {
     onRemove: () => void
 }
 
+type ResultatType = 'OPPFYLT' | 'IKKE_OPPFYLT' | 'IKKE_RELEVANT'
+
+interface ResultatBegrunnelserSectionProps {
+    title: string
+    fields: FieldArrayWithId<KodeverkForm, `vilkar.${number}.mulige_resultater.${ResultatType}`, 'id'>[]
+    onAppend: (value: Årsak) => void
+    onRemove: (index: number) => void
+    control: Control<KodeverkForm>
+    vilkårIndex: number
+    errors: FieldErrors<KodeverkForm>
+    resultType: ResultatType
+    mainVilkårshjemmel: Vilkårshjemmel | undefined
+}
+
+const ResultatBegrunnelserSection = ({
+    title,
+    fields,
+    onAppend,
+    onRemove,
+    control,
+    vilkårIndex,
+    errors,
+    resultType,
+    mainVilkårshjemmel,
+}: ResultatBegrunnelserSectionProps) => {
+    const getDefaultVilkårshjemmel = () => {
+        if (resultType === 'IKKE_RELEVANT') {
+            return mainVilkårshjemmel
+                ? { ...mainVilkårshjemmel }
+                : {
+                      lovverk: '',
+                      lovverksversjon: '',
+                      paragraf: '',
+                      ledd: null,
+                      setning: null,
+                      bokstav: null,
+                  }
+        }
+        return mainVilkårshjemmel ? { ...mainVilkårshjemmel } : undefined
+    }
+
+    return (
+        <Box padding="4" borderWidth="1" borderRadius="medium">
+            <h4 className="text-md mb-4 font-medium">{title}</h4>
+            {fields.map((field, resultIndex) => (
+                <div key={field.id} className="mb-4 flex flex-col gap-4">
+                    <div className="flex items-start gap-4">
+                        <Controller
+                            name={`vilkar.${vilkårIndex}.mulige_resultater.${resultType}.${resultIndex}.kode` as const}
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    label="Kode"
+                                    error={
+                                        errors?.vilkar?.[vilkårIndex]?.mulige_resultater?.[resultType]?.[resultIndex]
+                                            ?.kode?.message
+                                    }
+                                    value={field.value || ''}
+                                />
+                            )}
+                        />
+                        <Controller
+                            name={
+                                `vilkar.${vilkårIndex}.mulige_resultater.${resultType}.${resultIndex}.beskrivelse` as const
+                            }
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    label="Tekst"
+                                    className="w-100"
+                                    error={
+                                        errors?.vilkar?.[vilkårIndex]?.mulige_resultater?.[resultType]?.[resultIndex]
+                                            ?.beskrivelse?.message
+                                    }
+                                    value={field.value || ''}
+                                />
+                            )}
+                        />
+                        <Button type="button" variant="tertiary" onClick={() => onRemove(resultIndex)} className="mt-6">
+                            Fjern
+                        </Button>
+                    </div>
+                    <div className="ml-4">
+                        <VilkårshjemmelForm
+                            control={control}
+                            index={vilkårIndex}
+                            errors={errors}
+                            resultIndex={resultIndex}
+                            resultType={resultType}
+                        />
+                    </div>
+                </div>
+            ))}
+            <Button
+                type="button"
+                variant="secondary"
+                icon={<PlusIcon />}
+                size="small"
+                onClick={() =>
+                    onAppend({
+                        kode: '',
+                        beskrivelse: '',
+                        vilkårshjemmel: getDefaultVilkårshjemmel(),
+                    })
+                }
+            >
+                Legg til
+            </Button>
+        </Box>
+    )
+}
+
 export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormProps) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+    // Watch the main vilkårshjemmel to get current values for pre-filling
+    const mainVilkårshjemmel = useWatch({
+        control,
+        name: `vilkar.${index}.vilkårshjemmel`,
+    })
 
     const {
         fields: oppfyltFields,
@@ -122,217 +242,41 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Mulige resultater</h3>
                 <div className="space-y-6">
-                    <Box padding="4" borderWidth="1" borderRadius="medium">
-                        <h4 className="text-md mb-4 font-medium">Begrunnelser for oppfylt</h4>
-                        {oppfyltFields.map((field, resultIndex) => (
-                            <div key={field.id} className="mb-4 flex items-start gap-4">
-                                <Controller
-                                    name={`vilkar.${index}.mulige_resultater.OPPFYLT.${resultIndex}.kode` as const}
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label="Kode"
-                                            error={
-                                                errors?.vilkar?.[index]?.mulige_resultater?.OPPFYLT?.[resultIndex]?.kode
-                                                    ?.message
-                                            }
-                                            value={field.value || ''}
-                                        />
-                                    )}
-                                />
-                                <Controller
-                                    name={
-                                        `vilkar.${index}.mulige_resultater.OPPFYLT.${resultIndex}.beskrivelse` as const
-                                    }
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label="Tekst"
-                                            className="w-100"
-                                            error={
-                                                errors?.vilkar?.[index]?.mulige_resultater?.OPPFYLT?.[resultIndex]
-                                                    ?.beskrivelse?.message
-                                            }
-                                            value={field.value || ''}
-                                        />
-                                    )}
-                                />
-                                <Button
-                                    type="button"
-                                    variant="tertiary"
-                                    onClick={() => removeOppfylt(resultIndex)}
-                                    className="mt-6"
-                                >
-                                    Fjern
-                                </Button>
-                            </div>
-                        ))}
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            icon={<PlusIcon />}
-                            size="small"
-                            onClick={() =>
-                                appendOppfylt({
-                                    kode: '',
-                                    beskrivelse: '',
-                                })
-                            }
-                        >
-                            Legg til
-                        </Button>
-                    </Box>
+                    <ResultatBegrunnelserSection
+                        title="Begrunnelser for oppfylt"
+                        fields={oppfyltFields}
+                        onAppend={appendOppfylt}
+                        onRemove={removeOppfylt}
+                        control={control}
+                        vilkårIndex={index}
+                        errors={errors}
+                        resultType="OPPFYLT"
+                        mainVilkårshjemmel={mainVilkårshjemmel}
+                    />
 
-                    <Box padding="4" borderWidth="1" borderRadius="medium">
-                        <h4 className="text-md mb-4 font-medium">Begrunnelser for ikke oppfylt</h4>
-                        {ikkeOppfyltFields.map((field, resultIndex) => (
-                            <div key={field.id} className="mb-4 flex items-start gap-4">
-                                <Controller
-                                    name={`vilkar.${index}.mulige_resultater.IKKE_OPPFYLT.${resultIndex}.kode` as const}
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label="Kode"
-                                            error={
-                                                errors?.vilkar?.[index]?.mulige_resultater?.IKKE_OPPFYLT?.[resultIndex]
-                                                    ?.kode?.message
-                                            }
-                                            value={field.value || ''}
-                                        />
-                                    )}
-                                />
-                                <Controller
-                                    name={
-                                        `vilkar.${index}.mulige_resultater.IKKE_OPPFYLT.${resultIndex}.beskrivelse` as const
-                                    }
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label="Tekst"
-                                            className="w-100"
-                                            error={
-                                                errors?.vilkar?.[index]?.mulige_resultater?.IKKE_OPPFYLT?.[resultIndex]
-                                                    ?.beskrivelse?.message
-                                            }
-                                            value={field.value || ''}
-                                        />
-                                    )}
-                                />
-                                <Button
-                                    type="button"
-                                    variant="tertiary"
-                                    onClick={() => removeIkkeOppfylt(resultIndex)}
-                                    className="mt-6"
-                                >
-                                    Fjern
-                                </Button>
-                            </div>
-                        ))}
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            icon={<PlusIcon />}
-                            size="small"
-                            onClick={() =>
-                                appendIkkeOppfylt({
-                                    kode: '',
-                                    beskrivelse: '',
-                                })
-                            }
-                        >
-                            Legg til
-                        </Button>
-                    </Box>
+                    <ResultatBegrunnelserSection
+                        title="Begrunnelser for ikke oppfylt"
+                        fields={ikkeOppfyltFields}
+                        onAppend={appendIkkeOppfylt}
+                        onRemove={removeIkkeOppfylt}
+                        control={control}
+                        vilkårIndex={index}
+                        errors={errors}
+                        resultType="IKKE_OPPFYLT"
+                        mainVilkårshjemmel={mainVilkårshjemmel}
+                    />
 
-                    <Box padding="4" borderWidth="1" borderRadius="medium">
-                        <h4 className="text-md mb-4 font-medium">Begrunnelser for ikke relevant / unntak</h4>
-                        {ikkeRelevantFields.map((field, resultIndex) => (
-                            <div key={field.id} className="mb-4 flex flex-col gap-4">
-                                <div className="flex items-start gap-4">
-                                    <Controller
-                                        name={
-                                            `vilkar.${index}.mulige_resultater.IKKE_RELEVANT.${resultIndex}.kode` as const
-                                        }
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField
-                                                {...field}
-                                                label="Kode"
-                                                error={
-                                                    errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[
-                                                        resultIndex
-                                                    ]?.kode?.message
-                                                }
-                                                value={field.value || ''}
-                                            />
-                                        )}
-                                    />
-                                    <Controller
-                                        name={
-                                            `vilkar.${index}.mulige_resultater.IKKE_RELEVANT.${resultIndex}.beskrivelse` as const
-                                        }
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField
-                                                {...field}
-                                                label="Tekst"
-                                                className="w-100"
-                                                error={
-                                                    errors?.vilkar?.[index]?.mulige_resultater?.IKKE_RELEVANT?.[
-                                                        resultIndex
-                                                    ]?.beskrivelse?.message
-                                                }
-                                                value={field.value || ''}
-                                            />
-                                        )}
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="tertiary"
-                                        onClick={() => removeIkkeRelevant(resultIndex)}
-                                        className="mt-6"
-                                    >
-                                        Fjern
-                                    </Button>
-                                </div>
-                                <div className="ml-4">
-                                    <VilkårshjemmelForm
-                                        control={control}
-                                        index={index}
-                                        errors={errors}
-                                        resultIndex={resultIndex}
-                                        resultType="IKKE_RELEVANT"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            icon={<PlusIcon />}
-                            size="small"
-                            onClick={() =>
-                                appendIkkeRelevant({
-                                    kode: '',
-                                    beskrivelse: '',
-                                    vilkårshjemmel: {
-                                        lovverk: '',
-                                        lovverksversjon: '',
-                                        paragraf: '',
-                                        ledd: null,
-                                        setning: null,
-                                        bokstav: null,
-                                    },
-                                })
-                            }
-                        >
-                            Legg til
-                        </Button>
-                    </Box>
+                    <ResultatBegrunnelserSection
+                        title="Begrunnelser for ikke relevant / unntak"
+                        fields={ikkeRelevantFields}
+                        onAppend={appendIkkeRelevant}
+                        onRemove={removeIkkeRelevant}
+                        control={control}
+                        vilkårIndex={index}
+                        errors={errors}
+                        resultType="IKKE_RELEVANT"
+                        mainVilkårshjemmel={mainVilkårshjemmel}
+                    />
                 </div>
             </div>
 
