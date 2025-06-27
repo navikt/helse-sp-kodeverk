@@ -1,7 +1,7 @@
 'use client'
 
 import { Control, FieldErrors } from 'react-hook-form'
-import { Heading, TextField } from '@navikt/ds-react'
+import { TextField } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 
 import { KodeverkForm } from '@schemas/kodeverk'
@@ -36,9 +36,6 @@ export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resul
 
     return (
         <div className="space-y-4">
-            <Heading size="small" level="3">
-                Vilkårshjemmel
-            </Heading>
             <div className="grid grid-cols-2 gap-4">
                 {fields.slice(0, 2).map((field) => (
                     <Controller

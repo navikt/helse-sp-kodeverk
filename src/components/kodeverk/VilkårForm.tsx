@@ -60,11 +60,11 @@ const ResultatBegrunnelserSection = ({
     }
 
     return (
-        <Box padding="4" borderWidth="1" borderRadius="medium">
+        <Box padding="4" borderWidth="1" borderRadius="medium" className="bg-gray-50">
             <h4 className="text-md mb-4 font-medium">{title}</h4>
             {fields.map((field, resultIndex) => (
-                <div key={field.id} className="mb-4 flex flex-col gap-4">
-                    <div className="flex items-start gap-4">
+                <div key={field.id} className="mb-6 rounded-lg border border-gray-200 bg-gray-100 p-4">
+                    <div className="mb-4 flex items-start gap-4">
                         <Controller
                             name={`vilkar.${vilkårIndex}.mulige_resultater.${resultType}.${resultIndex}.kode` as const}
                             control={control}
@@ -102,7 +102,8 @@ const ResultatBegrunnelserSection = ({
                             Fjern
                         </Button>
                     </div>
-                    <div className="ml-4">
+                    <div className="p-4">
+                        <h5 className="mb-3 text-sm font-medium text-gray-700">Vilkårshjemmel for begrunnelse</h5>
                         <VilkårshjemmelForm
                             control={control}
                             index={vilkårIndex}
@@ -178,7 +179,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6">
             <div className="grid grid-cols-2 gap-4">
                 <Controller
                     name={`vilkar.${index}.vilkårskode` as const}
@@ -237,7 +238,10 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                 />
             </div>
 
-            <VilkårshjemmelForm control={control} index={index} errors={errors} />
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                <h4 className="text-md mb-4 font-medium text-gray-700">Hovedvilkårshjemmel</h4>
+                <VilkårshjemmelForm control={control} index={index} errors={errors} />
+            </div>
 
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Mulige resultater</h3>

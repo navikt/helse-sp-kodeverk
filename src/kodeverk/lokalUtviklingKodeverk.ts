@@ -7,105 +7,16 @@ export const kategoriLabels = {
 } as const
 
 export const lokalUtviklingKodeverk: Kodeverk = [
-    // Ftrl 22-13 3
-    {
-        vilkårshjemmel: {
-            lovverk: 'Folketrygdloven',
-            lovverksversjon: '2019-01-01',
-            paragraf: '22-13',
-            ledd: '3',
-            setning: null,
-            bokstav: null,
-        },
-        vilkårskode: 'MAA_SOKE_INNEN_TRE_MAANEDER',
-        spørsmålstekst: '',
-        beskrivelse: 'En ytelse gis for opptil tre måneder før den måneden da kravet ble satt fram',
-        kategori: 'generelle_bestemmelser',
-        mulige_resultater: {
-            OPPFYLT: [
-                {
-                    kode: 'INNEN_TRE_MANEDER',
-                    beskrivelse: 'Søknad fremsatt i tide',
-                },
-            ],
-            IKKE_OPPFYLT: [
-                {
-                    kode: 'IKKE_INNEN_TRE_MANEDER',
-                    beskrivelse: 'Søknad ikke fremsatt i tide',
-                },
-            ],
-        },
-    },
-    // Ftrl 2-1
-    {
-        vilkårshjemmel: {
-            lovverk: 'Folketrygdloven',
-            lovverksversjon: '2019-01-01',
-            paragraf: '2-1',
-            ledd: null,
-            setning: null,
-            bokstav: null,
-        },
-        vilkårskode: 'BOINO',
-        spørsmålstekst: '',
-        beskrivelse: 'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
-        kategori: 'generelle_bestemmelser',
-        mulige_resultater: {
-            OPPFYLT: [
-                {
-                    kode: 'MEDLEM_FOLKETRYGDEN',
-                    beskrivelse: 'Er medlem i folketrygden',
-                },
-            ],
-            IKKE_OPPFYLT: [
-                {
-                    kode: 'IKKE_MEDLEM_FOLKETRYGDEN',
-                    beskrivelse: 'Er ikke medlem i folketrygden',
-                },
-            ],
-        },
-    },
-    // Ftrl 8-4
-    {
-        vilkårshjemmel: {
-            lovverk: 'Folketrygdloven',
-            lovverksversjon: '2019-01-01',
-            paragraf: '8-4',
-            ledd: null,
-            setning: null,
-            bokstav: null,
-        },
-        vilkårskode: 'ARBUFOR',
-        spørsmålstekst: '',
-        beskrivelse: 'Arbeidsufør',
-        kategori: 'generelle_bestemmelser',
-        mulige_resultater: {
-            OPPFYLT: [
-                {
-                    kode: 'ER_ARBEIDSUFORE',
-                    beskrivelse: 'Er arbeidsufør',
-                },
-            ],
-            IKKE_OPPFYLT: [
-                {
-                    kode: 'IKKE_ARBEIDSUFORE',
-                    beskrivelse: 'Er ikke arbeidsufør',
-                },
-            ],
-        },
-    },
-    // Ftrl 8-2 1
     {
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
             paragraf: '8-2',
-            ledd: '1',
+            ledd: '',
             setning: null,
             bokstav: null,
         },
         vilkårskode: 'OPPTJT',
-        spørsmålstekst: '',
         beskrivelse: 'Opptjeningstid',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
@@ -113,22 +24,50 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 {
                     kode: 'HOVEDREGEL',
                     beskrivelse: 'Har arbeidet i 28 dager før arbeidsuførhet inntreffer',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
                 },
                 {
                     kode: 'ANNEN_YTELSE',
                     beskrivelse:
                         'Har mottatt dagpenger, omsorgspenger, pleiepenger, opplæringspenger, svangerskapspenger eller foreldrepenger',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+                {
+                    kode: 'COVID',
+                    beskrivelse: 'Covid',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
                 },
             ],
             IKKE_OPPFYLT: [
                 {
                     kode: 'IKKE_ARBEIDET',
                     beskrivelse: 'Har ikke arbeidet i 28 dager før arbeidsuførhet inntreffer',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
                 },
-
                 {
                     kode: 'AAP_FOR_FORELDREPENGER',
                     beskrivelse: 'Har AAP før foreldrepenger og retten var brukt opp uten ny opptjening',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
                 },
             ],
             IKKE_RELEVANT: [
@@ -162,8 +101,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                     vilkårshjemmel: {
                         lovverk: 'Folketrygdloven',
                         lovverksversjon: '2019-01-01',
-                        paragraf: '8-2',
-                        ledd: '1',
+                        paragraf: '8-49',
+                        ledd: '4',
                         setning: null,
                         bokstav: null,
                     },
@@ -183,7 +122,154 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             ],
         },
     },
-    // Ftrl 8-3 2
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '22-13',
+            ledd: '3',
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'MAA_SOKE_INNEN_TRE_MAANEDER',
+        beskrivelse: 'En ytelse gis for opptil tre måneder før den måneden da kravet ble satt fram',
+        kategori: 'generelle_bestemmelser',
+        mulige_resultater: {
+            OPPFYLT: [
+                {
+                    kode: 'INNEN_TRE_MANEDER',
+                    beskrivelse: 'Søknad fremsatt i tide',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+            ],
+            IKKE_OPPFYLT: [
+                {
+                    kode: 'IKKE_INNEN_TRE_MANEDER',
+                    beskrivelse: 'Søknad ikke fremsatt i tide',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+            ],
+        },
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '2-1',
+            ledd: null,
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'BOINO',
+        beskrivelse: 'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
+        kategori: 'generelle_bestemmelser',
+        mulige_resultater: {
+            OPPFYLT: [
+                {
+                    kode: 'MEDLEM_FOLKETRYGDEN',
+                    beskrivelse: 'Er medlem i folketrygden',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+            ],
+            IKKE_OPPFYLT: [
+                {
+                    kode: 'IKKE_MEDLEM_FOLKETRYGDEN',
+                    beskrivelse: 'Er ikke medlem i folketrygden',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+            ],
+        },
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '8-4',
+            ledd: null,
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'ARBUFOR',
+        beskrivelse: 'Arbeidsufør',
+        kategori: 'generelle_bestemmelser',
+        mulige_resultater: {
+            OPPFYLT: [
+                {
+                    kode: 'ER_ARBEIDSUFORE',
+                    beskrivelse: 'arbeidsufør på grunn av en funksjonsnedsettelse som klart skyldes sykdom eller skade',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+                {
+                    kode: 'AAA',
+                    beskrivelse: 'innlagt i en godkjent helseinstitusjon,',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+                {
+                    kode: 'BBB',
+                    beskrivelse:
+                        'under behandling og legen erklærer at behandlingen gjør det nødvendig at vedkommende ikke arbeider',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+                {
+                    kode: 'CCC',
+                    beskrivelse: 'deltar på et arbeidsrettet tiltak',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+                {
+                    kode: 'DDD',
+                    beskrivelse:
+                        'på grunn av sykdom, skade eller lyte får tilskott til opplæringstiltak etter § 10-7 tredje ledd,',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+                {
+                    kode: 'KOSM',
+                    beskrivelse: 'Kosmetisk inngrep som er medisinks begrunnet',
+                    vilkårshjemmel: {
+                        lovverk: 'TODO',
+                        lovverksversjon: 'TODO',
+                        paragraf: 'TODO',
+                    },
+                },
+            ],
+            IKKE_OPPFYLT: [],
+        },
+    },
     {
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
@@ -194,25 +280,13 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'MINSTEINNT',
-        spørsmålstekst: '',
         beskrivelse: 'Har opparbeidet minste inntekt (1/2G) - inntektsgrunnlaget',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
-            OPPFYLT: [
-                {
-                    kode: 'HAR_MINSTE_INNTEKT',
-                    beskrivelse: 'Her må det stå noe',
-                },
-            ],
-            IKKE_OPPFYLT: [
-                {
-                    kode: 'IKKE_MINSTE_INNTEKT',
-                    beskrivelse: 'Her må det stå noe',
-                },
-            ],
+            OPPFYLT: [],
+            IKKE_OPPFYLT: [],
         },
     },
-    // Ftrl 8-3
     {
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
@@ -222,23 +296,12 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             setning: null,
             bokstav: null,
         },
-        vilkårskode: 'INNTAP',
-        spørsmålstekst: '',
+        vilkårskode: 'ARBEIDSUFOR',
         beskrivelse: 'Har tapt pensjonsgivende inntekt på grunn av arbeidsuførhet',
         kategori: 'generelle_bestemmelser',
         mulige_resultater: {
-            OPPFYLT: [
-                {
-                    kode: 'HAR_INNTEKTSTAP',
-                    beskrivelse: 'Her må det stå noe',
-                },
-            ],
-            IKKE_OPPFYLT: [
-                {
-                    kode: 'IKKE_INNTEKTSTAP',
-                    beskrivelse: 'Her må det stå noe',
-                },
-            ],
+            OPPFYLT: [],
+            IKKE_OPPFYLT: [],
         },
     },
 ]
