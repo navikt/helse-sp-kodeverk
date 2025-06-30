@@ -3,7 +3,17 @@ import { z } from 'zod'
 // Basert på Maybe<T> = T | null | undefined
 const maybeString = z.string().nullable().optional()
 
-export const kategoriEnum = z.enum(['generelle_bestemmelser', 'arbeidstakere', 'selvstendig_næringsdrivende'])
+export const kategoriEnum = z.enum([
+    'generelle_bestemmelser',
+    'arbeidstakere',
+    'selvstendig_næringsdrivende',
+    'frilansere',
+    'medlemmer_med_kombinerte_inntekter',
+    'særskilte_grupper',
+    'medlemmer_med_rett_til_andre_ytelser',
+    'opphold_i_institusjon',
+    'yrkesskade',
+])
 
 export const vilkårshjemmelSchema = z.object({
     lovverk: z.string().min(2),
