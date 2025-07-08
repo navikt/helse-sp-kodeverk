@@ -25,8 +25,8 @@ import { CSS } from '@dnd-kit/utilities'
 import { DragVerticalIcon } from '@navikt/aksel-icons'
 
 import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
-import { VilkårForm } from '@/components/kodeverk/VilkårForm'
-import { ExcelExport } from '@/components/kodeverk/ExcelExport'
+import { VilkårForm } from '@/components/old/kodeverk/VilkårForm'
+import { ExcelExport } from '@/components/old/kodeverk/ExcelExport'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     const { lovverk, paragraf, ledd, setning, bokstav } = hjemmel
