@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx'
 import { Button } from '@navikt/ds-react'
 import { DownloadIcon } from '@navikt/aksel-icons'
 
-import { KodeverkForm, Vilkår } from '@/schemas/kodeverk'
+import { KodeverkForm, Vilkår } from '@/schemas/kodeverkV2'
 
 function beregnKolonnebredder(data: Record<string, string>[]) {
     const colWidths: { wch: number }[] = []
@@ -29,49 +29,93 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
     const rows: Record<string, string>[] = []
     for (const vilkår of kodeverk.vilkar) {
         const hjemmel = vilkår.vilkårshjemmel
-        const resultater = []
-        type ResultatType = 'OPPFYLT' | 'IKKE_OPPFYLT' | 'IKKE_RELEVANT'
+        const flattedData = []
 
-        for (const type of ['OPPFYLT', 'IKKE_OPPFYLT', 'IKKE_RELEVANT'] as ResultatType[]) {
-            if (!vilkår.mulige_resultater[type]) continue
-            for (const årsak of vilkår.mulige_resultater[type]) {
-                resultater.push({
-                    resultatType: type,
-                    årsakKode: årsak.kode,
-                    årsakBeskrivelse: årsak.beskrivelse,
-                    årsakLovverk: årsak.vilkårshjemmel?.lovverk || '',
-                    årsakLovverkversjon: årsak.vilkårshjemmel?.lovverksversjon || '',
-                    årsakParagraf: årsak.vilkårshjemmel?.paragraf || '',
-                    årsakLedd: årsak.vilkårshjemmel?.ledd || '',
-                    årsakSetning: årsak.vilkårshjemmel?.setning || '',
-                    årsakBokstav: årsak.vilkårshjemmel?.bokstav || '',
+        // Flaten out underspørsmål and alternativer
+        for (const underspørsmål of vilkår.underspørsmål) {
+            if (!underspørsmål.alternativer || underspørsmål.alternativer.length === 0) {
+                flattedData.push({
+                    underspørsmålKode: underspørsmål.kode,
+                    underspørsmålNavn: underspørsmål.navn,
+                    underspørsmålVariant: underspørsmål.variant,
+                    alternativKode: '',
+                    alternativNavn: '',
+                    alternativLovverk: '',
+                    alternativLovverksversjon: '',
+                    alternativParagraf: '',
+                    alternativLedd: '',
+                    alternativSetning: '',
+                    alternativBokstav: '',
                 })
+            } else {
+                for (const alternativ of underspørsmål.alternativer) {
+                    flattedData.push({
+                        underspørsmålKode: underspørsmål.kode,
+                        underspørsmålNavn: underspørsmål.navn,
+                        underspørsmålVariant: underspørsmål.variant,
+                        alternativKode: alternativ.kode,
+                        alternativNavn: alternativ.navn,
+                        alternativLovverk: alternativ.vilkårshjemmel?.lovverk || '',
+                        alternativLovverksversjon: alternativ.vilkårshjemmel?.lovverksversjon || '',
+                        alternativParagraf: alternativ.vilkårshjemmel?.paragraf || '',
+                        alternativLedd: alternativ.vilkårshjemmel?.ledd || '',
+                        alternativSetning: alternativ.vilkårshjemmel?.setning || '',
+                        alternativBokstav: alternativ.vilkårshjemmel?.bokstav || '',
+                    })
+                }
             }
         }
 
-        resultater.forEach((res, index) => {
+        if (flattedData.length === 0) {
+            // If no underspørsmål, add a row with just vilkår info
             rows.push({
-                vilkårskode: index === 0 ? vilkår.vilkårskode : '',
-                spørsmålstekst: index === 0 ? vilkår.spørsmålstekst || '' : '',
-                beskrivelse: index === 0 ? vilkår.beskrivelse : '',
-                kategori: index === 0 ? vilkår.kategori : '',
-                lovverk: index === 0 ? hjemmel.lovverk : '',
-                lovverksversjon: index === 0 ? hjemmel.lovverksversjon : '',
-                paragraf: index === 0 ? hjemmel.paragraf : '',
-                ledd: index === 0 ? hjemmel.ledd || '' : '',
-                setning: index === 0 ? hjemmel.setning || '' : '',
-                bokstav: index === 0 ? hjemmel.bokstav || '' : '',
-                resultatType: res.resultatType,
-                årsakKode: res.årsakKode,
-                årsakBeskrivelse: res.årsakBeskrivelse,
-                årsakLovverk: res.årsakLovverk,
-                årsakLovverkversjon: res.årsakLovverkversjon,
-                årsakParagraf: res.årsakParagraf,
-                årsakLedd: res.årsakLedd,
-                årsakSetning: res.årsakSetning,
-                årsakBokstav: res.årsakBokstav,
+                vilkårskode: vilkår.vilkårskode,
+                beskrivelse: vilkår.beskrivelse,
+                kategori: vilkår.kategori,
+                lovverk: hjemmel.lovverk,
+                lovverksversjon: hjemmel.lovverksversjon,
+                paragraf: hjemmel.paragraf,
+                ledd: hjemmel.ledd || '',
+                setning: hjemmel.setning || '',
+                bokstav: hjemmel.bokstav || '',
+                underspørsmålKode: '',
+                underspørsmålNavn: '',
+                underspørsmålVariant: '',
+                alternativKode: '',
+                alternativNavn: '',
+                alternativLovverk: '',
+                alternativLovverksversjon: '',
+                alternativParagraf: '',
+                alternativLedd: '',
+                alternativSetning: '',
+                alternativBokstav: '',
             })
-        })
+        } else {
+            flattedData.forEach((data, index) => {
+                rows.push({
+                    vilkårskode: index === 0 ? vilkår.vilkårskode : '',
+                    beskrivelse: index === 0 ? vilkår.beskrivelse : '',
+                    kategori: index === 0 ? vilkår.kategori : '',
+                    lovverk: index === 0 ? hjemmel.lovverk : '',
+                    lovverksversjon: index === 0 ? hjemmel.lovverksversjon : '',
+                    paragraf: index === 0 ? hjemmel.paragraf : '',
+                    ledd: index === 0 ? hjemmel.ledd || '' : '',
+                    setning: index === 0 ? hjemmel.setning || '' : '',
+                    bokstav: index === 0 ? hjemmel.bokstav || '' : '',
+                    underspørsmålKode: data.underspørsmålKode,
+                    underspørsmålNavn: data.underspørsmålNavn,
+                    underspørsmålVariant: data.underspørsmålVariant,
+                    alternativKode: data.alternativKode,
+                    alternativNavn: data.alternativNavn,
+                    alternativLovverk: data.alternativLovverk,
+                    alternativLovverksversjon: data.alternativLovverksversjon,
+                    alternativParagraf: data.alternativParagraf,
+                    alternativLedd: data.alternativLedd,
+                    alternativSetning: data.alternativSetning,
+                    alternativBokstav: data.alternativBokstav,
+                })
+            })
+        }
     }
 
     const worksheet = XLSX.utils.json_to_sheet(rows)

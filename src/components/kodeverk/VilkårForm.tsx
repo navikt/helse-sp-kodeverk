@@ -1,13 +1,13 @@
 'use client'
 
-import { Control, FieldErrors, useFieldArray, useWatch, FieldArrayWithId } from 'react-hook-form'
-import { Button, Select, TextField, Modal, Heading, Box } from '@navikt/ds-react'
+import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
+import { Button, Select, TextField, Modal, Heading } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
 
-import { kategoriLabels } from '@/kodeverk/lokalUtviklingKodeverk'
-import { KodeverkForm, Årsak, Vilkårshjemmel } from '@schemas/kodeverk'
+import { kategoriLabels } from '@/kodeverk/lokalUtviklingKodeverkV2'
+import { KodeverkForm } from '@schemas/kodeverkV2'
 
 import { VilkårshjemmelForm } from './VilkårshjemmelForm'
 
@@ -18,155 +18,208 @@ interface VilkårFormProps {
     onRemove: () => void
 }
 
-type ResultatType = 'OPPFYLT' | 'IKKE_OPPFYLT' | 'IKKE_RELEVANT'
-
-interface ResultatBegrunnelserSectionProps {
-    title: string
-    fields: FieldArrayWithId<KodeverkForm, `vilkar.${number}.mulige_resultater.${ResultatType}`, 'id'>[]
-    onAppend: (value: Årsak) => void
-    onRemove: (index: number) => void
+interface UnderspørsmålSectionProps {
     control: Control<KodeverkForm>
     vilkårIndex: number
+    underspørsmålIndex: number
     errors: FieldErrors<KodeverkForm>
-    resultType: ResultatType
-    mainVilkårshjemmel: Vilkårshjemmel | undefined
+    onRemove: () => void
 }
 
-const ResultatBegrunnelserSection = ({
-    title,
-    fields,
-    onAppend,
-    onRemove,
+interface AlternativSectionProps {
+    control: Control<KodeverkForm>
+    vilkårIndex: number
+    underspørsmålIndex: number
+    alternativIndex: number
+    errors: FieldErrors<KodeverkForm>
+    onRemove: () => void
+}
+
+const AlternativSection = ({
     control,
     vilkårIndex,
+    underspørsmålIndex,
+    alternativIndex,
     errors,
-    resultType,
-    mainVilkårshjemmel,
-}: ResultatBegrunnelserSectionProps) => {
-    const getDefaultVilkårshjemmel = () => {
-        if (resultType === 'IKKE_RELEVANT') {
-            return mainVilkårshjemmel
-                ? { ...mainVilkårshjemmel }
-                : {
-                      lovverk: '',
-                      lovverksversjon: '',
-                      paragraf: '',
-                      ledd: null,
-                      setning: null,
-                      bokstav: null,
-                  }
-        }
-        return mainVilkårshjemmel ? { ...mainVilkårshjemmel } : undefined
-    }
+    onRemove,
+}: AlternativSectionProps) => {
+    return (
+        <div className="ml-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="mb-4 flex items-start gap-4">
+                <Controller
+                    name={
+                        `vilkar.${vilkårIndex}.underspørsmål.${underspørsmålIndex}.alternativer.${alternativIndex}.kode` as const
+                    }
+                    control={control}
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="Kode"
+                            size="small"
+                            error={
+                                errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[underspørsmålIndex]?.alternativer?.[
+                                    alternativIndex
+                                ]?.kode?.message
+                            }
+                            value={field.value || ''}
+                        />
+                    )}
+                />
+                <Controller
+                    name={
+                        `vilkar.${vilkårIndex}.underspørsmål.${underspørsmålIndex}.alternativer.${alternativIndex}.navn` as const
+                    }
+                    control={control}
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="Navn"
+                            size="small"
+                            className="flex-1"
+                            error={
+                                errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[underspørsmålIndex]?.alternativer?.[
+                                    alternativIndex
+                                ]?.navn?.message
+                            }
+                            value={field.value || ''}
+                        />
+                    )}
+                />
+                <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
+                    Fjern
+                </Button>
+            </div>
+
+            <div className="mt-4 rounded bg-gray-100 p-3">
+                <h6 className="mb-3 text-sm font-medium text-gray-700">Vilkårshjemmel for alternativ</h6>
+                <VilkårshjemmelForm
+                    control={control}
+                    index={vilkårIndex}
+                    errors={errors}
+                    underspørsmålIndex={underspørsmålIndex}
+                    alternativIndex={alternativIndex}
+                />
+            </div>
+        </div>
+    )
+}
+
+const UnderspørsmålSection = ({
+    control,
+    vilkårIndex,
+    underspørsmålIndex,
+    errors,
+    onRemove,
+}: UnderspørsmålSectionProps) => {
+    const {
+        fields: alternativFields,
+        append: appendAlternativ,
+        remove: removeAlternativ,
+    } = useFieldArray({
+        control,
+        name: `vilkar.${vilkårIndex}.underspørsmål.${underspørsmålIndex}.alternativer` as const,
+    })
 
     return (
-        <Box padding="4" borderWidth="1" borderRadius="medium" className="bg-gray-50">
-            <h4 className="text-md mb-4 font-medium">{title}</h4>
-            {fields.map((field, resultIndex) => (
-                <div key={field.id} className="mb-6 rounded-lg border border-gray-200 bg-gray-100 p-4">
-                    <div className="mb-4 flex items-start gap-4">
-                        <Controller
-                            name={`vilkar.${vilkårIndex}.mulige_resultater.${resultType}.${resultIndex}.kode` as const}
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    label="Kode"
-                                    error={
-                                        errors?.vilkar?.[vilkårIndex]?.mulige_resultater?.[resultType]?.[resultIndex]
-                                            ?.kode?.message
-                                    }
-                                    value={field.value || ''}
-                                />
-                            )}
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="mb-4 flex items-start gap-4">
+                <Controller
+                    name={`vilkar.${vilkårIndex}.underspørsmål.${underspørsmålIndex}.kode` as const}
+                    control={control}
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="Kode"
+                            size="small"
+                            error={errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[underspørsmålIndex]?.kode?.message}
+                            value={field.value || ''}
                         />
-                        <Controller
-                            name={
-                                `vilkar.${vilkårIndex}.mulige_resultater.${resultType}.${resultIndex}.beskrivelse` as const
-                            }
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    label="Tekst"
-                                    className="w-100"
-                                    error={
-                                        errors?.vilkar?.[vilkårIndex]?.mulige_resultater?.[resultType]?.[resultIndex]
-                                            ?.beskrivelse?.message
-                                    }
-                                    value={field.value || ''}
-                                />
-                            )}
+                    )}
+                />
+                <Controller
+                    name={`vilkar.${vilkårIndex}.underspørsmål.${underspørsmålIndex}.navn` as const}
+                    control={control}
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="Navn"
+                            size="small"
+                            className="flex-1"
+                            error={errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[underspørsmålIndex]?.navn?.message}
+                            value={field.value || ''}
                         />
-                        <Button type="button" variant="tertiary" onClick={() => onRemove(resultIndex)} className="mt-6">
-                            Fjern
-                        </Button>
-                    </div>
-                    <div className="p-4">
-                        <h5 className="mb-3 text-sm font-medium text-gray-700">Vilkårshjemmel for begrunnelse</h5>
-                        <VilkårshjemmelForm
+                    )}
+                />
+                <Controller
+                    name={`vilkar.${vilkårIndex}.underspørsmål.${underspørsmålIndex}.variant` as const}
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            {...field}
+                            label="Variant"
+                            size="small"
+                            error={errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[underspørsmålIndex]?.variant?.message}
+                            value={field.value || ''}
+                        >
+                            <option value="">Velg variant</option>
+                            <option value="CHECKBOX">Checkbox</option>
+                            <option value="RADIO">Radio</option>
+                            <option value="SELECT">Select</option>
+                        </Select>
+                    )}
+                />
+                <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
+                    Fjern
+                </Button>
+            </div>
+
+            <div className="mt-6">
+                <h5 className="mb-3 text-sm font-medium">Alternativer</h5>
+                <div className="space-y-4">
+                    {alternativFields.map((field, alternativIndex) => (
+                        <AlternativSection
+                            key={field.id}
                             control={control}
-                            index={vilkårIndex}
+                            vilkårIndex={vilkårIndex}
+                            underspørsmålIndex={underspørsmålIndex}
+                            alternativIndex={alternativIndex}
                             errors={errors}
-                            resultIndex={resultIndex}
-                            resultType={resultType}
+                            onRemove={() => removeAlternativ(alternativIndex)}
                         />
-                    </div>
+                    ))}
                 </div>
-            ))}
-            <Button
-                type="button"
-                variant="secondary"
-                icon={<PlusIcon />}
-                size="small"
-                onClick={() =>
-                    onAppend({
-                        kode: '',
-                        beskrivelse: '',
-                        vilkårshjemmel: getDefaultVilkårshjemmel(),
-                    })
-                }
-            >
-                Legg til
-            </Button>
-        </Box>
+                <Button
+                    type="button"
+                    variant="secondary"
+                    icon={<PlusIcon />}
+                    size="small"
+                    onClick={() =>
+                        appendAlternativ({
+                            kode: '',
+                            navn: '',
+                            vilkårshjemmel: undefined,
+                            underspørsmål: [],
+                        })
+                    }
+                    className="mt-4"
+                >
+                    Legg til alternativ
+                </Button>
+            </div>
+        </div>
     )
 }
 
 export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormProps) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-    // Watch the main vilkårshjemmel to get current values for pre-filling
-    const mainVilkårshjemmel = useWatch({
-        control,
-        name: `vilkar.${index}.vilkårshjemmel`,
-    })
-
     const {
-        fields: oppfyltFields,
-        append: appendOppfylt,
-        remove: removeOppfylt,
+        fields: underspørsmålFields,
+        append: appendUnderspørsmål,
+        remove: removeUnderspørsmål,
     } = useFieldArray({
         control,
-        name: `vilkar.${index}.mulige_resultater.OPPFYLT` as const,
-    })
-
-    const {
-        fields: ikkeOppfyltFields,
-        append: appendIkkeOppfylt,
-        remove: removeIkkeOppfylt,
-    } = useFieldArray({
-        control,
-        name: `vilkar.${index}.mulige_resultater.IKKE_OPPFYLT` as const,
-    })
-
-    const {
-        fields: ikkeRelevantFields,
-        append: appendIkkeRelevant,
-        remove: removeIkkeRelevant,
-    } = useFieldArray({
-        control,
-        name: `vilkar.${index}.mulige_resultater.IKKE_RELEVANT` as const,
+        name: `vilkar.${index}.underspørsmål` as const,
     })
 
     const handleDeleteConfirm = () => {
@@ -194,24 +247,12 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     )}
                 />
                 <Controller
-                    name={`vilkar.${index}.spørsmålstekst` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Spørsmålstekst (valgfritt)"
-                            error={errors?.vilkar?.[index]?.spørsmålstekst?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
-                <Controller
                     name={`vilkar.${index}.beskrivelse` as const}
                     control={control}
                     render={({ field }) => (
                         <TextField
                             {...field}
-                            label="Tekst"
+                            label="Beskrivelse"
                             error={errors?.vilkar?.[index]?.beskrivelse?.message}
                             value={field.value || ''}
                         />
@@ -244,43 +285,37 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
             </div>
 
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Mulige resultater</h3>
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Underspørsmål</h3>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        icon={<PlusIcon />}
+                        size="small"
+                        onClick={() =>
+                            appendUnderspørsmål({
+                                kode: '',
+                                navn: '',
+                                variant: 'RADIO',
+                                alternativer: [],
+                            })
+                        }
+                    >
+                        Legg til underspørsmål
+                    </Button>
+                </div>
+
                 <div className="space-y-6">
-                    <ResultatBegrunnelserSection
-                        title="Begrunnelser for oppfylt"
-                        fields={oppfyltFields}
-                        onAppend={appendOppfylt}
-                        onRemove={removeOppfylt}
-                        control={control}
-                        vilkårIndex={index}
-                        errors={errors}
-                        resultType="OPPFYLT"
-                        mainVilkårshjemmel={mainVilkårshjemmel}
-                    />
-
-                    <ResultatBegrunnelserSection
-                        title="Begrunnelser for ikke oppfylt"
-                        fields={ikkeOppfyltFields}
-                        onAppend={appendIkkeOppfylt}
-                        onRemove={removeIkkeOppfylt}
-                        control={control}
-                        vilkårIndex={index}
-                        errors={errors}
-                        resultType="IKKE_OPPFYLT"
-                        mainVilkårshjemmel={mainVilkårshjemmel}
-                    />
-
-                    <ResultatBegrunnelserSection
-                        title="Begrunnelser for ikke relevant / unntak"
-                        fields={ikkeRelevantFields}
-                        onAppend={appendIkkeRelevant}
-                        onRemove={removeIkkeRelevant}
-                        control={control}
-                        vilkårIndex={index}
-                        errors={errors}
-                        resultType="IKKE_RELEVANT"
-                        mainVilkårshjemmel={mainVilkårshjemmel}
-                    />
+                    {underspørsmålFields.map((field, underspørsmålIndex) => (
+                        <UnderspørsmålSection
+                            key={field.id}
+                            control={control}
+                            vilkårIndex={index}
+                            underspørsmålIndex={underspørsmålIndex}
+                            errors={errors}
+                            onRemove={() => removeUnderspørsmål(underspørsmålIndex)}
+                        />
+                    ))}
                 </div>
             </div>
 

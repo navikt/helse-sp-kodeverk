@@ -4,30 +4,38 @@ import { Control, FieldErrors } from 'react-hook-form'
 import { TextField } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 
-import { KodeverkForm } from '@schemas/kodeverk'
+import { KodeverkForm } from '@schemas/kodeverkV2'
 
 interface VilkårshjemmelFormProps {
     control: Control<KodeverkForm>
     index: number
     errors: FieldErrors<KodeverkForm>
-    resultIndex?: number
-    resultType?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'IKKE_RELEVANT'
+    underspørsmålIndex?: number
+    alternativIndex?: number
 }
 
 type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'paragraf' | 'ledd' | 'setning' | 'bokstav'
 
-export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resultType }: VilkårshjemmelFormProps) => {
+export const VilkårshjemmelForm = ({
+    control,
+    index,
+    errors,
+    underspørsmålIndex,
+    alternativIndex,
+}: VilkårshjemmelFormProps) => {
     const getFieldName = (field: VilkårshjemmelField) => {
-        if (resultIndex !== undefined && resultType) {
-            return `vilkar.${index}.mulige_resultater.${resultType}.${resultIndex}.vilkårshjemmel.${field}` as const
+        if (underspørsmålIndex !== undefined && alternativIndex !== undefined) {
+            return `vilkar.${index}.underspørsmål.${underspørsmålIndex}.alternativer.${alternativIndex}.vilkårshjemmel.${field}` as const
         }
         return `vilkar.${index}.vilkårshjemmel.${field}` as const
     }
 
     const getError = (field: VilkårshjemmelField) => {
-        if (resultIndex !== undefined && resultType) {
-            const resultErrors = errors?.vilkar?.[index]?.mulige_resultater?.[resultType]?.[resultIndex]?.vilkårshjemmel
-            return resultErrors?.[field]?.message
+        if (underspørsmålIndex !== undefined && alternativIndex !== undefined) {
+            const alternativErrors =
+                errors?.vilkar?.[index]?.underspørsmål?.[underspørsmålIndex]?.alternativer?.[alternativIndex]
+                    ?.vilkårshjemmel
+            return alternativErrors?.[field]?.message
         }
         return errors?.vilkar?.[index]?.vilkårshjemmel?.[field]?.message
     }

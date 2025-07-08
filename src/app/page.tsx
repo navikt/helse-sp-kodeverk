@@ -24,7 +24,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { DragVerticalIcon } from '@navikt/aksel-icons'
 
-import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
+import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverkV2'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
 import { ExcelExport } from '@/components/kodeverk/ExcelExport'
 
@@ -38,7 +38,7 @@ const formatParagraf = (hjemmel: Vilkårshjemmel) => {
 }
 
 const fetchKodeverk = async (): Promise<KodeverkForm> => {
-    const response = await fetch('/api/v1/open/kodeverk')
+    const response = await fetch('/api/v2/open/kodeverk')
     if (!response.ok) {
         throw new Error('Failed to fetch kodeverk')
     }
@@ -47,7 +47,7 @@ const fetchKodeverk = async (): Promise<KodeverkForm> => {
 }
 
 const saveKodeverk = async (kodeverk: KodeverkForm): Promise<void> => {
-    const response = await fetch('/api/v1/kodeverk', {
+    const response = await fetch('/api/v2/kodeverk', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -191,22 +191,7 @@ const Page = () => {
     }
 
     const onSubmit = (data: KodeverkForm) => {
-        // Fjern tomme IKKE_RELEVANT arrays
-        const cleanedData = {
-            ...data,
-            vilkar: data.vilkar.map((vilkår) => ({
-                ...vilkår,
-                mulige_resultater: {
-                    ...vilkår.mulige_resultater,
-                    IKKE_RELEVANT: vilkår.mulige_resultater.IKKE_RELEVANT?.length
-                        ? vilkår.mulige_resultater.IKKE_RELEVANT
-                        : undefined,
-                    SKAL_IKKE_VURDERES: [],
-                },
-            })),
-        }
-
-        saveMutation.mutate(cleanedData)
+        saveMutation.mutate(data)
     }
 
     const addVilkår = () => {
@@ -220,14 +205,9 @@ const Page = () => {
                 bokstav: null,
             },
             vilkårskode: '',
-            spørsmålstekst: '',
             beskrivelse: '',
             kategori: 'generelle_bestemmelser',
-            mulige_resultater: {
-                OPPFYLT: [],
-                IKKE_OPPFYLT: [],
-                IKKE_RELEVANT: [],
-            },
+            underspørsmål: [],
         }
         append(newVilkår)
     }
