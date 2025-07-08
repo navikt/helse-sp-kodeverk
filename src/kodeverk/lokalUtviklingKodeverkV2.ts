@@ -66,6 +66,60 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                             setning: null,
                             bokstav: null,
                         },
+                        underspørsmål: [
+                            {
+                                kode: 'COVID_PERIODE',
+                                navn: 'Hvilken periode gjelder covid-opptjeningen?',
+                                variant: 'RADIO',
+                                alternativer: [
+                                    {
+                                        kode: 'MARS_2020',
+                                        navn: 'Mars 2020',
+                                        vilkårshjemmel: {
+                                            lovverk: 'Midlertidig lov',
+                                            lovverksversjon: '2020-03-01',
+                                            paragraf: '1',
+                                            ledd: '1',
+                                            setning: null,
+                                            bokstav: null,
+                                        },
+                                    },
+                                    {
+                                        kode: 'ETTER_MARS_2020',
+                                        navn: 'Etter mars 2020',
+                                        vilkårshjemmel: {
+                                            lovverk: 'Midlertidig lov',
+                                            lovverksversjon: '2020-03-01',
+                                            paragraf: '1',
+                                            ledd: '2',
+                                            setning: null,
+                                            bokstav: null,
+                                        },
+                                        underspørsmål: [
+                                            {
+                                                kode: 'SPESIFISERT_PERIODE',
+                                                navn: 'Spesifiser periode',
+                                                variant: 'SELECT',
+                                                alternativer: [
+                                                    {
+                                                        kode: 'APRIL_2020',
+                                                        navn: 'April 2020',
+                                                    },
+                                                    {
+                                                        kode: 'MAI_2020',
+                                                        navn: 'Mai 2020',
+                                                    },
+                                                    {
+                                                        kode: 'JUNI_2020',
+                                                        navn: 'Juni 2020',
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
                     },
                 ],
             },
