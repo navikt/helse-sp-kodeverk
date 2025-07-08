@@ -36,7 +36,7 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
             if (!underspørsmål.alternativer || underspørsmål.alternativer.length === 0) {
                 flattedData.push({
                     underspørsmålKode: underspørsmål.kode,
-                    underspørsmålNavn: underspørsmål.navn,
+                    underspørsmålNavn: underspørsmål.navn || '',
                     underspørsmålVariant: underspørsmål.variant,
                     alternativKode: '',
                     alternativNavn: '',
@@ -51,10 +51,10 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
                 for (const alternativ of underspørsmål.alternativer) {
                     flattedData.push({
                         underspørsmålKode: underspørsmål.kode,
-                        underspørsmålNavn: underspørsmål.navn,
+                        underspørsmålNavn: underspørsmål.navn || '',
                         underspørsmålVariant: underspørsmål.variant,
                         alternativKode: alternativ.kode,
-                        alternativNavn: alternativ.navn,
+                        alternativNavn: alternativ.navn || '',
                         alternativLovverk: alternativ.vilkårshjemmel?.lovverk || '',
                         alternativLovverksversjon: alternativ.vilkårshjemmel?.lovverksversjon || '',
                         alternativParagraf: alternativ.vilkårshjemmel?.paragraf || '',
@@ -103,10 +103,10 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
                     setning: index === 0 ? hjemmel.setning || '' : '',
                     bokstav: index === 0 ? hjemmel.bokstav || '' : '',
                     underspørsmålKode: data.underspørsmålKode,
-                    underspørsmålNavn: data.underspørsmålNavn,
+                    underspørsmålNavn: data.underspørsmålNavn || '',
                     underspørsmålVariant: data.underspørsmålVariant,
                     alternativKode: data.alternativKode,
-                    alternativNavn: data.alternativNavn,
+                    alternativNavn: data.alternativNavn || '',
                     alternativLovverk: data.alternativLovverk,
                     alternativLovverksversjon: data.alternativLovverksversjon,
                     alternativParagraf: data.alternativParagraf,

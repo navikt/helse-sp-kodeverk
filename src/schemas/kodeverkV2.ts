@@ -30,19 +30,19 @@ export type Vilkårshjemmel = z.infer<typeof vilkårshjemmelSchema>
 // Definerer typene eksplisitt først for å unngå sirkulær referanse
 export const alternativSchema: z.ZodType<{
     kode: string
-    navn: string
+    navn?: string | null | undefined
     oppfylt?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'N/A'
     vilkårshjemmel?: Vilkårshjemmel | null
     underspørsmål?: Array<{
         kode: string
-        navn: string
+        navn?: string | null | undefined
         variant: 'CHECKBOX' | 'RADIO' | 'SELECT'
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         alternativer?: any[]
     }>
 }> = z.object({
     kode: z.string().min(2),
-    navn: z.string().min(2),
+    navn: maybeString,
     oppfylt: oppfyltEnum.default('N/A').optional(),
     vilkårshjemmel: vilkårshjemmelSchema.nullable().optional(),
     underspørsmål: z.array(z.lazy(() => underspørsmålSchema)).optional(),
@@ -50,11 +50,11 @@ export const alternativSchema: z.ZodType<{
 
 export const underspørsmålSchema: z.ZodType<{
     kode: string
-    navn: string
+    navn?: string | null | undefined
     variant: 'CHECKBOX' | 'RADIO' | 'SELECT'
     alternativer?: Array<{
         kode: string
-        navn: string
+        navn?: string | null | undefined
         oppfylt?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'N/A'
         vilkårshjemmel?: Vilkårshjemmel | null
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -62,7 +62,7 @@ export const underspørsmålSchema: z.ZodType<{
     }>
 }> = z.object({
     kode: z.string().min(2),
-    navn: z.string().min(2),
+    navn: maybeString,
     variant: z.enum(['CHECKBOX', 'RADIO', 'SELECT']),
     alternativer: z.array(z.lazy(() => alternativSchema)).optional(),
 })

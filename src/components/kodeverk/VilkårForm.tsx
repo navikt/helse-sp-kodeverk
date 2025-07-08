@@ -70,7 +70,14 @@ const AlternativSection = ({
                     name={`${alternativPath}.navn` as any}
                     control={control}
                     render={({ field }) => (
-                        <TextField {...field} label="Navn" size="small" className="flex-1" value={field.value || ''} />
+                        <TextField
+                            {...field}
+                            label="Navn"
+                            size="small"
+                            className="flex-1"
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
+                        />
                     )}
                 />
                 <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
@@ -176,7 +183,7 @@ const AlternativSection = ({
                     onClick={() =>
                         appendNestedUnderspørsmål({
                             kode: '',
-                            navn: '',
+                            navn: null,
                             variant: 'RADIO',
                             alternativer: [],
                         })
@@ -223,7 +230,14 @@ const UnderspørsmålSection = ({
                     name={`${underspørsmålPath}.navn` as any}
                     control={control}
                     render={({ field }) => (
-                        <TextField {...field} label="Navn" size="small" className="flex-1" value={field.value || ''} />
+                        <TextField
+                            {...field}
+                            label="Navn"
+                            size="small"
+                            className="flex-1"
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
+                        />
                     )}
                 />
                 <Controller
@@ -267,7 +281,7 @@ const UnderspørsmålSection = ({
                     onClick={() =>
                         appendAlternativ({
                             kode: '',
-                            navn: '',
+                            navn: null,
                             oppfylt: 'N/A',
                             vilkårshjemmel: null,
                             underspørsmål: [],
@@ -367,7 +381,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         onClick={() =>
                             appendUnderspørsmål({
                                 kode: '',
-                                navn: '',
+                                navn: null,
                                 variant: 'RADIO',
                                 alternativer: [],
                             })
