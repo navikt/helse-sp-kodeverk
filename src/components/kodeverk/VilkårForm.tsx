@@ -1,7 +1,7 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
-import { Button, Select, TextField, Modal, Heading, Switch } from '@navikt/ds-react'
+import { Button, Select, TextField, Modal, Heading, Switch, RadioGroup, Radio } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
@@ -76,6 +76,27 @@ const AlternativSection = ({
                 <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
                     Fjern
                 </Button>
+            </div>
+
+            <div className="mb-4">
+                <Controller
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    name={`${alternativPath}.oppfylt` as any}
+                    control={control}
+                    render={({ field }) => (
+                        <RadioGroup
+                            {...field}
+                            legend="Oppfylt"
+                            size="small"
+                            value={field.value || 'N/A'}
+                            onChange={(value) => field.onChange(value)}
+                        >
+                            <Radio value="OPPFYLT">Oppfylt</Radio>
+                            <Radio value="IKKE_OPPFYLT">Ikke oppfylt</Radio>
+                            <Radio value="N/A">N/A</Radio>
+                        </RadioGroup>
+                    )}
+                />
             </div>
 
             <div className="mt-4 rounded bg-gray-100 p-3">
@@ -247,6 +268,7 @@ const UnderspørsmålSection = ({
                         appendAlternativ({
                             kode: '',
                             navn: '',
+                            oppfylt: 'N/A',
                             vilkårshjemmel: null,
                             underspørsmål: [],
                         })

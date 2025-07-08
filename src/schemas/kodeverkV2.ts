@@ -15,6 +15,8 @@ export const kategoriEnum = z.enum([
     'yrkesskade',
 ])
 
+export const oppfyltEnum = z.enum(['OPPFYLT', 'IKKE_OPPFYLT', 'N/A'])
+
 export const vilkårshjemmelSchema = z.object({
     lovverk: z.string().min(2),
     lovverksversjon: z.string().min(2), // evt. valider som datoformat om ønskelig
@@ -29,6 +31,7 @@ export type Vilkårshjemmel = z.infer<typeof vilkårshjemmelSchema>
 export const alternativSchema: z.ZodType<{
     kode: string
     navn: string
+    oppfylt?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'N/A'
     vilkårshjemmel?: Vilkårshjemmel | null
     underspørsmål?: Array<{
         kode: string
@@ -40,6 +43,7 @@ export const alternativSchema: z.ZodType<{
 }> = z.object({
     kode: z.string().min(2),
     navn: z.string().min(2),
+    oppfylt: oppfyltEnum.default('N/A').optional(),
     vilkårshjemmel: vilkårshjemmelSchema.nullable().optional(),
     underspørsmål: z.array(z.lazy(() => underspørsmålSchema)).optional(),
 })
@@ -51,6 +55,7 @@ export const underspørsmålSchema: z.ZodType<{
     alternativer?: Array<{
         kode: string
         navn: string
+        oppfylt?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'N/A'
         vilkårshjemmel?: Vilkårshjemmel | null
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         underspørsmål?: any[]
@@ -81,3 +86,4 @@ export const kodeverkFormSchema = z.object({
 export type Vilkår = z.infer<typeof vilkårSchema>
 export type Kodeverk = z.infer<typeof kodeverkSchema>
 export type KodeverkForm = z.infer<typeof kodeverkFormSchema>
+export type OppfyltStatus = z.infer<typeof oppfyltEnum>

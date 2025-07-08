@@ -34,6 +34,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'HOVEDREGEL',
                         navn: 'Har arbeidet i 28 dager før arbeidsuførhet inntreffer',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -46,6 +47,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'ANNEN_YTELSE',
                         navn: 'Har mottatt dagpenger, omsorgspenger, pleiepenger, opplæringspenger, svangerskapspenger eller foreldrepenger',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -58,6 +60,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'COVID',
                         navn: 'Covid-relatert opptjening',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Midlertidig lov',
                             lovverksversjon: '2020-03-01',
@@ -75,6 +78,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                                     {
                                         kode: 'MARS_2020',
                                         navn: 'Mars 2020',
+                                        oppfylt: 'N/A',
                                         vilkårshjemmel: {
                                             lovverk: 'Midlertidig lov',
                                             lovverksversjon: '2020-03-01',
@@ -87,6 +91,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                                     {
                                         kode: 'ETTER_MARS_2020',
                                         navn: 'Etter mars 2020',
+                                        oppfylt: 'N/A',
                                         vilkårshjemmel: {
                                             lovverk: 'Midlertidig lov',
                                             lovverksversjon: '2020-03-01',
@@ -104,14 +109,17 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                                                     {
                                                         kode: 'APRIL_2020',
                                                         navn: 'April 2020',
+                                                        oppfylt: 'N/A',
                                                     },
                                                     {
                                                         kode: 'MAI_2020',
                                                         navn: 'Mai 2020',
+                                                        oppfylt: 'N/A',
                                                     },
                                                     {
                                                         kode: 'JUNI_2020',
                                                         navn: 'Juni 2020',
+                                                        oppfylt: 'N/A',
                                                     },
                                                 ],
                                             },
@@ -131,10 +139,12 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'IKKE_ARBEIDET',
                         navn: 'Har ikke arbeidet i 28 dager før arbeidsuførhet inntreffer',
+                        oppfylt: 'N/A',
                     },
                     {
                         kode: 'AAP_FOR_FORELDREPENGER',
                         navn: 'Har AAP før foreldrepenger og retten var brukt opp uten ny opptjening',
+                        oppfylt: 'N/A',
                     },
                 ],
             },
@@ -146,6 +156,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'ANSATT_NORSK_SKIP_OPTJ_UINNT',
                         navn: 'Ansatt på et norsk skip i utenriksfart',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -158,6 +169,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'FISKER',
                         navn: 'Fisker som er tatt opp på blad B i fiskermanntallet',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -170,6 +182,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'MILITAERTJENESTE',
                         navn: 'Utført militærtjeneste hvor arbeidsuførheten oppstod under tjenesten',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -182,6 +195,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'YRKESSKADE',
                         navn: 'Arbeidsufør på grunn av en godkjent yrkesskade',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -216,6 +230,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'INNEN_TRE_MANEDER',
                         navn: 'Søknad fremsatt i tide (innen 3 måneder)',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -228,6 +243,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'IKKE_INNEN_TRE_MANEDER',
                         navn: 'Søknad ikke fremsatt i tide (over 3 måneder)',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -262,6 +278,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'MEDLEM_FOLKETRYGDEN',
                         navn: 'Er medlem i folketrygden',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -279,10 +296,12 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                                     {
                                         kode: 'FAST_BOSATT',
                                         navn: 'Fast bosatt i Norge',
+                                        oppfylt: 'N/A',
                                     },
                                     {
                                         kode: 'MIDLERTIDIG_BOSATT',
                                         navn: 'Midlertidig bosatt i Norge',
+                                        oppfylt: 'N/A',
                                     },
                                 ],
                             },
@@ -291,6 +310,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'IKKE_MEDLEM_FOLKETRYGDEN',
                         navn: 'Er ikke medlem i folketrygden',
+                        oppfylt: 'N/A',
                         vilkårshjemmel: {
                             lovverk: 'Folketrygdloven',
                             lovverksversjon: '2019-01-01',
@@ -325,6 +345,7 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'SYKDOM',
                         navn: 'Arbeidsufør som følge av sykdom',
+                        oppfylt: 'N/A',
                         underspørsmål: [
                             {
                                 kode: 'SYKDOM_DOKUMENTASJON',
@@ -334,10 +355,12 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                                     {
                                         kode: 'SYKEMELDING',
                                         navn: 'Sykemelding fra lege',
+                                        oppfylt: 'N/A',
                                     },
                                     {
                                         kode: 'LEGEERKLÆRING',
                                         navn: 'Legeerklæring',
+                                        oppfylt: 'N/A',
                                     },
                                 ],
                             },
@@ -346,10 +369,12 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'SKADE',
                         navn: 'Arbeidsufør som følge av skade',
+                        oppfylt: 'N/A',
                     },
                     {
                         kode: 'LYTE',
                         navn: 'Arbeidsufør som følge av lyte',
+                        oppfylt: 'N/A',
                     },
                 ],
             },
