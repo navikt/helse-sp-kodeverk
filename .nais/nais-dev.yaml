@@ -39,6 +39,7 @@ spec:
         - /_next/*
         - /public/*
         - /api/v1/open/*
+        - /api/v2/open/*
   gcp:
     buckets:
       - name: helse-sp-kodeverk
