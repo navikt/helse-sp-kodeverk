@@ -1,7 +1,7 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
-import { Button, Select, TextField, Modal, Heading } from '@navikt/ds-react'
+import { Button, Select, TextField, Modal, Heading, Switch } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
@@ -79,8 +79,51 @@ const AlternativSection = ({
             </div>
 
             <div className="mt-4 rounded bg-gray-100 p-3">
-                <h6 className="mb-3 text-sm font-medium text-gray-700">Vilkårshjemmel for alternativ</h6>
-                <VilkårshjemmelForm control={control} index={vilkårIndex} alternativPath={alternativPath} />
+                <Controller
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    name={`${alternativPath}.vilkårshjemmel` as any}
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <div className="mb-3 flex items-center gap-3">
+                                <Switch
+                                    size="small"
+                                    checked={!!field.value}
+                                    onChange={(event) => {
+                                        const checked = event.target.checked
+                                        if (checked) {
+                                            field.onChange({
+                                                lovverk: '',
+                                                lovverksversjon: '',
+                                                paragraf: '',
+                                                ledd: null,
+                                                setning: null,
+                                                bokstav: null,
+                                            })
+                                        } else {
+                                            field.onChange(null)
+                                        }
+                                    }}
+                                >
+                                    Har vilkårshjemmel
+                                </Switch>
+                            </div>
+
+                            {field.value && (
+                                <div>
+                                    <h6 className="mb-3 text-sm font-medium text-gray-700">
+                                        Vilkårshjemmel for alternativ
+                                    </h6>
+                                    <VilkårshjemmelForm
+                                        control={control}
+                                        index={vilkårIndex}
+                                        alternativPath={alternativPath}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                />
             </div>
 
             {/* Nested underspørsmål for this alternativ */}
