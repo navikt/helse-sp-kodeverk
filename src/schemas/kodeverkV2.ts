@@ -29,7 +29,7 @@ export type Vilkårshjemmel = z.infer<typeof vilkårshjemmelSchema>
 export const alternativSchema: z.ZodType<{
     kode: string
     navn: string
-    vilkårshjemmel?: Vilkårshjemmel // noen Årsak-er har dette
+    vilkårshjemmel?: Vilkårshjemmel 
     underspørsmål?: Array<{
         kode: string
         navn: string
@@ -40,7 +40,7 @@ export const alternativSchema: z.ZodType<{
 }> = z.object({
     kode: z.string().min(2),
     navn: z.string().min(2),
-    vilkårshjemmel: vilkårshjemmelSchema.optional(), // noen Årsak-er har dette
+    vilkårshjemmel: vilkårshjemmelSchema.optional(), 
     underspørsmål: z.array(z.lazy(() => underspørsmålSchema)).optional(),
 })
 
@@ -51,6 +51,7 @@ export const underspørsmålSchema: z.ZodType<{
     alternativer?: Array<{
         kode: string
         navn: string
+        vilkårshjemmel?: Vilkårshjemmel 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         underspørsmål?: any[]
     }>

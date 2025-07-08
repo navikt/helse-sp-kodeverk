@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
 
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
-import { kodeverkSchema } from '@schemas/kodeverk'
+import { kodeverkSchema } from '@schemas/kodeverkV2'
 import { kodeverkStore } from '@/mockapi/storage'
 
 const storage = new Storage()
@@ -25,7 +25,7 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
 
             // hvis development oppdater lokalt kodeverk
             if (process.env.NODE_ENV === 'development') {
-                kodeverkStore.kodeverk = validationResult.data
+                kodeverkStore.kodeverkV2 = validationResult.data
                 return NextResponse.json({ success: true })
             }
 

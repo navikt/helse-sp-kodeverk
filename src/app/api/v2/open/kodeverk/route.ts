@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import { File, Storage } from '@google-cloud/storage'
 
 import { ErrorResponse } from '@/auth/beskyttetApi'
-import { lokalUtviklingKodeverk } from '@/kodeverk/lokalUtviklingKodeverk'
+import { lokalUtviklingKodeverkV2 } from '@/kodeverk/lokalUtviklingKodeverkV2'
 import { kodeverkStore } from '@/mockapi/storage'
-import { Kodeverk } from '@schemas/kodeverk'
+import { Kodeverk } from '@schemas/kodeverkV2'
 
 const storage = new Storage()
 const bucketName = 'helse-sp-kodeverk'
@@ -12,7 +12,7 @@ const bucketName = 'helse-sp-kodeverk'
 export async function GET(): Promise<NextResponse<Kodeverk | ErrorResponse>> {
     // hvis development returner lokalt kodeverk
     if (process.env.NODE_ENV === 'development') {
-        return NextResponse.json(kodeverkStore.kodeverk)
+        return NextResponse.json(kodeverkStore.kodeverkV2)
     }
 
     const [files] = await storage.bucket(bucketName).getFiles({ autoPaginate: false })
@@ -21,7 +21,7 @@ export async function GET(): Promise<NextResponse<Kodeverk | ErrorResponse>> {
     const latest = v2Files.sort((a: File, b: File) => b.metadata.updated!.localeCompare(a.metadata.updated!))[0]
 
     if (!latest) {
-        return NextResponse.json(lokalUtviklingKodeverk)
+        return NextResponse.json(lokalUtviklingKodeverkV2)
     }
 
     // return content from latest file
