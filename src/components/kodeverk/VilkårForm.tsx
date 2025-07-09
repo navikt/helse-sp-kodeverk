@@ -1,10 +1,38 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
-import { Button, Select, TextField, Modal, Heading, Switch, RadioGroup, Radio } from '@navikt/ds-react'
+import {
+    Button,
+    Select,
+    TextField,
+    Modal,
+    Heading,
+    Switch,
+    RadioGroup,
+    Radio,
+    ExpansionCard,
+    Stack,
+} from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+    KeyboardSensor,
+} from '@dnd-kit/core'
+import {
+    SortableContext,
+    useSortable,
+    verticalListSortingStrategy,
+    sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { DragVerticalIcon } from '@navikt/aksel-icons'
 
 import { kategoriLabels } from '@/kodeverk/lokalUtviklingKodeverkV2'
 import { KodeverkForm } from '@schemas/kodeverkV2'
@@ -98,9 +126,11 @@ const AlternativSection = ({
                             value={field.value || 'N/A'}
                             onChange={(value) => field.onChange(value)}
                         >
-                            <Radio value="OPPFYLT">Oppfylt</Radio>
-                            <Radio value="IKKE_OPPFYLT">Ikke oppfylt</Radio>
-                            <Radio value="N/A">N/A</Radio>
+                            <Stack gap="0 6" direction={{ xs: 'column', sm: 'row' }} wrap={false}>
+                                <Radio value="OPPFYLT">Oppfylt</Radio>
+                                <Radio value="IKKE_OPPFYLT">Ikke oppfylt</Radio>
+                                <Radio value="N/A">N/A</Radio>
+                            </Stack>
                         </RadioGroup>
                     )}
                 />
@@ -296,6 +326,29 @@ const UnderspørsmålSection = ({
     )
 }
 
+// Legg til SortableUndersporsmalCard-komponent
+const SortableUndersporsmalCard = ({ id, children }: { id: string; children: React.ReactNode }) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    }
+    return (
+        <div ref={setNodeRef} style={style} className="flex items-start gap-2">
+            <div
+                {...attributes}
+                {...listeners}
+                className="mt-2 cursor-grab rounded p-2 hover:bg-gray-100"
+                role="button"
+                tabIndex={0}
+            >
+                <DragVerticalIcon className="h-5 w-5 text-gray-400" />
+            </div>
+            <div className="flex-1">{children}</div>
+        </div>
+    )
+}
+
 export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormProps) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -303,10 +356,28 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
         fields: underspørsmålFields,
         append: appendUnderspørsmål,
         remove: removeUnderspørsmål,
+        move: moveUnderspørsmål,
     } = useFieldArray({
         control,
         name: `vilkar.${index}.underspørsmål` as const,
     })
+
+    // DnD-kit setup for underspørsmål
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        }),
+    )
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event
+        if (over && active.id !== over.id) {
+            const oldIndex = underspørsmålFields.findIndex((field) => field.id === active.id)
+            const newIndex = underspørsmålFields.findIndex((field) => field.id === over.id)
+            moveUnderspørsmål(oldIndex, newIndex)
+        }
+    }
 
     const handleDeleteConfirm = () => {
         onRemove()
@@ -390,19 +461,37 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         Legg til underspørsmål
                     </Button>
                 </div>
-
-                <div className="space-y-6">
-                    {underspørsmålFields.map((field, underspørsmålIndex) => (
-                        <UnderspørsmålSection
-                            key={field.id}
-                            control={control}
-                            vilkårIndex={index}
-                            underspørsmålPath={`vilkar.${index}.underspørsmål.${underspørsmålIndex}`}
-                            errors={errors}
-                            onRemove={() => removeUnderspørsmål(underspørsmålIndex)}
-                        />
-                    ))}
-                </div>
+                {/* Drag and drop context for underspørsmål */}
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext
+                        items={underspørsmålFields.map((field) => field.id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        {underspørsmålFields.map((field, underspørsmålIndex) => (
+                            <SortableUndersporsmalCard key={field.id} id={field.id}>
+                                <ExpansionCard aria-label="Underspørsmål">
+                                    <ExpansionCard.Header>
+                                        <ExpansionCard.Title>
+                                            {field.navn || field.kode || 'Nytt underspørsmål'}
+                                        </ExpansionCard.Title>
+                                        <ExpansionCard.Description>
+                                            {field.kode && field.navn ? `Kode: ${field.kode}` : ''}
+                                        </ExpansionCard.Description>
+                                    </ExpansionCard.Header>
+                                    <ExpansionCard.Content>
+                                        <UnderspørsmålSection
+                                            control={control}
+                                            vilkårIndex={index}
+                                            underspørsmålPath={`vilkar.${index}.underspørsmål.${underspørsmålIndex}`}
+                                            errors={errors}
+                                            onRemove={() => removeUnderspørsmål(underspørsmålIndex)}
+                                        />
+                                    </ExpansionCard.Content>
+                                </ExpansionCard>
+                            </SortableUndersporsmalCard>
+                        ))}
+                    </SortableContext>
+                </DndContext>
             </div>
 
             <Button
