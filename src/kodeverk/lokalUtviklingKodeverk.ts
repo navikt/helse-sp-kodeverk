@@ -4,64 +4,91 @@ export const lokalUtviklingKodeverk: Kodeverk = [
     {
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
-            lovverksversjon: '2019-01-01',
-            paragraf: '8-2',
-            ledd: '',
+            lovverksversjon: '2019-07-01',
+            paragraf: '22-13',
+            ledd: null,
             setning: null,
             bokstav: null,
         },
-        vilkårskode: 'OPPTJT',
-        beskrivelse: 'Opptjeningstid',
+        vilkårskode: 'KRAV_RETTIDIG_FRAMSATT',
+        beskrivelse: 'Frist for framsetting av krav',
         oppfylt: [
             {
-                kode: 'HOVEDREGEL',
-                beskrivelse: 'Har arbeidet i 28 dager før arbeidsuførhet inntreffer',
+                kode: 'KRAV_FRAMSATT_INNEN_TRE_MAANEDER_FOR_HELE_PERIODEN',
+                beskrivelse: 'Søkt innen tre måneder for hele perioden',
                 vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-07-01',
+                    paragraf: '22-13',
+                    ledd: '3',
+                    setning: null,
+                    bokstav: null,
                 },
             },
             {
-                kode: 'ANNEN_YTELSE',
+                kode: 'KRAV_FRAMSATT_INNEN_TRE_MAANEDER_FOR_DELER_AV_PERIODEN',
+                beskrivelse: 'Søkt innen tre måneder for deler av perioden',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-07-01',
+                    paragraf: '22-13',
+                    ledd: '3',
+                    setning: null,
+                    bokstav: null,
+                },
+            },
+            {
+                kode: 'KRAV_FRAMSATT_INNEN_TRE_AAR_FOR_HELE_PERIODEN_PGA_UTE_AV_STAND',
                 beskrivelse:
-                    'Har mottatt dagpenger, omsorgspenger, pleiepenger, opplæringspenger, svangerskapspenger eller foreldrepenger',
+                    'Søkt innen tre år for hele perioden, ikke vært i stand til å søke tidligere',
                 vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-07-01',
+                    paragraf: '22-13',
+                    ledd: '7',
+                    setning: '1',
+                    bokstav: null,
                 },
             },
             {
-                kode: 'COVID',
-                beskrivelse: 'Covid',
+                kode: 'KRAV_FRAMSATT_INNEN_TRE_AAR_FOR_DELER_AV_PERIODEN_PGA_UTE_AV_STAND',
+                beskrivelse:
+                    'Søkt innen tre år for deler av perioden, ikke vært i stand til å søke tidligere',
                 vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-07-01',
+                    paragraf: '22-13',
+                    ledd: '7',
+                    setning: '1',
+                    bokstav: null,
+                },
+            },
+            {
+                kode: 'KRAV_FRAMSATT_INNEN_TRE_AAR_FOR_HELE_PERIODEN_PGA_MISVISENDE_OPPLYSNINGER',
+                beskrivelse: 'Søkt innen tre år for hele perioden, misvisende opplysninger',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-07-01',
+                    paragraf: '22-13',
+                    ledd: '7',
+                    setning: '2',
+                    bokstav: null,
+                },
+            },
+            {
+                kode: 'KRAV_FRAMSATT_INNEN_TRE_AAR_FOR_DELER_AV_PERIODEN_PGA_MISVISENDE_OPPLYSNINGER',
+                beskrivelse: 'Søkt innen tre år for deler av perioden, misvisende opplysninger',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-07-01',
+                    paragraf: '22-13',
+                    ledd: '7',
+                    setning: '2',
+                    bokstav: null,
                 },
             },
         ],
-        ikkeOppfylt: [
-            {
-                kode: 'IKKE_ARBEIDET',
-                beskrivelse: 'Har ikke arbeidet i 28 dager før arbeidsuførhet inntreffer',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-            {
-                kode: 'AAP_FOR_FORELDREPENGER',
-                beskrivelse: 'Har AAP før foreldrepenger og retten var brukt opp uten ny opptjening',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-        ],
+        ikkeOppfylt: [],
     },
     {
         vilkårshjemmel: {
@@ -72,131 +99,21 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             setning: null,
             bokstav: null,
         },
-        vilkårskode: 'MAA_SOKE_INNEN_TRE_MAANEDER',
-        beskrivelse: 'En ytelse gis for opptil tre måneder før den måneden da kravet ble satt fram',
+        vilkårskode: 'KRAV_FREMSATT_INNEN_TRE_MNDER',
+        beskrivelse:
+            'En ytelse som gis pr. dag eller pr. måned, gis for opptil tre måneder før den måneden da kravet ble satt fram ',
         oppfylt: [
             {
-                kode: 'INNEN_TRE_MANEDER',
-                beskrivelse: 'Søknad fremsatt i tide',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-        ],
-        ikkeOppfylt: [
-            {
-                kode: 'IKKE_INNEN_TRE_MANEDER',
-                beskrivelse: 'Søknad ikke fremsatt i tide',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-        ],
-    },
-    {
-        vilkårshjemmel: {
-            lovverk: 'Folketrygdloven',
-            lovverksversjon: '2019-01-01',
-            paragraf: '2-1',
-            ledd: null,
-            setning: null,
-            bokstav: null,
-        },
-        vilkårskode: 'BOINO',
-        beskrivelse: 'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
-        oppfylt: [
-            {
-                kode: 'MEDLEM_FOLKETRYGDEN',
-                beskrivelse: 'Er medlem i folketrygden',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-        ],
-        ikkeOppfylt: [
-            {
-                kode: 'IKKE_MEDLEM_FOLKETRYGDEN',
-                beskrivelse: 'Er ikke medlem i folketrygden',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-        ],
-    },
-    {
-        vilkårshjemmel: {
-            lovverk: 'Folketrygdloven',
-            lovverksversjon: '2019-01-01',
-            paragraf: '8-4',
-            ledd: null,
-            setning: null,
-            bokstav: null,
-        },
-        vilkårskode: 'ARBUFOR',
-        beskrivelse: 'Arbeidsufør',
-        oppfylt: [
-            {
-                kode: 'ER_ARBEIDSUFORE',
-                beskrivelse: 'arbeidsufør på grunn av en funksjonsnedsettelse som klart skyldes sykdom eller skade',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-            {
-                kode: 'AAA',
-                beskrivelse: 'innlagt i en godkjent helseinstitusjon,',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-            {
-                kode: 'BBB',
+                kode: 'SOEKT_INNEN_TRE_MAANEDER',
                 beskrivelse:
-                    'under behandling og legen erklærer at behandlingen gjør det nødvendig at vedkommende ikke arbeider',
+                    'Ja, oppfylt for hele perioden etter § 22-13 tredje avsnitt',
                 vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-            {
-                kode: 'CCC',
-                beskrivelse: 'deltar på et arbeidsrettet tiltak',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-            {
-                kode: 'DDD',
-                beskrivelse:
-                    'på grunn av sykdom, skade eller lyte får tilskott til opplæringstiltak etter § 10-7 tredje ledd,',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
-                },
-            },
-            {
-                kode: 'KOSM',
-                beskrivelse: 'Kosmetisk inngrep som er medisinks begrunnet',
-                vilkårshjemmel: {
-                    lovverk: 'TODO',
-                    lovverksversjon: 'TODO',
-                    paragraf: 'TODO',
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '22-13',
+                    ledd: '3',
+                    setning: null,
+                    bokstav: null,
                 },
             },
         ],
@@ -205,7 +122,190 @@ export const lokalUtviklingKodeverk: Kodeverk = [
     {
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
-            lovverksversjon: '2019-01-01',
+            lovverksversjon: '1997-05-01',
+            paragraf: '2-1',
+            ledd: null,
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'BOSATT_I_NORGE',
+        beskrivelse:
+            'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
+        oppfylt: [
+            {
+                kode: 'MINST_12_MND_OPPHOLD',
+                beskrivelse:
+                    'Oppholdet er ment å vare eller har vart minst 12 måneder',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '1997-05-01',
+                    paragraf: '2-1',
+                    ledd: '2',
+                },
+            },
+            {
+                kode: 'MIDLERTIDIG_FRAVAER',
+                beskrivelse: 'Midlertidig fravær under 12 måneder',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '1997-05-01',
+                    paragraf: '2-1',
+                    ledd: '4',
+                    setning: null,
+                    bokstav: null,
+                },
+            },
+        ],
+        ikkeOppfylt: [
+            {
+                kode: 'IKKE_LOVLIG_OPPHOLD',
+                beskrivelse:
+                    'Det er et vilkår for medlemskap at vedkommende har lovlig opphold i Norge',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '1997-05-01',
+                    paragraf: '2-1',
+                    ledd: '3',
+                },
+            },
+            {
+                kode: 'OPPHOLD_I_UTL_6MND_2AAR',
+                beskrivelse:
+                    'Opphold i utlandet mer enn seks måneder pr. år i to eller flere påfølgende år',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '1997-05-01',
+                    paragraf: '2-1',
+                    ledd: '4',
+                    setning: '2',
+                    bokstav: null,
+                },
+            },
+        ],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2020-06-12',
+            paragraf: '8-2',
+            ledd: '',
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'OPPTJENNING',
+        beskrivelse:
+            'Har vært i arbeid i minst fire uker (opptjeningstid) ',
+        oppfylt: [
+            {
+                kode: 'OPPTJENNING_HOVEDREGEL',
+                beskrivelse:
+                    'Har arbeidet i 28 dager før arbeidsuførhet inntreffer',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2020-06-12',
+                    paragraf: '8-2',
+                    ledd: '1',
+                    setning: '1',
+                },
+            },
+            {
+                kode: 'OPPTJENNING_ANNEN_YTELSE',
+                beskrivelse:
+                    'Har mottatt dagpenger, omsorgspenger, pleiepenger, opplæringspenger, svangerskapspenger eller foreldrepenger',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2020-06-12',
+                    paragraf: '8-2',
+                    ledd: '2',
+                    setning: '1',
+                },
+            },
+            {
+                kode: 'OPPTJENNING_COVID',
+                beskrivelse:
+                    'Selvstendig næringsdrivende og frilansere som har mistet inntekt som følge av utbrudd av covid-19',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2020-06-12',
+                    paragraf: '8-2',
+                    ledd: '3',
+                },
+            },
+            {
+                kode: 'OPPTJENNING_YRKESAKTIV_FOR_FORELDREPENGER',
+                beskrivelse:
+                    'Sammenhengende yrkesaktiv (eller mottatt ytelse etter kapittel 8, 9 eller 14) i minst fire uker umiddelbart før uttaket av foreldrepenger starter',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2020-06-12',
+                    paragraf: '8-2',
+                    ledd: '',
+                    setning: '3',
+                    bokstav: null,
+                },
+            },
+        ],
+        ikkeOppfylt: [
+            {
+                kode: 'OPPTJENNING_AAP_FOR_FORELDREPENGER',
+                beskrivelse:
+                    'Har AAP før foreldrepenger og retten var brukt opp uten ny opptjening',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2020-06-12',
+                    paragraf: '8-2',
+                    ledd: '2',
+                    setning: '2',
+                },
+            },
+        ],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2012-01-01',
+            paragraf: '8-3',
+            ledd: '1',
+            setning: '1',
+            bokstav: null,
+        },
+        vilkårskode: 'TAPTINNTEKT',
+        beskrivelse: 'Har tapt pensjonsgivende inntekt på grunn av arbeidsuførhet ',
+        oppfylt: [],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2012-01-01',
+            paragraf: '8-3',
+            ledd: '1',
+            setning: '2',
+            bokstav: null,
+        },
+        vilkårskode: 'MAXALDER',
+        beskrivelse: 'Den sykmeldte er ikke fylt 70 år ',
+        oppfylt: [
+            {
+                kode: 'MAXALDER_BEGRENSET',
+                beskrivelse:
+                    'Medlem mellom 67 og 70 år har en begrenset sykepengerett, se § 8-51 og § 8-12 fjerde ledd',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2012-01-01',
+                    paragraf: '8-3',
+                    ledd: '1',
+                    setning: '3',
+                    bokstav: null,
+                },
+            },
+        ],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2012-01-01',
             paragraf: '8-3',
             ledd: '2',
             setning: null,
@@ -221,12 +321,497 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
             paragraf: '8-3',
+            ledd: '3',
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'AVSLUTTET_AKTIVITET',
+        beskrivelse: 'Har trukket seg tilbake fra arbeidslivet ',
+        oppfylt: [],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '8-4',
             ledd: null,
             setning: null,
             bokstav: null,
         },
-        vilkårskode: 'ARBEIDSUFOR',
-        beskrivelse: 'Har tapt pensjonsgivende inntekt på grunn av arbeidsuførhet',
+        vilkårskode: 'ARBUFOR',
+        beskrivelse: 'Arbeidsufør',
+        oppfylt: [
+            {
+                kode: 'ARBUFOR_FUNK',
+                beskrivelse:
+                    'Har en funksjonsnedsettelse som klart skyldes sykdom eller skade',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '1',
+                    setning: '1',
+                },
+            },
+            {
+                kode: 'ARBUFOR_INSTITUSJON',
+                beskrivelse: 'Er innlagt i en godkjent helseinstitusjon',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    bokstav: 'a',
+                },
+            },
+            {
+                kode: 'ARBUFOR_BEHANDLING',
+                beskrivelse:
+                    'Er under behandling og legen erklærer at behandlingen gjør det nødvendig at vedkommende ikke arbeider',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    bokstav: 'b',
+                },
+            },
+            {
+                kode: 'ARBUFOR_TILTAK',
+                beskrivelse: 'Deltar på et arbeidsrettet tiltak',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    bokstav: 'c',
+                },
+            },
+            {
+                kode: 'ARBUFOR_TILSKOTT',
+                beskrivelse:
+                    'På grunn av sykdom, skade eller lyte får tilskott til opplæringstiltak etter § 10-7 tredje ledd',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    bokstav: 'd',
+                },
+            },
+            {
+                kode: 'ARBUFOR_KOSM',
+                beskrivelse: 'Kosmetisk inngrep som er medisinsk begrunnet',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '3',
+                },
+            },
+            {
+                kode: 'ARBUFOR_KONTROLL',
+                beskrivelse:
+                    'nødvendig kontrollundersøkelse som krever minst 24 timers fravær, reisetid medregnet',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    setning: null,
+                    bokstav: 'e',
+                },
+            },
+            {
+                kode: 'ARBUFOR_SMITTE',
+                beskrivelse:
+                    'Myndighet har nedlagt forbud mot at han eller hun arbeider på grunn av smittefare',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    setning: null,
+                    bokstav: 'f',
+                },
+            },
+            {
+                kode: 'ARBUFOR_SVANGERSKAPSAVBRUDD',
+                beskrivelse: 'Arbeidsufør som følge av svangerskapsavbrudd',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    setning: null,
+                    bokstav: 'g',
+                },
+            },
+            {
+                kode: 'ARBUFOR_BARNLOSHET',
+                beskrivelse:
+                    'Arbeidsufør som følge av behandling for barnløshet',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    setning: null,
+                    bokstav: 'h',
+                },
+            },
+            {
+                kode: 'ARBUFOR_DONOR',
+                beskrivelse: 'Er donor eller er under vurdering som donor',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    setning: null,
+                    bokstav: 'i',
+                },
+            },
+            {
+                kode: 'ARBUFOR_STERILISERING',
+                beskrivelse:
+                    'arbeidsufør som følge av behandling i forbindelse med sterilisering',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-4',
+                    ledd: '2',
+                    setning: null,
+                    bokstav: 'j',
+                },
+            },
+        ],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '8-9',
+            ledd: null,
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'OPPHOLD_I_NORGE',
+        beskrivelse:
+            'Den sykmeldte oppholder seg i Norge, i et annet   EØS-land eller i et land eller område der trygdeforordningen gjelder',
+        oppfylt: [
+            {
+                kode: 'EOS_BORGER',
+                beskrivelse: 'Er EoS borger',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-9',
+                    ledd: '1',
+                    setning: '1',
+                    bokstav: null,
+                },
+            },
+        ],
+        ikkeOppfylt: [
+            {
+                kode: 'IKKE_EOS',
+                beskrivelse: 'TODO',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-9',
+                    ledd: '1',
+                    setning: '2',
+                    bokstav: null,
+                },
+            },
+        ],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '8-12',
+            ledd: '1',
+            setning: '1',
+            bokstav: null,
+        },
+        vilkårskode: 'DAGER_IGJEN',
+        beskrivelse:
+            'Retten til sykepenger fra trygden opphører ved mottak av sykepenger over en bestemt periode',
+        oppfylt: [
+            {
+                kode: 'DAGER_IGJEN_ARB_SN_FRI',
+                beskrivelse:
+                    'arbeidstaker, selvstendig næringsdrivende eller frilanser (maks 248 dager i de siste tre årene))',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-12',
+                    ledd: '1',
+                    setning: '1',
+                    bokstav: null,
+                },
+            },
+            {
+                kode: 'DAGER_IGJEN_ANDRE',
+                beskrivelse:
+                    'Når andre medlemmer har mottatt sykepenger fra trygden i til sammen 250 dager i de siste tre årene, opphører retten til sykepenger fra trygden',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-12',
+                    ledd: '1',
+                    setning: '2',
+                    bokstav: null,
+                },
+            },
+            {
+                kode: 'DAGER_IGJEN_26UKER_ARBEIDSFOR',
+                beskrivelse:
+                    'Har vært helt arbeidsfør i 26 uker etter sykepenger fra trygden',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2019-01-01',
+                    paragraf: '8-12',
+                    ledd: '2',
+                    setning: '1',
+                    bokstav: null,
+                },
+            },
+        ],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '8-38',
+            ledd: '1',
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'JEVNLIG_INNTEKT',
+        beskrivelse: 'Har hatt jevnlig frilanser inntekt ',
+        oppfylt: [],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2012-01-01',
+            paragraf: '8-3',
+            ledd: null,
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'TAP_MINSTEINNTEKT',
+        beskrivelse: 'Tap av pensjonsgivende inntekt og minsteinntekt',
+        oppfylt: [],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2021-06-01',
+            paragraf: '8-12',
+            ledd: null,
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'DAGER_IGJEN',
+        beskrivelse: 'Antall sykepengedager',
+        oppfylt: [
+            {
+                kode: 'DAGER_IGJEN_OPPFYLT_FOR_HELE_PERIODEN',
+                beskrivelse:
+                    'Sykepengedager igjen for hele perioden',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2021-06-01',
+                    paragraf: '8-12',
+                    ledd: '1',
+                    setning: null,
+                    bokstav: null,
+                },
+            },
+            {
+                kode: 'DAGER_IGJEN_OPPFYLT_FOR_DELER_AV_PERIODEN',
+                beskrivelse:
+                    'Sykepengedager igjen for deler av perioden',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2021-06-01',
+                    paragraf: '8-12',
+                    ledd: '1',
+                    setning: null,
+                    bokstav: null,
+                },
+            },
+        ],
+        ikkeOppfylt: [
+            {
+                kode: 'IKKE_DAGER_IGJEN',
+                beskrivelse:
+                    'Fått utbetalt sykepenger til maksdato og ikke opptjent ny rett til sykepenger',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2021-06-01',
+                    paragraf: '8-12',
+                    ledd: '2',
+                    setning: null,
+                    bokstav: null,
+                },
+            },
+        ],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '1998-12-18',
+            paragraf: '8-15',
+            ledd: '2',
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'ARB_MIDLERTIDIG_AVBRUTT',
+        beskrivelse:
+            'Arbeidsforholdet er midlertidig avbryt i mer enn 14 dager',
+        oppfylt: [
+            {
+                kode: 'ARB_MIDLERTIDIG_AVBRUTT_PERM',
+                beskrivelse: 'Permisjon',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '1998-12-18',
+                    paragraf: '8-15',
+                    ledd: '2',
+                    setning: '2',
+                    bokstav: null,
+                },
+            },
+        ],
+        ikkeOppfylt: [
+            {
+                kode: 'ARB_MIDLERTIDIG_AVBRUT_TURNUS',
+                beskrivelse: 'Fast turnusordning',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2021-06-01',
+                    paragraf: '8-15',
+                    ledd: '2',
+                    setning: '3',
+                    bokstav: null,
+                },
+            },
+        ],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2023-01-01',
+            paragraf: '8-17',
+            ledd: null,
+            setning: null,
+            bokstav: null,
+        },
+        vilkårskode: 'SYKEPENGER_TRYGDEN',
+        beskrivelse: 'Trygden yter sykepenger ',
+        oppfylt: [
+            {
+                kode: 'SYKEPENGER_TRYGDEN_AGUT',
+                beskrivelse: 'Arbeidsgiverperioden er utløpt',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2023-01-01',
+                    paragraf: '8-17',
+                    ledd: '1',
+                    setning: null,
+                    bokstav: 'a',
+                },
+            },
+            {
+                kode: 'SYKEPENGER_TRYGDEN_IKKEARB',
+                beskrivelse:
+                    'Arbeidsgiveren er ikke forpliktet til å yte etter ftrl § 8-18',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2023-01-01',
+                    paragraf: '8-17',
+                    ledd: '1',
+                    setning: null,
+                    bokstav: 'b',
+                },
+            },
+            {
+                kode: 'SYKEPENGER_TRYGDEN_STREIK_LOCKOUT',
+                beskrivelse: 'Streik eller lockout etter ftrl § 8-31',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2023-01-01',
+                    paragraf: '8-17',
+                    ledd: '1',
+                    setning: null,
+                    bokstav: 'c',
+                },
+            },
+            {
+                kode: 'SYKEPENGER_TRYGDEN_KONTROLL',
+                beskrivelse:
+                    'Nødvendig kontrollundersøkelse som krever minst 24 timers fravær, jf. ftrl  8-4 2 e ',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2023-01-01',
+                    paragraf: '8-17',
+                    ledd: '1',
+                    setning: null,
+                    bokstav: 'd',
+                },
+            },
+            {
+                kode: 'SYKEPENGER_TRYGDEN_DONOR',
+                beskrivelse: 'Arbeidstakeren er donor, jf § 8-4 2  i',
+                vilkårshjemmel: {
+                    lovverk: 'Folketrygdloven',
+                    lovverksversjon: '2023-01-01',
+                    paragraf: '8-17',
+                    ledd: '1',
+                    setning: null,
+                    bokstav: 'e',
+                },
+            },
+        ],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            paragraf: '8-22',
+            ledd: '1',
+            setning: '1',
+            bokstav: null,
+        },
+        vilkårskode: 'ARB_BETALER_IKKE',
+        beskrivelse: 'Trygdens ansvar når arbeidsgiveren ikke betaler',
+        oppfylt: [],
+        ikkeOppfylt: [],
+    },
+    {
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2021-05-21',
+            paragraf: '8-44',
+            ledd: '1',
+            setning: null,
+            bokstav: 'a',
+        },
+        vilkårskode: 'ARBUFOR_SKIP',
+        beskrivelse:
+            'Er arbeidsufør som arbeidstaker på skip, selv om vedkommende ikke ellers er arbeidsufør',
         oppfylt: [],
         ikkeOppfylt: [],
     },
