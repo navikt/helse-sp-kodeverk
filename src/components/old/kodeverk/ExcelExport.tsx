@@ -30,11 +30,11 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
     for (const vilkår of kodeverk.vilkar) {
         const hjemmel = vilkår.vilkårshjemmel
         const resultater = []
-        type ResultatType = 'OPPFYLT' | 'IKKE_OPPFYLT' | 'IKKE_RELEVANT'
+        type ResultatType = 'oppfylt' | 'ikkeOppfylt'
 
-        for (const type of ['OPPFYLT', 'IKKE_OPPFYLT', 'IKKE_RELEVANT'] as ResultatType[]) {
-            if (!vilkår.mulige_resultater[type]) continue
-            for (const årsak of vilkår.mulige_resultater[type]) {
+        for (const type of ['oppfylt', 'ikkeOppfylt'] as ResultatType[]) {
+            if (!vilkår[type]) continue
+            for (const årsak of vilkår[type]) {
                 resultater.push({
                     resultatType: type,
                     årsakKode: årsak.kode,
@@ -52,9 +52,7 @@ function kodeverkTilExcel(kodeverk: KodeverkForm) {
         resultater.forEach((res, index) => {
             rows.push({
                 vilkårskode: index === 0 ? vilkår.vilkårskode : '',
-                spørsmålstekst: index === 0 ? vilkår.spørsmålstekst || '' : '',
                 beskrivelse: index === 0 ? vilkår.beskrivelse : '',
-                kategori: index === 0 ? vilkår.kategori : '',
                 lovverk: index === 0 ? hjemmel.lovverk : '',
                 lovverksversjon: index === 0 ? hjemmel.lovverksversjon : '',
                 paragraf: index === 0 ? hjemmel.paragraf : '',

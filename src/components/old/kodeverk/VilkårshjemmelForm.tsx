@@ -11,7 +11,7 @@ interface VilkårshjemmelFormProps {
     index: number
     errors: FieldErrors<KodeverkForm>
     resultIndex?: number
-    resultType?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'IKKE_RELEVANT'
+    resultType?: 'oppfylt' | 'ikkeOppfylt'
 }
 
 type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'paragraf' | 'ledd' | 'setning' | 'bokstav'
@@ -19,14 +19,14 @@ type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'paragraf' | 'ledd' 
 export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resultType }: VilkårshjemmelFormProps) => {
     const getFieldName = (field: VilkårshjemmelField) => {
         if (resultIndex !== undefined && resultType) {
-            return `vilkar.${index}.mulige_resultater.${resultType}.${resultIndex}.vilkårshjemmel.${field}` as const
+            return `vilkar.${index}.${resultType}.${resultIndex}.vilkårshjemmel.${field}` as const
         }
         return `vilkar.${index}.vilkårshjemmel.${field}` as const
     }
 
     const getError = (field: VilkårshjemmelField) => {
         if (resultIndex !== undefined && resultType) {
-            const resultErrors = errors?.vilkar?.[index]?.mulige_resultater?.[resultType]?.[resultIndex]?.vilkårshjemmel
+            const resultErrors = errors?.vilkar?.[index]?.[resultType]?.[resultIndex]?.vilkårshjemmel
             return resultErrors?.[field]?.message
         }
         return errors?.vilkar?.[index]?.vilkårshjemmel?.[field]?.message
