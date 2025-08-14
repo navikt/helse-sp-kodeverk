@@ -189,6 +189,7 @@ const AlternativSection = ({
                                 <UNSAFE_Combobox
                                     label="Kode"
                                     size="small"
+                                    allowNewValues={true}
                                     options={displayOptions}
                                     selectedOptions={selectedOptions}
                                     onToggleSelected={(option, isSelected) => {
