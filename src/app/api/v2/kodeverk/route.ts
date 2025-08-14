@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
 
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
-import { kodeverkSchema } from '@schemas/kodeverkV2'
+import { hovedspørsmålArraySchema } from '@/schemas/saksbehandlergrensesnitt'
 import { kodeverkStore } from '@/mockapi/storage'
 
 const storage = new Storage()
@@ -15,7 +15,7 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
             const body = await request.json()
 
             // Validate request body against schema
-            const validationResult = kodeverkSchema.safeParse(body)
+            const validationResult = hovedspørsmålArraySchema.safeParse(body)
             if (!validationResult.success) {
                 return NextResponse.json(
                     { error: 'Invalid kodeverk format', details: validationResult.error.format() },

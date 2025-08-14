@@ -24,20 +24,10 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { DragVerticalIcon } from '@navikt/aksel-icons'
 
-import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverkV2'
-import { VilkårForm } from '@/components/kodeverk/VilkårForm'
-import { ExcelExport } from '@/components/kodeverk/ExcelExport'
+import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
+import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
 
-const formatParagraf = (hjemmel: Vilkårshjemmel) => {
-    const { lovverk, paragraf, ledd, setning, bokstav } = hjemmel
-    let result = `${lovverk} § ${paragraf}`
-    if (ledd) result += ` ${ledd}. ledd`
-    if (setning) result += ` ${setning}. setning`
-    if (bokstav) result += ` bokstav ${bokstav}`
-    return result
-}
-
-const fetchKodeverk = async (): Promise<KodeverkForm> => {
+const fetchKodeverk = async (): Promise<HovedspørsmålForm> => {
     const response = await fetch('/api/v2/open/kodeverk')
     if (!response.ok) {
         throw new Error('Failed to fetch kodeverk')
@@ -46,7 +36,7 @@ const fetchKodeverk = async (): Promise<KodeverkForm> => {
     return { vilkar: arr }
 }
 
-const saveKodeverk = async (kodeverk: KodeverkForm): Promise<void> => {
+const saveKodeverk = async (kodeverk: HovedspørsmålForm): Promise<void> => {
     const response = await fetch('/api/v2/kodeverk', {
         method: 'POST',
         headers: {
@@ -95,7 +85,7 @@ const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCard
 const Page = () => {
     const queryClient = useQueryClient()
     const { data: serverKodeverk, isLoading } = useQuery({
-        queryKey: ['kodeverk'],
+        queryKey: ['saksbehandlergrensesnitt'],
         queryFn: fetchKodeverk,
     })
 
@@ -104,8 +94,9 @@ const Page = () => {
         handleSubmit,
         formState: { errors, isDirty },
         reset,
-    } = useForm<KodeverkForm>({
-        resolver: zodResolver(kodeverkFormSchema),
+        setValue,
+    } = useForm<HovedspørsmålForm>({
+        resolver: zodResolver(hovedspørsmålFormSchema),
         defaultValues: { vilkar: [] },
     })
 
@@ -138,11 +129,11 @@ const Page = () => {
     const saveMutation = useMutation({
         mutationFn: saveKodeverk,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['kodeverk'] })
+            await queryClient.invalidateQueries({ queryKey: ['saksbehandlergrensesnitt'] })
             setValidationError(null)
 
             // Hent de oppdaterte dataene og resett skjemaet eksplisitt
-            const updatedData = queryClient.getQueryData<KodeverkForm>(['kodeverk'])
+            const updatedData = queryClient.getQueryData<HovedspørsmålForm>(['saksbehandlergrensesnitt'])
             if (updatedData) {
                 reset(updatedData)
             }
@@ -190,21 +181,13 @@ const Page = () => {
         }
     }
 
-    const onSubmit = (data: KodeverkForm) => {
+    const onSubmit = (data: HovedspørsmålForm) => {
         saveMutation.mutate(data)
     }
 
-    const addVilkår = () => {
-        const newVilkår: Vilkår = {
-            vilkårshjemmel: {
-                lovverk: '',
-                lovverksversjon: '',
-                paragraf: '',
-                ledd: null,
-                setning: null,
-                bokstav: null,
-            },
-            vilkårskode: '',
+    const addSpørsmål = () => {
+        const newVilkår: Hovedspørsmål = {
+            kode: crypto.randomUUID(),
             beskrivelse: '',
             kategori: 'generelle_bestemmelser',
             underspørsmål: [],
@@ -233,38 +216,35 @@ const Page = () => {
             {showSuccess && (
                 <div className="fixed right-4 bottom-4 z-50">
                     <Alert variant="success" closeButton onClose={handleCloseSuccess}>
-                        Kodeverket er lagret!
+                        Grensesnitt er lagret!
                     </Alert>
                 </div>
             )}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-6 flex items-center justify-between">
                     <Heading level="1" size="large">
-                        Rediger ui
+                        Rediger saksbehandlergrensesnitt
                     </Heading>
                     <div className="flex gap-4">
-                        <ExcelExport kodeverk={{ vilkar: fields }} />
-                        <Button type="button" onClick={addVilkår} variant="primary">
-                            Legg til vilkår
+                        <Button type="button" onClick={addSpørsmål} variant="primary">
+                            Legg til spørsmål
                         </Button>
                     </div>
                 </div>
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
                         {fields.map((field, index) => (
-                            <SortableExpansionCard key={field.id} id={field.id} aria-label="Vilkår" className="mb-4">
+                            <SortableExpansionCard key={field.id} id={field.id} aria-label="Spørsmål" className="mb-4">
                                 <ExpansionCard.Header>
-                                    <ExpansionCard.Title>{field.beskrivelse || 'Nytt vilkår'}</ExpansionCard.Title>
-                                    <ExpansionCard.Description>
-                                        {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
-                                    </ExpansionCard.Description>
+                                    <ExpansionCard.Title>{field.beskrivelse || 'Nytt spørsmål'}</ExpansionCard.Title>
                                 </ExpansionCard.Header>
                                 <ExpansionCard.Content>
-                                    <VilkårForm
+                                    <SpørsmålForm
                                         control={control}
                                         index={index}
                                         errors={errors}
                                         onRemove={() => remove(index)}
+                                        setValue={setValue}
                                     />
                                 </ExpansionCard.Content>
                             </SortableExpansionCard>

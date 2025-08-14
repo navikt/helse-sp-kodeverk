@@ -1,67 +1,56 @@
 'use client'
 
-import { Control, FieldErrors, useFieldArray } from 'react-hook-form'
 import {
-    Button,
-    Select,
-    TextField,
-    Modal,
-    Heading,
-    Switch,
-    RadioGroup,
-    Radio,
-    ExpansionCard,
-    Stack,
-} from '@navikt/ds-react'
-import { Controller } from 'react-hook-form'
-import { useState } from 'react'
-import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
-import {
-    DndContext,
     closestCenter,
+    DndContext,
+    DragEndEvent,
+    KeyboardSensor,
     PointerSensor,
     useSensor,
     useSensors,
-    DragEndEvent,
-    KeyboardSensor,
 } from '@dnd-kit/core'
 import {
     SortableContext,
+    sortableKeyboardCoordinates,
     useSortable,
     verticalListSortingStrategy,
-    sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DragVerticalIcon } from '@navikt/aksel-icons'
+import { DragVerticalIcon, PlusIcon, TrashIcon } from '@navikt/aksel-icons'
+import { Button, Checkbox, ExpansionCard, Heading, Modal, Select, TextField } from '@navikt/ds-react'
+import { useState } from 'react'
+import { Control, Controller, FieldErrors, useFieldArray, useWatch, UseFormSetValue, FieldPath } from 'react-hook-form'
+import { v4 as uuidv4 } from 'uuid'
 
 import { kategoriLabels } from '@/kodeverk/lokalUtviklingKodeverkV2'
-import { KodeverkForm } from '@schemas/kodeverkV2'
-
-import { VilkårshjemmelForm } from './VilkårshjemmelForm'
+import { HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 
 interface VilkårFormProps {
-    control: Control<KodeverkForm>
+    control: Control<HovedspørsmålForm>
     index: number
-    errors: FieldErrors<KodeverkForm>
+    errors: FieldErrors<HovedspørsmålForm>
     onRemove: () => void
+    setValue: UseFormSetValue<HovedspørsmålForm>
 }
 
 interface UnderspørsmålSectionProps {
-    control: Control<KodeverkForm>
+    control: Control<HovedspørsmålForm>
     vilkårIndex: number
     underspørsmålPath: string
-    errors: FieldErrors<KodeverkForm>
+    errors: FieldErrors<HovedspørsmålForm>
     onRemove: () => void
     level?: number
+    setValue?: UseFormSetValue<HovedspørsmålForm>
 }
 
 interface AlternativSectionProps {
-    control: Control<KodeverkForm>
+    control: Control<HovedspørsmålForm>
     vilkårIndex: number
     alternativPath: string
-    errors: FieldErrors<KodeverkForm>
+    errors: FieldErrors<HovedspørsmålForm>
     onRemove: () => void
     level?: number
+    setValue?: UseFormSetValue<HovedspørsmålForm>
 }
 
 const AlternativSection = ({
@@ -71,6 +60,7 @@ const AlternativSection = ({
     errors,
     onRemove,
     level = 0,
+    setValue,
 }: AlternativSectionProps) => {
     const {
         fields: nestedUnderspørsmålFields,
@@ -78,150 +68,147 @@ const AlternativSection = ({
         remove: removeNestedUnderspørsmål,
     } = useFieldArray({
         control,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        name: `${alternativPath}.underspørsmål` as any,
+        name: `${alternativPath}.underspørsmål` as `vilkar.${number}.underspørsmål.${number}.alternativer.${number}.underspørsmål`,
+    })
+
+    // Watch harUnderspørsmål checkbox to determine UI behavior
+    const harUnderspørsmål = useWatch({
+        control,
+        name: `${alternativPath}.harUnderspørsmål` as FieldPath<HovedspørsmålForm>,
+    })
+
+    // Watch current kode value
+    const currentKode = useWatch({
+        control,
+        name: `${alternativPath}.kode` as FieldPath<HovedspørsmålForm>,
     })
 
     const indent = level * 20
 
     return (
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4" style={{ marginLeft: `${indent}px` }}>
-            <div className="mb-4 flex items-start gap-4">
-                <Controller
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    name={`${alternativPath}.kode` as any}
-                    control={control}
-                    render={({ field }) => <TextField {...field} label="Kode" size="small" value={field.value || ''} />}
-                />
-                <Controller
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    name={`${alternativPath}.navn` as any}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Navn"
-                            size="small"
-                            className="flex-1"
-                            value={field.value || ''}
-                            onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
+            <div className="mb-4 space-y-4">
+                <div className="flex items-start gap-4">
+                    {/* Vis bare kodeinput hvis alternativet IKKE har underspørsmål */}
+                    {!harUnderspørsmål && (
+                        <Controller
+                            name={`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>}
+                            control={control}
+                            render={({ field }) => (
+                                <TextField {...field} label="Kode" size="small" value={field.value || ''} />
+                            )}
                         />
                     )}
-                />
-                <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
-                    Fjern
-                </Button>
-            </div>
+                    <Controller
+                        name={`${alternativPath}.navn` as FieldPath<HovedspørsmålForm>}
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                label="Navn"
+                                size="small"
+                                className="flex-1"
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
+                            />
+                        )}
+                    />
+                    <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
+                        Fjern
+                    </Button>
+                </div>
 
-            <div className="mb-4">
-                <Controller
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    name={`${alternativPath}.oppfylt` as any}
-                    control={control}
-                    render={({ field }) => (
-                        <RadioGroup
-                            {...field}
-                            legend="Oppfylt"
-                            size="small"
-                            value={field.value || 'N/A'}
-                            onChange={(value) => field.onChange(value)}
-                        >
-                            <Stack gap="0 6" direction={{ xs: 'column', sm: 'row' }} wrap={false}>
-                                <Radio value="OPPFYLT">Oppfylt</Radio>
-                                <Radio value="IKKE_OPPFYLT">Ikke oppfylt</Radio>
-                                <Radio value="N/A">N/A</Radio>
-                            </Stack>
-                        </RadioGroup>
-                    )}
-                />
-            </div>
+                {/* Checkbox for å kontrollere om alternativet har underspørsmål */}
+                <div className="flex items-center gap-4">
+                    <Controller
+                        name={`${alternativPath}.harUnderspørsmål` as FieldPath<HovedspørsmålForm>}
+                        control={control}
+                        render={({ field }) => (
+                            <Checkbox
+                                {...field}
+                                checked={field.value || false}
+                                onChange={(e) => {
+                                    const hasSubquestions = e.target.checked
+                                    field.onChange(hasSubquestions)
 
-            <div className="mt-4 rounded bg-gray-100 p-3">
-                <Controller
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    name={`${alternativPath}.vilkårshjemmel` as any}
-                    control={control}
-                    render={({ field }) => (
-                        <div>
-                            <div className="mb-3 flex items-center gap-3">
-                                <Switch
-                                    size="small"
-                                    checked={!!field.value}
-                                    onChange={(event) => {
-                                        const checked = event.target.checked
-                                        if (checked) {
-                                            field.onChange({
-                                                lovverk: '',
-                                                lovverksversjon: '',
-                                                paragraf: '',
-                                                ledd: null,
-                                                setning: null,
-                                                bokstav: null,
-                                            })
-                                        } else {
-                                            field.onChange(null)
+                                    if (hasSubquestions) {
+                                        // Generer UUID når checkbox aktiveres
+                                        if (!currentKode || currentKode === '') {
+                                            setValue?.(
+                                                `${alternativPath}.kode` as FieldPath<HovedspørsmålForm>,
+                                                uuidv4(),
+                                            )
                                         }
-                                    }}
-                                >
-                                    Har vilkårshjemmel
-                                </Switch>
-                            </div>
+                                    } else {
+                                        // Tøm underspørsmål når checkbox deaktiveres
+                                        setValue?.(
+                                            `${alternativPath}.underspørsmål` as FieldPath<HovedspørsmålForm>,
+                                            [],
+                                        )
+                                    }
+                                }}
+                            >
+                                Har underspørsmål
+                            </Checkbox>
+                        )}
+                    />
+                    {harUnderspørsmål && (
+                        <span className="text-sm text-gray-600">Kode: {currentKode || 'Genereres automatisk'}</span>
+                    )}
+                </div>
+            </div>
 
-                            {field.value && (
-                                <div>
-                                    <h6 className="mb-3 text-sm font-medium text-gray-700">
-                                        Vilkårshjemmel for alternativ
-                                    </h6>
-                                    <VilkårshjemmelForm
+            {/* Vis underspørsmål og knapp kun hvis checkbox er aktivert */}
+            {harUnderspørsmål && (
+                <>
+                    {/* Nested underspørsmål for this alternativ */}
+                    {nestedUnderspørsmålFields.length > 0 && (
+                        <div className="mt-6">
+                            <h6 className="mb-3 text-sm font-medium text-gray-700">
+                                Underspørsmål for dette alternativet
+                            </h6>
+                            <div className="space-y-4">
+                                {nestedUnderspørsmålFields.map((field, nestedIndex) => (
+                                    <UnderspørsmålSection
+                                        key={field.id}
                                         control={control}
-                                        index={vilkårIndex}
-                                        alternativPath={alternativPath}
+                                        vilkårIndex={vilkårIndex}
+                                        underspørsmålPath={`${alternativPath}.underspørsmål.${nestedIndex}`}
+                                        errors={errors}
+                                        onRemove={() => removeNestedUnderspørsmål(nestedIndex)}
+                                        level={level + 1}
+                                        setValue={setValue}
                                     />
-                                </div>
-                            )}
+                                ))}
+                            </div>
                         </div>
                     )}
-                />
-            </div>
 
-            {/* Nested underspørsmål for this alternativ */}
-            {nestedUnderspørsmålFields.length > 0 && (
-                <div className="mt-6">
-                    <h6 className="mb-3 text-sm font-medium text-gray-700">Underspørsmål for dette alternativet</h6>
-                    <div className="space-y-4">
-                        {nestedUnderspørsmålFields.map((field, nestedIndex) => (
-                            <UnderspørsmålSection
-                                key={field.id}
-                                control={control}
-                                vilkårIndex={vilkårIndex}
-                                underspørsmålPath={`${alternativPath}.underspørsmål.${nestedIndex}`}
-                                errors={errors}
-                                onRemove={() => removeNestedUnderspørsmål(nestedIndex)}
-                                level={level + 1}
-                            />
-                        ))}
+                    <div className="mt-4 flex gap-2">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            icon={<PlusIcon />}
+                            size="small"
+                            onClick={() => {
+                                // Generer UUID for alternativet hvis ikke allerede satt
+                                if (!currentKode || currentKode === '') {
+                                    setValue?.(`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>, uuidv4())
+                                }
+
+                                appendNestedUnderspørsmål({
+                                    kode: '',
+                                    navn: null,
+                                    variant: 'RADIO',
+                                    alternativer: [],
+                                })
+                            }}
+                        >
+                            Legg til underspørsmål
+                        </Button>
                     </div>
-                </div>
+                </>
             )}
-
-            <div className="mt-4 flex gap-2">
-                <Button
-                    type="button"
-                    variant="secondary"
-                    icon={<PlusIcon />}
-                    size="small"
-                    onClick={() =>
-                        appendNestedUnderspørsmål({
-                            kode: '',
-                            navn: null,
-                            variant: 'RADIO',
-                            alternativer: [],
-                        })
-                    }
-                >
-                    Legg til underspørsmål
-                </Button>
-            </div>
         </div>
     )
 }
@@ -233,6 +220,7 @@ const UnderspørsmålSection = ({
     errors,
     onRemove,
     level = 0,
+    setValue,
 }: UnderspørsmålSectionProps) => {
     const {
         fields: alternativFields,
@@ -240,8 +228,7 @@ const UnderspørsmålSection = ({
         remove: removeAlternativ,
     } = useFieldArray({
         control,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        name: `${underspørsmålPath}.alternativer` as any,
+        name: `${underspørsmålPath}.alternativer` as `vilkar.${number}.underspørsmål.${number}.alternativer`,
     })
 
     const indent = level * 20
@@ -250,14 +237,12 @@ const UnderspørsmålSection = ({
         <div className="rounded-lg border border-gray-200 bg-white p-4" style={{ marginLeft: `${indent}px` }}>
             <div className="mb-4 flex items-start gap-4">
                 <Controller
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    name={`${underspørsmålPath}.kode` as any}
+                    name={`${underspørsmålPath}.kode` as FieldPath<HovedspørsmålForm>}
                     control={control}
                     render={({ field }) => <TextField {...field} label="Kode" size="small" value={field.value || ''} />}
                 />
                 <Controller
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    name={`${underspørsmålPath}.navn` as any}
+                    name={`${underspørsmålPath}.navn` as FieldPath<HovedspørsmålForm>}
                     control={control}
                     render={({ field }) => (
                         <TextField
@@ -271,8 +256,7 @@ const UnderspørsmålSection = ({
                     )}
                 />
                 <Controller
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    name={`${underspørsmålPath}.variant` as any}
+                    name={`${underspørsmålPath}.variant` as FieldPath<HovedspørsmålForm>}
                     control={control}
                     render={({ field }) => (
                         <Select {...field} label="Variant" size="small" value={field.value || ''}>
@@ -300,6 +284,7 @@ const UnderspørsmålSection = ({
                             errors={errors}
                             onRemove={() => removeAlternativ(alternativIndex)}
                             level={level}
+                            setValue={setValue}
                         />
                     ))}
                 </div>
@@ -310,10 +295,9 @@ const UnderspørsmålSection = ({
                     size="small"
                     onClick={() =>
                         appendAlternativ({
-                            kode: '',
+                            kode: '', // Starter tom, vil bli satt til UUID hvis underspørsmål legges til
                             navn: null,
-                            oppfylt: 'N/A',
-                            vilkårshjemmel: null,
+                            harUnderspørsmål: false,
                             underspørsmål: [],
                         })
                     }
@@ -349,7 +333,7 @@ const SortableUndersporsmalCard = ({ id, children }: { id: string; children: Rea
     )
 }
 
-export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormProps) => {
+export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: VilkårFormProps) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
 
     const {
@@ -392,18 +376,6 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
         <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6">
             <div className="grid grid-cols-2 gap-4">
                 <Controller
-                    name={`vilkar.${index}.vilkårskode` as const}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Vilkårskode"
-                            error={errors?.vilkar?.[index]?.vilkårskode?.message}
-                            value={field.value || ''}
-                        />
-                    )}
-                />
-                <Controller
                     name={`vilkar.${index}.beskrivelse` as const}
                     control={control}
                     render={({ field }) => (
@@ -434,11 +406,6 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         </Select>
                     )}
                 />
-            </div>
-
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
-                <h4 className="text-md mb-4 font-medium text-gray-700">Hovedvilkårshjemmel</h4>
-                <VilkårshjemmelForm control={control} index={index} />
             </div>
 
             <div className="space-y-4">
@@ -485,6 +452,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                                             underspørsmålPath={`vilkar.${index}.underspørsmål.${underspørsmålIndex}`}
                                             errors={errors}
                                             onRemove={() => removeUnderspørsmål(underspørsmålIndex)}
+                                            setValue={setValue}
                                         />
                                     </ExpansionCard.Content>
                                 </ExpansionCard>

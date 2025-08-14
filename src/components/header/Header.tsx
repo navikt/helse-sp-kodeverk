@@ -24,7 +24,7 @@ export function Header(): ReactElement {
                 Kodeverk
             </InternalHeaderButton>
             <InternalHeaderButton as={NextLink} href="/ui">
-                UI
+                Saksbehandlergrensesnitt
             </InternalHeaderButton>
             <Spacer />
             <BrukerMeny />

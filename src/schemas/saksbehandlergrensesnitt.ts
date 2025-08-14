@@ -15,24 +15,11 @@ export const kategoriEnum = z.enum([
     'yrkesskade',
 ])
 
-export const oppfyltEnum = z.enum(['OPPFYLT', 'IKKE_OPPFYLT', 'N/A'])
-
-export const vilkårshjemmelSchema = z.object({
-    lovverk: z.string().min(2),
-    lovverksversjon: z.string().min(2), // evt. valider som datoformat om ønskelig
-    paragraf: z.string(),
-    ledd: maybeString,
-    setning: maybeString,
-    bokstav: maybeString,
-})
-export type Vilkårshjemmel = z.infer<typeof vilkårshjemmelSchema>
-
 // Definerer typene eksplisitt først for å unngå sirkulær referanse
 export const alternativSchema: z.ZodType<{
     kode: string
     navn?: string | null | undefined
-    oppfylt?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'N/A'
-    vilkårshjemmel?: Vilkårshjemmel | null
+    harUnderspørsmål?: boolean
     underspørsmål?: Array<{
         kode: string
         navn?: string | null | undefined
@@ -43,8 +30,7 @@ export const alternativSchema: z.ZodType<{
 }> = z.object({
     kode: z.string().min(2),
     navn: maybeString,
-    oppfylt: oppfyltEnum.default('N/A').optional(),
-    vilkårshjemmel: vilkårshjemmelSchema.nullable().optional(),
+    harUnderspørsmål: z.boolean().optional().default(false),
     underspørsmål: z.array(z.lazy(() => underspørsmålSchema)).optional(),
 })
 
@@ -55,8 +41,7 @@ export const underspørsmålSchema: z.ZodType<{
     alternativer?: Array<{
         kode: string
         navn?: string | null | undefined
-        oppfylt?: 'OPPFYLT' | 'IKKE_OPPFYLT' | 'N/A'
-        vilkårshjemmel?: Vilkårshjemmel | null
+        harUnderspørsmål?: boolean
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         underspørsmål?: any[]
     }>
@@ -67,23 +52,21 @@ export const underspørsmålSchema: z.ZodType<{
     alternativer: z.array(z.lazy(() => alternativSchema)).optional(),
 })
 
-export const vilkårSchema = z.object({
-    vilkårshjemmel: vilkårshjemmelSchema,
-    vilkårskode: z.string().min(5),
+export const hovedspørsmålSchema = z.object({
+    kode: z.string(),
     beskrivelse: z.string().min(5),
     kategori: kategoriEnum,
     underspørsmål: z.array(underspørsmålSchema),
 })
 
 // Hele kodeverket
-export const kodeverkSchema = z.array(vilkårSchema)
+export const hovedspørsmålArraySchema = z.array(hovedspørsmålSchema)
 
-export const kodeverkFormSchema = z.object({
-    vilkar: kodeverkSchema,
+export const hovedspørsmålFormSchema = z.object({
+    vilkar: hovedspørsmålArraySchema,
 })
 
 // Type exports
-export type Vilkår = z.infer<typeof vilkårSchema>
-export type Kodeverk = z.infer<typeof kodeverkSchema>
-export type KodeverkForm = z.infer<typeof kodeverkFormSchema>
-export type OppfyltStatus = z.infer<typeof oppfyltEnum>
+export type Hovedspørsmål = z.infer<typeof hovedspørsmålSchema>
+export type HovedspørsmålArray = z.infer<typeof hovedspørsmålArraySchema>
+export type HovedspørsmålForm = z.infer<typeof hovedspørsmålFormSchema>

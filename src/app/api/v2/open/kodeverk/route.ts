@@ -4,12 +4,12 @@ import { File, Storage } from '@google-cloud/storage'
 import { ErrorResponse } from '@/auth/beskyttetApi'
 import { lokalUtviklingKodeverkV2 } from '@/kodeverk/lokalUtviklingKodeverkV2'
 import { kodeverkStore } from '@/mockapi/storage'
-import { Kodeverk } from '@schemas/kodeverkV2'
+import { HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 
 const storage = new Storage()
 const bucketName = 'helse-sp-kodeverk'
 
-export async function GET(): Promise<NextResponse<Kodeverk | ErrorResponse>> {
+export async function GET(): Promise<NextResponse<HovedspørsmålArray | ErrorResponse>> {
     // hvis development returner lokalt kodeverk
     if (process.env.NODE_ENV === 'development') {
         return NextResponse.json(kodeverkStore.kodeverkV2)

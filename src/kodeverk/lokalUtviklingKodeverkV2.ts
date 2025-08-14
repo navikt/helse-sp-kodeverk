@@ -1,4 +1,4 @@
-import { type Kodeverk } from '@/schemas/kodeverkV2'
+import { type HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 
 export const kategoriLabels = {
     generelle_bestemmelser: 'Generelle bestemmelser',
@@ -12,17 +12,9 @@ export const kategoriLabels = {
     yrkesskade: 'Yrkesskade',
 } as const
 
-export const lokalUtviklingKodeverkV2: Kodeverk = [
+export const lokalUtviklingKodeverkV2: HovedspørsmålArray = [
     {
-        vilkårshjemmel: {
-            lovverk: 'Folketrygdloven',
-            lovverksversjon: '1970',
-            paragraf: '8-3',
-            ledd: null,
-            setning: null,
-            bokstav: null,
-        },
-        vilkårskode: 'SDFSDF',
+        kode: 'SDFSDF',
         beskrivelse: 'tap av pensjonsgivende inntekt og minsteinntekt',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
@@ -31,12 +23,10 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                 navn: 'Inntektstap pga arbeidsuførhet',
                 variant: 'RADIO',
                 alternativer: [
-                    { kode: 'INNTEKTSTAP_JA', navn: 'Ja', oppfylt: 'OPPFYLT', vilkårshjemmel: null, underspørsmål: [] },
+                    { kode: 'INNTEKTSTAP_JA', navn: 'Ja', underspørsmål: [] },
                     {
                         kode: 'INNTEKTSTAP_NEI',
                         navn: 'Nei',
-                        oppfylt: 'IKKE_OPPFYLT',
-                        vilkårshjemmel: null,
                         underspørsmål: [],
                     },
                 ],
@@ -49,8 +39,6 @@ export const lokalUtviklingKodeverkV2: Kodeverk = [
                     {
                         kode: 'FYLT_70',
                         navn: 'Fylt 70 år',
-                        oppfylt: 'IKKE_OPPFYLT',
-                        vilkårshjemmel: null,
                         underspørsmål: [],
                     },
                 ],
