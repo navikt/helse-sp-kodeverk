@@ -6,23 +6,6 @@ import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragEndEvent,
-} from '@dnd-kit/core'
-import {
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { DragVerticalIcon } from '@navikt/aksel-icons'
 
 import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
 import { VilkårForm } from '@/components/old/kodeverk/VilkårForm'
@@ -51,37 +34,46 @@ const saveKodeverk = async (kodeverk: KodeverkForm): Promise<void> => {
     }
 }
 
-interface SortableExpansionCardProps {
-    id: string
-    children: React.ReactNode
-    'aria-label': string
-    className?: string
-}
+// Type for fields med id fra useFieldArray
+type FieldWithId = Vilkår & { id: string }
 
-const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCardProps) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
+// Funksjon for å sortere vilkår basert på lovverk, kapittel og paragraf
+const sortVilkår = (vilkår: FieldWithId[]): FieldWithId[] => {
+    return [...vilkår].sort((a, b) => {
+        // Nye vilkår (uten lovverk) skal vises øverst
+        if (!a.vilkårshjemmel.lovverk && !b.vilkårshjemmel.lovverk) return 0
+        if (!a.vilkårshjemmel.lovverk) return -1
+        if (!b.vilkårshjemmel.lovverk) return 1
 
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    }
+        // Sorter på lovverk
+        const lovverkCompare = a.vilkårshjemmel.lovverk.localeCompare(b.vilkårshjemmel.lovverk)
+        if (lovverkCompare !== 0) return lovverkCompare
 
-    return (
-        <div ref={setNodeRef} style={style} className="flex items-start gap-2">
-            <div
-                {...attributes}
-                {...listeners}
-                className="hover:bg-gray-100 mt-6 cursor-grab rounded p-2"
-                role="button"
-                tabIndex={0}
-            >
-                <DragVerticalIcon className="text-gray-400 h-5 w-5" />
-            </div>
-            <div className="flex-1">
-                <ExpansionCard {...props}>{children}</ExpansionCard>
-            </div>
-        </div>
-    )
+        // Sorter på kapittel (numerisk)
+        const kapittelA = parseInt(a.vilkårshjemmel.kapittel) || 0
+        const kapittelB = parseInt(b.vilkårshjemmel.kapittel) || 0
+        if (kapittelA !== kapittelB) return kapittelA - kapittelB
+
+        // Sorter på paragraf (numerisk)
+        const paragrafA = parseInt(a.vilkårshjemmel.paragraf) || 0
+        const paragrafB = parseInt(b.vilkårshjemmel.paragraf) || 0
+        if (paragrafA !== paragrafB) return paragrafA - paragrafB
+
+        // Sorter på ledd
+        const leddA = a.vilkårshjemmel.ledd ? parseInt(a.vilkårshjemmel.ledd.toString()) : 0
+        const leddB = b.vilkårshjemmel.ledd ? parseInt(b.vilkårshjemmel.ledd.toString()) : 0
+        if (leddA !== leddB) return leddA - leddB
+
+        // Sorter på setning
+        const setningA = a.vilkårshjemmel.setning ? parseInt(a.vilkårshjemmel.setning.toString()) : 0
+        const setningB = b.vilkårshjemmel.setning ? parseInt(b.vilkårshjemmel.setning.toString()) : 0
+        if (setningA !== setningB) return setningA - setningB
+
+        // Sorter på bokstav
+        const bokstavA = a.vilkårshjemmel.bokstav || ''
+        const bokstavB = b.vilkårshjemmel.bokstav || ''
+        return bokstavA.localeCompare(bokstavB)
+    })
 }
 
 const Page = () => {
@@ -98,27 +90,13 @@ const Page = () => {
         defaultValues: { vilkar: [] },
     })
 
-    const { fields, append, remove, move } = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
         control,
         name: 'vilkar',
     })
 
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        }),
-    )
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event
-
-        if (over && active.id !== over.id) {
-            const oldIndex = fields.findIndex((field) => field.id === active.id)
-            const newIndex = fields.findIndex((field) => field.id === over.id)
-            move(oldIndex, newIndex)
-        }
-    }
+    // Sorter vilkårene før visning
+    const sortedFields = sortVilkår(fields as FieldWithId[])
 
     const [validationError, setValidationError] = useState<string | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
@@ -247,28 +225,28 @@ const Page = () => {
                         </Button>
                     </div>
                 </div>
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
-                        {fields.map((field, index) => (
-                            <SortableExpansionCard key={field.id} id={field.id} aria-label="Vilkår" className="mb-4">
-                                <ExpansionCard.Header>
-                                    <ExpansionCard.Title>{field.beskrivelse || 'Nytt vilkår'}</ExpansionCard.Title>
-                                    <ExpansionCard.Description>
-                                        {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
-                                    </ExpansionCard.Description>
-                                </ExpansionCard.Header>
-                                <ExpansionCard.Content>
-                                    <VilkårForm
-                                        control={control}
-                                        index={index}
-                                        errors={errors}
-                                        onRemove={() => remove(index)}
-                                    />
-                                </ExpansionCard.Content>
-                            </SortableExpansionCard>
-                        ))}
-                    </SortableContext>
-                </DndContext>
+                {sortedFields.map((field) => {
+                    // Finn den opprinnelige indeksen i fields-arrayet
+                    const originalIndex = fields.findIndex((f) => f.id === field.id)
+                    return (
+                        <ExpansionCard key={field.id} aria-label="Vilkår" className="mb-4">
+                            <ExpansionCard.Header>
+                                <ExpansionCard.Title>{field.beskrivelse || 'Nytt vilkår'}</ExpansionCard.Title>
+                                <ExpansionCard.Description>
+                                    {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
+                                </ExpansionCard.Description>
+                            </ExpansionCard.Header>
+                            <ExpansionCard.Content>
+                                <VilkårForm
+                                    control={control}
+                                    index={originalIndex}
+                                    errors={errors}
+                                    onRemove={() => remove(originalIndex)}
+                                />
+                            </ExpansionCard.Content>
+                        </ExpansionCard>
+                    )
+                })}
             </form>
         </div>
     )
