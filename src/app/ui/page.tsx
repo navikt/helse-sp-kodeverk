@@ -240,7 +240,7 @@ const Page = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-6 flex items-center justify-between">
                     <Heading level="1" size="large">
-                        Rediger Kodeverk
+                        Rediger ui
                     </Heading>
                     <div className="flex gap-4">
                         <ExcelExport kodeverk={{ vilkar: fields }} />

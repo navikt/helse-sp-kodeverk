@@ -23,8 +23,9 @@ export function Providers({ children }: PropsWithChildren): ReactElement {
                     queries: {
                         /* Setting this to true causes the request to be immediately executed after initial
                            mount Even if the query had data hydrated from the server side render */
-                        refetchOnMount: false,
+                        refetchOnMount: true, // Lar React Query refetche invalidated queries ved mount
                         refetchOnWindowFocus: false,
+                        staleTime: 5 * 60 * 1000, // Data er ferske i 5 minutter som standard
                     },
                 },
             }),

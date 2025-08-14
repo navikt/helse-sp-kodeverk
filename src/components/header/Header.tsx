@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react'
 import NextLink from 'next/link'
 import { InternalHeader, Spacer } from '@navikt/ds-react'
-import { InternalHeaderTitle } from '@navikt/ds-react/InternalHeader'
+import { InternalHeaderTitle, InternalHeaderButton } from '@navikt/ds-react/InternalHeader'
 
 import { BrukerMeny } from '@components/header/brukermeny/BrukerMeny'
 
@@ -20,6 +20,12 @@ export function Header(): ReactElement {
             <InternalHeaderTitle as={NextLink} href="/">
                 Spillerom kodeverk admin
             </InternalHeaderTitle>
+            <InternalHeaderButton as={NextLink} href="/kodeverk">
+                Kodeverk
+            </InternalHeaderButton>
+            <InternalHeaderButton as={NextLink} href="/ui">
+                UI
+            </InternalHeaderButton>
             <Spacer />
             <BrukerMeny />
         </InternalHeader>
