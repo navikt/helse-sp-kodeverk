@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { File, Storage } from '@google-cloud/storage'
 
 import { ErrorResponse } from '@/auth/beskyttetApi'
-import { lokalUtviklingKodeverkV2 } from '@/kodeverk/lokalUtviklingKodeverkV2'
+import { saksbehandlerUi } from '@/kodeverk/lokalSaksbehandlerui'
 import { kodeverkStore } from '@/mockapi/storage'
 import { HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 
@@ -21,7 +21,7 @@ export async function GET(): Promise<NextResponse<HovedspørsmålArray | ErrorRe
     const latest = v2Files.sort((a: File, b: File) => b.metadata.updated!.localeCompare(a.metadata.updated!))[0]
 
     if (!latest) {
-        return NextResponse.json(lokalUtviklingKodeverkV2)
+        return NextResponse.json(saksbehandlerUi)
     }
 
     // return content from latest file

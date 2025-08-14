@@ -22,7 +22,7 @@ import { useState } from 'react'
 import { Control, Controller, FieldErrors, useFieldArray, useWatch, UseFormSetValue, FieldPath } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 
-import { kategoriLabels } from '@/kodeverk/lokalUtviklingKodeverkV2'
+import { kategoriLabels } from '@/kodeverk/lokalSaksbehandlerui'
 import { HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 
 interface VilkårFormProps {

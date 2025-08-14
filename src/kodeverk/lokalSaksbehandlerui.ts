@@ -12,7 +12,7 @@ export const kategoriLabels = {
     yrkesskade: 'Yrkesskade',
 } as const
 
-export const lokalUtviklingKodeverkV2: HovedspørsmålArray = [
+export const saksbehandlerUi: HovedspørsmålArray = [
     {
         kode: 'SDFSDF',
         beskrivelse: 'tap av pensjonsgivende inntekt og minsteinntekt',
