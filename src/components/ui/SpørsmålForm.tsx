@@ -179,7 +179,7 @@ const AlternativSection = ({
                             // Hvis koden ikke finnes i kodeverket, vis den som et alternativ med spesiell markering
                             const displayOptions = isValidKode
                                 ? kodeOptions
-                                : [...kodeOptions, { value: currentValue, label: `${currentValue} - UKJENT KODE` }]
+                                : [...kodeOptions, { value: currentValue, label: `⚠️ ${currentValue} - UKJENT KODE` }]
 
                             const selectedOptions = currentValue
                                 ? displayOptions.filter((opt) => opt.value === currentValue)
@@ -420,10 +420,10 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
         const options: KodeOption[] = []
         for (const vilkar of kodeverkData.vilkar) {
             for (const årsak of vilkar.oppfylt) {
-                options.push({ value: årsak.kode, label: `${årsak.kode} - ${årsak.beskrivelse}` })
+                options.push({ value: årsak.kode, label: `✅ ${årsak.kode} - ${årsak.beskrivelse}` })
             }
             for (const årsak of vilkar.ikkeOppfylt) {
-                options.push({ value: årsak.kode, label: `${årsak.kode} - ${årsak.beskrivelse}` })
+                options.push({ value: årsak.kode, label: `❌ ${årsak.kode} - ${årsak.beskrivelse}` })
             }
         }
         return options.sort((a, b) => a.value.localeCompare(b.value))
