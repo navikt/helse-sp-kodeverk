@@ -7,7 +7,7 @@ export function useKodeverk() {
     return useQuery<KodeverkForm, Error>({
         queryKey: ['kodeverk'],
         queryFn: async () => {
-            const data = await fetchAndParse('/api/v1/open/kodeverk', kodeverkSchema)
+            const data = await fetchAndParse('/api/v2/open/kodeverk', kodeverkSchema)
             return { vilkar: data }
         },
     })

@@ -28,7 +28,7 @@ import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from 
 import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
 
 const fetchKodeverk = async (): Promise<HovedspørsmålForm> => {
-    const response = await fetch('/api/v2/open/kodeverk')
+    const response = await fetch('/api/v2/open/saksbehandlerui')
     if (!response.ok) {
         throw new Error('Failed to fetch kodeverk')
     }
@@ -37,7 +37,7 @@ const fetchKodeverk = async (): Promise<HovedspørsmålForm> => {
 }
 
 const saveKodeverk = async (kodeverk: HovedspørsmålForm): Promise<void> => {
-    const response = await fetch('/api/v2/kodeverk', {
+    const response = await fetch('/api/v2/saksbehandlerui', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

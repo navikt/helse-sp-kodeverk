@@ -39,7 +39,7 @@ const formatParagraf = (hjemmel: Vilkårshjemmel) => {
 }
 
 const saveKodeverk = async (kodeverk: KodeverkForm): Promise<void> => {
-    const response = await fetch('/api/v1/kodeverk', {
+    const response = await fetch('/api/v2/kodeverk', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

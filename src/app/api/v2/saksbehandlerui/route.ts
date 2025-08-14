@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
 
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
-import { kodeverkSchema } from '@schemas/kodeverk'
+import { hovedspørsmålArraySchema } from '@/schemas/saksbehandlergrensesnitt'
 import { kodeverkStore } from '@/mockapi/storage'
 
 const storage = new Storage()
@@ -15,7 +15,7 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
             const body = await request.json()
 
             // Validate request body against schema
-            const validationResult = kodeverkSchema.safeParse(body)
+            const validationResult = hovedspørsmålArraySchema.safeParse(body)
             if (!validationResult.success) {
                 return NextResponse.json(
                     { error: 'Invalid kodeverk format', details: validationResult.error.format() },
@@ -25,12 +25,12 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
 
             // hvis development oppdater lokalt kodeverk
             if (process.env.NODE_ENV === 'development') {
-                kodeverkStore.kodeverk = validationResult.data
+                kodeverkStore.kodeverkV2 = validationResult.data
                 return NextResponse.json({ success: true })
             }
 
-            // filename is current timestamp
-            const fileName = `v3-kodeverk-${Date.now()}.json`
+            // filename is current timestamp with v2 prefix
+            const fileName = `saksbehandlerui-${Date.now()}.json`
             const bucket = storage.bucket(bucketName)
             const file = bucket.file(fileName)
 
