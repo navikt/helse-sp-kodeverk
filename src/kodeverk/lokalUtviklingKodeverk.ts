@@ -5,7 +5,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-07-01',
-            paragraf: '22-13',
+            kapittel: '22',
+            paragraf: '13',
             ledd: null,
             setning: null,
             bokstav: null,
@@ -19,7 +20,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
-                    paragraf: '22-13',
+                    kapittel: '22',
+                    paragraf: '13',
                     ledd: '3',
                     setning: null,
                     bokstav: null,
@@ -31,7 +33,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
-                    paragraf: '22-13',
+                    kapittel: '22',
+                    paragraf: '13',
                     ledd: '3',
                     setning: null,
                     bokstav: null,
@@ -43,7 +46,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
-                    paragraf: '22-13',
+                    kapittel: '22',
+                    paragraf: '13',
                     ledd: '7',
                     setning: '1',
                     bokstav: null,
@@ -55,7 +59,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
-                    paragraf: '22-13',
+                    kapittel: '22',
+                    paragraf: '13',
                     ledd: '7',
                     setning: '1',
                     bokstav: null,
@@ -67,7 +72,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
-                    paragraf: '22-13',
+                    kapittel: '22',
+                    paragraf: '13',
                     ledd: '7',
                     setning: '2',
                     bokstav: null,
@@ -79,7 +85,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
-                    paragraf: '22-13',
+                    kapittel: '22',
+                    paragraf: '13',
                     ledd: '7',
                     setning: '2',
                     bokstav: null,
@@ -92,7 +99,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
-            paragraf: '22-13',
+            kapittel: '22',
+            paragraf: '13',
             ledd: '3',
             setning: null,
             bokstav: null,
@@ -107,7 +115,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '22-13',
+                    kapittel: '22',
+                    paragraf: '13',
                     ledd: '3',
                     setning: null,
                     bokstav: null,
@@ -120,7 +129,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '1997-05-01',
-            paragraf: '2-1',
+            kapittel: '2',
+            paragraf: '1',
             ledd: null,
             setning: null,
             bokstav: null,
@@ -134,7 +144,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1997-05-01',
-                    paragraf: '2-1',
+                    kapittel: '2',
+                    paragraf: '1',
                     ledd: '2',
                 },
             },
@@ -144,7 +155,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1997-05-01',
-                    paragraf: '2-1',
+                    kapittel: '2',
+                    paragraf: '1',
                     ledd: '4',
                     setning: null,
                     bokstav: null,
@@ -158,7 +170,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1997-05-01',
-                    paragraf: '2-1',
+                    kapittel: '2',
+                    paragraf: '1',
                     ledd: '3',
                 },
             },
@@ -168,7 +181,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1997-05-01',
-                    paragraf: '2-1',
+                    kapittel: '2',
+                    paragraf: '1',
                     ledd: '4',
                     setning: '2',
                     bokstav: null,
@@ -180,7 +194,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2020-06-12',
-            paragraf: '8-2',
+            kapittel: '8',
+            paragraf: '2',
             ledd: '',
             setning: null,
             bokstav: null,
@@ -194,7 +209,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2020-06-12',
-                    paragraf: '8-2',
+                    kapittel: '8',
+                    paragraf: '2',
                     ledd: '1',
                     setning: '1',
                 },
@@ -206,7 +222,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2020-06-12',
-                    paragraf: '8-2',
+                    kapittel: '8',
+                    paragraf: '2',
                     ledd: '2',
                     setning: '1',
                 },
@@ -218,7 +235,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2020-06-12',
-                    paragraf: '8-2',
+                    kapittel: '8',
+                    paragraf: '2',
                     ledd: '3',
                 },
             },
@@ -229,7 +247,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2020-06-12',
-                    paragraf: '8-2',
+                    kapittel: '8',
+                    paragraf: '2',
                     ledd: '',
                     setning: '3',
                     bokstav: null,
@@ -243,7 +262,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2020-06-12',
-                    paragraf: '8-2',
+                    kapittel: '8',
+                    paragraf: '2',
                     ledd: '2',
                     setning: '2',
                 },
@@ -254,7 +274,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2012-01-01',
-            paragraf: '8-3',
+            kapittel: '8',
+            paragraf: '3',
             ledd: '1',
             setning: '1',
             bokstav: null,
@@ -268,7 +289,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2012-01-01',
-            paragraf: '8-3',
+            kapittel: '8',
+            paragraf: '3',
             ledd: '1',
             setning: '2',
             bokstav: null,
@@ -283,7 +305,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2012-01-01',
-                    paragraf: '8-3',
+                    kapittel: '8',
+                    paragraf: '3',
                     ledd: '1',
                     setning: '3',
                     bokstav: null,
@@ -296,7 +319,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2012-01-01',
-            paragraf: '8-3',
+            kapittel: '8',
+            paragraf: '3',
             ledd: '2',
             setning: null,
             bokstav: null,
@@ -310,7 +334,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
-            paragraf: '8-3',
+            kapittel: '8',
+            paragraf: '3',
             ledd: '3',
             setning: null,
             bokstav: null,
@@ -324,7 +349,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
-            paragraf: '8-4',
+            kapittel: '8',
+            paragraf: '4',
             ledd: null,
             setning: null,
             bokstav: null,
@@ -338,7 +364,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '1',
                     setning: '1',
                 },
@@ -349,7 +376,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     bokstav: 'a',
                 },
@@ -361,7 +389,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     bokstav: 'b',
                 },
@@ -372,7 +401,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     bokstav: 'c',
                 },
@@ -384,7 +414,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     bokstav: 'd',
                 },
@@ -395,7 +426,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '3',
                 },
             },
@@ -405,7 +437,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     setning: null,
                     bokstav: 'e',
@@ -417,7 +450,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     setning: null,
                     bokstav: 'f',
@@ -429,7 +463,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     setning: null,
                     bokstav: 'g',
@@ -441,7 +476,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     setning: null,
                     bokstav: 'h',
@@ -453,7 +489,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     setning: null,
                     bokstav: 'i',
@@ -465,7 +502,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-4',
+                    kapittel: '8',
+                    paragraf: '4',
                     ledd: '2',
                     setning: null,
                     bokstav: 'j',
@@ -478,7 +516,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
-            paragraf: '8-9',
+            kapittel: '8',
+            paragraf: '9',
             ledd: null,
             setning: null,
             bokstav: null,
@@ -493,7 +532,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-9',
+                    kapittel: '8',
+                    paragraf: '9',
                     ledd: '1',
                     setning: '1',
                     bokstav: null,
@@ -507,7 +547,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-9',
+                    kapittel: '8',
+                    paragraf: '9',
                     ledd: '1',
                     setning: '2',
                     bokstav: null,
@@ -519,7 +560,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
-            paragraf: '8-12',
+            kapittel: '8',
+            paragraf: '12',
             ledd: '1',
             setning: '1',
             bokstav: null,
@@ -534,7 +576,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-12',
+                    kapittel: '8',
+                    paragraf: '12',
                     ledd: '1',
                     setning: '1',
                     bokstav: null,
@@ -547,7 +590,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-12',
+                    kapittel: '8',
+                    paragraf: '12',
                     ledd: '1',
                     setning: '2',
                     bokstav: null,
@@ -559,7 +603,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
-                    paragraf: '8-12',
+                    kapittel: '8',
+                    paragraf: '12',
                     ledd: '2',
                     setning: '1',
                     bokstav: null,
@@ -572,7 +617,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
-            paragraf: '8-38',
+            kapittel: '8',
+            paragraf: '38',
             ledd: '1',
             setning: null,
             bokstav: null,
@@ -586,7 +632,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2012-01-01',
-            paragraf: '8-3',
+            kapittel: '8',
+            paragraf: '3',
             ledd: null,
             setning: null,
             bokstav: null,
@@ -600,7 +647,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2021-06-01',
-            paragraf: '8-12',
+            kapittel: '8',
+            paragraf: '12',
             ledd: null,
             setning: null,
             bokstav: null,
@@ -614,7 +662,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2021-06-01',
-                    paragraf: '8-12',
+                    kapittel: '8',
+                    paragraf: '12',
                     ledd: '1',
                     setning: null,
                     bokstav: null,
@@ -626,7 +675,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2021-06-01',
-                    paragraf: '8-12',
+                    kapittel: '8',
+                    paragraf: '12',
                     ledd: '1',
                     setning: null,
                     bokstav: null,
@@ -640,7 +690,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2021-06-01',
-                    paragraf: '8-12',
+                    kapittel: '8',
+                    paragraf: '12',
                     ledd: '2',
                     setning: null,
                     bokstav: null,
@@ -652,7 +703,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '1998-12-18',
-            paragraf: '8-15',
+            kapittel: '8',
+            paragraf: '15',
             ledd: '2',
             setning: null,
             bokstav: null,
@@ -666,7 +718,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1998-12-18',
-                    paragraf: '8-15',
+                    kapittel: '8',
+                    paragraf: '15',
                     ledd: '2',
                     setning: '2',
                     bokstav: null,
@@ -680,7 +733,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2021-06-01',
-                    paragraf: '8-15',
+                    kapittel: '8',
+                    paragraf: '15',
                     ledd: '2',
                     setning: '3',
                     bokstav: null,
@@ -692,7 +746,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2023-01-01',
-            paragraf: '8-17',
+            kapittel: '8',
+            paragraf: '17',
             ledd: null,
             setning: null,
             bokstav: null,
@@ -706,7 +761,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2023-01-01',
-                    paragraf: '8-17',
+                    kapittel: '8',
+                    paragraf: '17',
                     ledd: '1',
                     setning: null,
                     bokstav: 'a',
@@ -718,7 +774,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2023-01-01',
-                    paragraf: '8-17',
+                    kapittel: '8',
+                    paragraf: '17',
                     ledd: '1',
                     setning: null,
                     bokstav: 'b',
@@ -730,7 +787,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2023-01-01',
-                    paragraf: '8-17',
+                    kapittel: '8',
+                    paragraf: '17',
                     ledd: '1',
                     setning: null,
                     bokstav: 'c',
@@ -742,7 +800,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2023-01-01',
-                    paragraf: '8-17',
+                    kapittel: '8',
+                    paragraf: '17',
                     ledd: '1',
                     setning: null,
                     bokstav: 'd',
@@ -754,7 +813,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2023-01-01',
-                    paragraf: '8-17',
+                    kapittel: '8',
+                    paragraf: '17',
                     ledd: '1',
                     setning: null,
                     bokstav: 'e',
@@ -767,7 +827,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2019-01-01',
-            paragraf: '8-22',
+            kapittel: '8',
+            paragraf: '22',
             ledd: '1',
             setning: '1',
             bokstav: null,
@@ -781,7 +842,8 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '2021-05-21',
-            paragraf: '8-44',
+            kapittel: '8',
+            paragraf: '44',
             ledd: '1',
             setning: null,
             bokstav: 'a',

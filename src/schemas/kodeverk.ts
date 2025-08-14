@@ -18,6 +18,7 @@ export const kategoriEnum = z.enum([
 export const vilkårshjemmelSchema = z.object({
     lovverk: z.string().min(2),
     lovverksversjon: z.string().min(2), // evt. valider som datoformat om ønskelig
+    kapittel: z.string(),
     paragraf: z.string(),
     ledd: maybeString,
     setning: maybeString,

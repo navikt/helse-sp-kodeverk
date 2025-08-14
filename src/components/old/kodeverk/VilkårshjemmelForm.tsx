@@ -14,7 +14,7 @@ interface VilkårshjemmelFormProps {
     resultType?: 'oppfylt' | 'ikkeOppfylt'
 }
 
-type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'paragraf' | 'ledd' | 'setning' | 'bokstav'
+type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'kapittel' | 'paragraf' | 'ledd' | 'setning' | 'bokstav'
 
 export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resultType }: VilkårshjemmelFormProps) => {
     const getFieldName = (field: VilkårshjemmelField) => {
@@ -32,7 +32,15 @@ export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resul
         return errors?.vilkar?.[index]?.vilkårshjemmel?.[field]?.message
     }
 
-    const fields: VilkårshjemmelField[] = ['lovverk', 'lovverksversjon', 'paragraf', 'ledd', 'setning', 'bokstav']
+    const fields: VilkårshjemmelField[] = [
+        'lovverk',
+        'lovverksversjon',
+        'kapittel',
+        'paragraf',
+        'ledd',
+        'setning',
+        'bokstav',
+    ]
 
     return (
         <div className="space-y-4">

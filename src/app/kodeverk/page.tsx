@@ -30,8 +30,8 @@ import { ExcelExport } from '@/components/old/kodeverk/ExcelExport'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
-    const { lovverk, paragraf, ledd, setning, bokstav } = hjemmel
-    let result = `${lovverk} § ${paragraf}`
+    const { lovverk, kapittel, paragraf, ledd, setning, bokstav } = hjemmel
+    let result = `${lovverk} kap. ${kapittel} § ${paragraf}`
     if (ledd) result += ` ${ledd}. ledd`
     if (setning) result += ` ${setning}. setning`
     if (bokstav) result += ` bokstav ${bokstav}`
@@ -196,6 +196,7 @@ const Page = () => {
             vilkårshjemmel: {
                 lovverk: '',
                 lovverksversjon: '',
+                kapittel: '',
                 paragraf: '',
                 ledd: null,
                 setning: null,
