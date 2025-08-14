@@ -196,13 +196,6 @@ const Page = () => {
             ...data,
             vilkar: data.vilkar.map((vilkår) => ({
                 ...vilkår,
-                mulige_resultater: {
-                    ...vilkår.mulige_resultater,
-                    IKKE_RELEVANT: vilkår.mulige_resultater.IKKE_RELEVANT?.length
-                        ? vilkår.mulige_resultater.IKKE_RELEVANT
-                        : undefined,
-                    SKAL_IKKE_VURDERES: [],
-                },
             })),
         }
 
@@ -220,14 +213,9 @@ const Page = () => {
                 bokstav: null,
             },
             vilkårskode: '',
-            spørsmålstekst: '',
             beskrivelse: '',
-            kategori: 'generelle_bestemmelser',
-            mulige_resultater: {
-                OPPFYLT: [],
-                IKKE_OPPFYLT: [],
-                IKKE_RELEVANT: [],
-            },
+            oppfylt: [],
+            ikkeOppfylt: [],
         }
         append(newVilkår)
     }
