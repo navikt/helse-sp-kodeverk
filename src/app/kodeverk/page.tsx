@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray } from 'react-hook-form'
@@ -27,6 +27,7 @@ import { DragVerticalIcon } from '@navikt/aksel-icons'
 import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
 import { VilkårForm } from '@/components/old/kodeverk/VilkårForm'
 import { ExcelExport } from '@/components/old/kodeverk/ExcelExport'
+import { useKodeverk } from '@hooks/queries/useKodeverk'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     const { lovverk, paragraf, ledd, setning, bokstav } = hjemmel
@@ -35,15 +36,6 @@ const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     if (setning) result += ` ${setning}. setning`
     if (bokstav) result += ` bokstav ${bokstav}`
     return result
-}
-
-const fetchKodeverk = async (): Promise<KodeverkForm> => {
-    const response = await fetch('/api/v1/open/kodeverk')
-    if (!response.ok) {
-        throw new Error('Failed to fetch kodeverk')
-    }
-    const arr = await response.json()
-    return { vilkar: arr }
 }
 
 const saveKodeverk = async (kodeverk: KodeverkForm): Promise<void> => {
@@ -94,10 +86,7 @@ const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCard
 
 const Page = () => {
     const queryClient = useQueryClient()
-    const { data: serverKodeverk, isLoading } = useQuery({
-        queryKey: ['kodeverk'],
-        queryFn: fetchKodeverk,
-    })
+    const { data: serverKodeverk, isLoading } = useKodeverk()
 
     const {
         control,

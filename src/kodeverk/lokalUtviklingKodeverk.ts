@@ -39,8 +39,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'KRAV_FRAMSATT_INNEN_TRE_AAR_FOR_HELE_PERIODEN_PGA_UTE_AV_STAND',
-                beskrivelse:
-                    'Søkt innen tre år for hele perioden, ikke vært i stand til å søke tidligere',
+                beskrivelse: 'Søkt innen tre år for hele perioden, ikke vært i stand til å søke tidligere',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
@@ -52,8 +51,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'KRAV_FRAMSATT_INNEN_TRE_AAR_FOR_DELER_AV_PERIODEN_PGA_UTE_AV_STAND',
-                beskrivelse:
-                    'Søkt innen tre år for deler av perioden, ikke vært i stand til å søke tidligere',
+                beskrivelse: 'Søkt innen tre år for deler av perioden, ikke vært i stand til å søke tidligere',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-07-01',
@@ -105,8 +103,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         oppfylt: [
             {
                 kode: 'SOEKT_INNEN_TRE_MAANEDER',
-                beskrivelse:
-                    'Ja, oppfylt for hele perioden etter § 22-13 tredje avsnitt',
+                beskrivelse: 'Ja, oppfylt for hele perioden etter § 22-13 tredje avsnitt',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
@@ -129,13 +126,11 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'BOSATT_I_NORGE',
-        beskrivelse:
-            'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
+        beskrivelse: 'Personer som er bosatt i Norge, er pliktige medlemmer i folketrygden',
         oppfylt: [
             {
                 kode: 'MINST_12_MND_OPPHOLD',
-                beskrivelse:
-                    'Oppholdet er ment å vare eller har vart minst 12 måneder',
+                beskrivelse: 'Oppholdet er ment å vare eller har vart minst 12 måneder',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1997-05-01',
@@ -159,8 +154,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         ikkeOppfylt: [
             {
                 kode: 'IKKE_LOVLIG_OPPHOLD',
-                beskrivelse:
-                    'Det er et vilkår for medlemskap at vedkommende har lovlig opphold i Norge',
+                beskrivelse: 'Det er et vilkår for medlemskap at vedkommende har lovlig opphold i Norge',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1997-05-01',
@@ -170,8 +164,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'OPPHOLD_I_UTL_6MND_2AAR',
-                beskrivelse:
-                    'Opphold i utlandet mer enn seks måneder pr. år i to eller flere påfølgende år',
+                beskrivelse: 'Opphold i utlandet mer enn seks måneder pr. år i to eller flere påfølgende år',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '1997-05-01',
@@ -193,13 +186,11 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'OPPTJENNING',
-        beskrivelse:
-            'Har vært i arbeid i minst fire uker (opptjeningstid) ',
+        beskrivelse: 'Har vært i arbeid i minst fire uker (opptjeningstid) ',
         oppfylt: [
             {
                 kode: 'OPPTJENNING_HOVEDREGEL',
-                beskrivelse:
-                    'Har arbeidet i 28 dager før arbeidsuførhet inntreffer',
+                beskrivelse: 'Har arbeidet i 28 dager før arbeidsuførhet inntreffer',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2020-06-12',
@@ -248,8 +239,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         ikkeOppfylt: [
             {
                 kode: 'OPPTJENNING_AAP_FOR_FORELDREPENGER',
-                beskrivelse:
-                    'Har AAP før foreldrepenger og retten var brukt opp uten ny opptjening',
+                beskrivelse: 'Har AAP før foreldrepenger og retten var brukt opp uten ny opptjening',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2020-06-12',
@@ -344,8 +334,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         oppfylt: [
             {
                 kode: 'ARBUFOR_FUNK',
-                beskrivelse:
-                    'Har en funksjonsnedsettelse som klart skyldes sykdom eller skade',
+                beskrivelse: 'Har en funksjonsnedsettelse som klart skyldes sykdom eller skade',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
@@ -412,8 +401,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'ARBUFOR_KONTROLL',
-                beskrivelse:
-                    'nødvendig kontrollundersøkelse som krever minst 24 timers fravær, reisetid medregnet',
+                beskrivelse: 'nødvendig kontrollundersøkelse som krever minst 24 timers fravær, reisetid medregnet',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
@@ -425,8 +413,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'ARBUFOR_SMITTE',
-                beskrivelse:
-                    'Myndighet har nedlagt forbud mot at han eller hun arbeider på grunn av smittefare',
+                beskrivelse: 'Myndighet har nedlagt forbud mot at han eller hun arbeider på grunn av smittefare',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
@@ -450,8 +437,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'ARBUFOR_BARNLOSHET',
-                beskrivelse:
-                    'Arbeidsufør som følge av behandling for barnløshet',
+                beskrivelse: 'Arbeidsufør som følge av behandling for barnløshet',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
@@ -475,8 +461,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'ARBUFOR_STERILISERING',
-                beskrivelse:
-                    'arbeidsufør som følge av behandling i forbindelse med sterilisering',
+                beskrivelse: 'arbeidsufør som følge av behandling i forbindelse med sterilisering',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
@@ -540,8 +525,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'DAGER_IGJEN',
-        beskrivelse:
-            'Retten til sykepenger fra trygden opphører ved mottak av sykepenger over en bestemt periode',
+        beskrivelse: 'Retten til sykepenger fra trygden opphører ved mottak av sykepenger over en bestemt periode',
         oppfylt: [
             {
                 kode: 'DAGER_IGJEN_ARB_SN_FRI',
@@ -571,8 +555,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'DAGER_IGJEN_26UKER_ARBEIDSFOR',
-                beskrivelse:
-                    'Har vært helt arbeidsfør i 26 uker etter sykepenger fra trygden',
+                beskrivelse: 'Har vært helt arbeidsfør i 26 uker etter sykepenger fra trygden',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2019-01-01',
@@ -627,8 +610,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         oppfylt: [
             {
                 kode: 'DAGER_IGJEN_OPPFYLT_FOR_HELE_PERIODEN',
-                beskrivelse:
-                    'Sykepengedager igjen for hele perioden',
+                beskrivelse: 'Sykepengedager igjen for hele perioden',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2021-06-01',
@@ -640,8 +622,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'DAGER_IGJEN_OPPFYLT_FOR_DELER_AV_PERIODEN',
-                beskrivelse:
-                    'Sykepengedager igjen for deler av perioden',
+                beskrivelse: 'Sykepengedager igjen for deler av perioden',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2021-06-01',
@@ -655,8 +636,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
         ikkeOppfylt: [
             {
                 kode: 'IKKE_DAGER_IGJEN',
-                beskrivelse:
-                    'Fått utbetalt sykepenger til maksdato og ikke opptjent ny rett til sykepenger',
+                beskrivelse: 'Fått utbetalt sykepenger til maksdato og ikke opptjent ny rett til sykepenger',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2021-06-01',
@@ -678,8 +658,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: null,
         },
         vilkårskode: 'ARB_MIDLERTIDIG_AVBRUTT',
-        beskrivelse:
-            'Arbeidsforholdet er midlertidig avbryt i mer enn 14 dager',
+        beskrivelse: 'Arbeidsforholdet er midlertidig avbryt i mer enn 14 dager',
         oppfylt: [
             {
                 kode: 'ARB_MIDLERTIDIG_AVBRUTT_PERM',
@@ -735,8 +714,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'SYKEPENGER_TRYGDEN_IKKEARB',
-                beskrivelse:
-                    'Arbeidsgiveren er ikke forpliktet til å yte etter ftrl § 8-18',
+                beskrivelse: 'Arbeidsgiveren er ikke forpliktet til å yte etter ftrl § 8-18',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2023-01-01',
@@ -760,8 +738,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             },
             {
                 kode: 'SYKEPENGER_TRYGDEN_KONTROLL',
-                beskrivelse:
-                    'Nødvendig kontrollundersøkelse som krever minst 24 timers fravær, jf. ftrl  8-4 2 e ',
+                beskrivelse: 'Nødvendig kontrollundersøkelse som krever minst 24 timers fravær, jf. ftrl  8-4 2 e ',
                 vilkårshjemmel: {
                     lovverk: 'Folketrygdloven',
                     lovverksversjon: '2023-01-01',
@@ -810,8 +787,7 @@ export const lokalUtviklingKodeverk: Kodeverk = [
             bokstav: 'a',
         },
         vilkårskode: 'ARBUFOR_SKIP',
-        beskrivelse:
-            'Er arbeidsufør som arbeidstaker på skip, selv om vedkommende ikke ellers er arbeidsufør',
+        beskrivelse: 'Er arbeidsufør som arbeidstaker på skip, selv om vedkommende ikke ellers er arbeidsufør',
         oppfylt: [],
         ikkeOppfylt: [],
     },

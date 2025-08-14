@@ -18,39 +18,15 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { DragVerticalIcon, PlusIcon, TrashIcon } from '@navikt/aksel-icons'
 import { Button, Checkbox, UNSAFE_Combobox, ExpansionCard, Heading, Modal, Select, TextField } from '@navikt/ds-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Control, Controller, FieldErrors, useFieldArray, useWatch, UseFormSetValue, FieldPath } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 
 import { kategoriLabels } from '@/kodeverk/lokalSaksbehandlerui'
-import { lokalUtviklingKodeverk } from '@/kodeverk/lokalUtviklingKodeverk'
 import { HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
+import { useKodeverk } from '@hooks/queries/useKodeverk'
 
-// Hent alle koder fra kodeverket (oppfylt og ikkeOppfylt)
-const getAllCodesFromKodeverk = () => {
-    const codes: Array<{ value: string; label: string }> = []
-
-    lokalUtviklingKodeverk.forEach((vilkår) => {
-        // Legg til oppfylte koder
-        vilkår.oppfylt.forEach((årsak) => {
-            codes.push({
-                value: årsak.kode,
-                label: `${årsak.kode} - ${årsak.beskrivelse}`,
-            })
-        })
-
-        // Legg til ikke-oppfylte koder
-        vilkår.ikkeOppfylt.forEach((årsak) => {
-            codes.push({
-                value: årsak.kode,
-                label: `${årsak.kode} - ${årsak.beskrivelse}`,
-            })
-        })
-    })
-
-    // Sorter alfabetisk på kode
-    return codes.sort((a, b) => a.value.localeCompare(b.value))
-}
+type KodeOption = { value: string; label: string }
 
 // Hjelpefunksjon for å få norske navn på varianttyper
 const getVariantDisplayName = (variant: string | undefined) => {
@@ -82,6 +58,7 @@ interface UnderspørsmålSectionProps {
     onRemove: () => void
     level?: number
     setValue?: UseFormSetValue<HovedspørsmålForm>
+    allKodeOptions: KodeOption[]
 }
 
 interface AlternativSectionProps {
@@ -92,6 +69,7 @@ interface AlternativSectionProps {
     onRemove: () => void
     level?: number
     setValue?: UseFormSetValue<HovedspørsmålForm>
+    allKodeOptions: KodeOption[]
 }
 
 const AlternativSection = ({
@@ -102,6 +80,7 @@ const AlternativSection = ({
     onRemove,
     level = 0,
     setValue,
+    allKodeOptions,
 }: AlternativSectionProps) => {
     const {
         fields: nestedUnderspørsmålFields,
@@ -188,16 +167,16 @@ const AlternativSection = ({
                         name={`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>}
                         control={control}
                         render={({ field }) => {
-                            const allOptions = getAllCodesFromKodeverk()
+                            const kodeOptions = allKodeOptions
                             const selectedOptions = field.value
-                                ? allOptions.filter((opt) => opt.value === field.value)
+                                ? kodeOptions.filter((opt) => opt.value === field.value)
                                 : []
 
                             return (
                                 <UNSAFE_Combobox
                                     label="Kode"
                                     size="small"
-                                    options={allOptions}
+                                    options={kodeOptions}
                                     selectedOptions={selectedOptions}
                                     onToggleSelected={(option, isSelected) => {
                                         if (isSelected) {
@@ -242,6 +221,7 @@ const AlternativSection = ({
                                         onRemove={() => removeNestedUnderspørsmål(nestedIndex)}
                                         level={level + 1}
                                         setValue={setValue}
+                                        allKodeOptions={allKodeOptions}
                                     />
                                 ))}
                             </div>
@@ -291,6 +271,7 @@ const UnderspørsmålSection = ({
     onRemove,
     level = 0,
     setValue,
+    allKodeOptions,
 }: UnderspørsmålSectionProps) => {
     const {
         fields: alternativFields,
@@ -365,6 +346,7 @@ const UnderspørsmålSection = ({
                             onRemove={() => removeAlternativ(alternativIndex)}
                             level={level}
                             setValue={setValue}
+                            allKodeOptions={allKodeOptions}
                         />
                     ))}
                 </div>
@@ -415,6 +397,20 @@ const SortableUndersporsmalCard = ({ id, children }: { id: string; children: Rea
 
 export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: VilkårFormProps) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const { data: kodeverkData } = useKodeverk()
+    const allKodeOptions: KodeOption[] = useMemo(() => {
+        if (!kodeverkData) return []
+        const options: KodeOption[] = []
+        for (const vilkar of kodeverkData.vilkar) {
+            for (const årsak of vilkar.oppfylt) {
+                options.push({ value: årsak.kode, label: `${årsak.kode} - ${årsak.beskrivelse}` })
+            }
+            for (const årsak of vilkar.ikkeOppfylt) {
+                options.push({ value: årsak.kode, label: `${årsak.kode} - ${årsak.beskrivelse}` })
+            }
+        }
+        return options.sort((a, b) => a.value.localeCompare(b.value))
+    }, [kodeverkData])
 
     const {
         fields: underspørsmålFields,
@@ -530,6 +526,7 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
                                             errors={errors}
                                             onRemove={() => removeUnderspørsmål(underspørsmålIndex)}
                                             setValue={setValue}
+                                            allKodeOptions={allKodeOptions}
                                         />
                                     </ExpansionCard.Content>
                                 </ExpansionCard>
