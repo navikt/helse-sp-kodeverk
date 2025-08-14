@@ -30,7 +30,7 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
             }
 
             // filename is current timestamp
-            const fileName = `kodeverk-${Date.now()}.json`
+            const fileName = `v3-kodeverk-${Date.now()}.json`
             const bucket = storage.bucket(bucketName)
             const file = bucket.file(fileName)
 

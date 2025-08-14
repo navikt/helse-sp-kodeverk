@@ -17,7 +17,7 @@ export async function GET(): Promise<NextResponse<Kodeverk | ErrorResponse>> {
 
     const [files] = await storage.bucket(bucketName).getFiles({ autoPaginate: false })
     // Filter out files that start with "v2-" to only include v1 files
-    const v1Files = files.filter((file: File) => !file.name.startsWith('v2-'))
+    const v1Files = files.filter((file: File) => file.name.startsWith('v3-'))
     const latest = v1Files.sort((a: File, b: File) => b.metadata.updated!.localeCompare(a.metadata.updated!))[0]
 
     if (!latest) {

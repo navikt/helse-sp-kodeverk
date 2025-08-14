@@ -17,7 +17,7 @@ export async function GET(): Promise<NextResponse<HovedspørsmålArray | ErrorRe
 
     const [files] = await storage.bucket(bucketName).getFiles({ autoPaginate: false })
     // Filter to only include files that start with "v2-"
-    const v2Files = files.filter((file: File) => file.name.startsWith('v2-'))
+    const v2Files = files.filter((file: File) => file.name.startsWith('saksbehandlerui-'))
     const latest = v2Files.sort((a: File, b: File) => b.metadata.updated!.localeCompare(a.metadata.updated!))[0]
 
     if (!latest) {
