@@ -151,7 +151,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
     }
 
     return (
-        <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6">
+        <div className="space-y-6">
             <div className="grid grid-cols-1 gap-4">
                 <Controller
                     name={`vilkar.${index}.vilkårskode` as const}

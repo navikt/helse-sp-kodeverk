@@ -17,13 +17,54 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { DragVerticalIcon, PlusIcon, TrashIcon } from '@navikt/aksel-icons'
-import { Button, Checkbox, ExpansionCard, Heading, Modal, Select, TextField } from '@navikt/ds-react'
+import { Button, Checkbox, UNSAFE_Combobox, ExpansionCard, Heading, Modal, Select, TextField } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Control, Controller, FieldErrors, useFieldArray, useWatch, UseFormSetValue, FieldPath } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 
 import { kategoriLabels } from '@/kodeverk/lokalSaksbehandlerui'
+import { lokalUtviklingKodeverk } from '@/kodeverk/lokalUtviklingKodeverk'
 import { HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
+
+// Hent alle koder fra kodeverket (oppfylt og ikkeOppfylt)
+const getAllCodesFromKodeverk = () => {
+    const codes: Array<{ value: string; label: string }> = []
+
+    lokalUtviklingKodeverk.forEach((vilkår) => {
+        // Legg til oppfylte koder
+        vilkår.oppfylt.forEach((årsak) => {
+            codes.push({
+                value: årsak.kode,
+                label: `${årsak.kode} - ${årsak.beskrivelse}`,
+            })
+        })
+
+        // Legg til ikke-oppfylte koder
+        vilkår.ikkeOppfylt.forEach((årsak) => {
+            codes.push({
+                value: årsak.kode,
+                label: `${årsak.kode} - ${årsak.beskrivelse}`,
+            })
+        })
+    })
+
+    // Sorter alfabetisk på kode
+    return codes.sort((a, b) => a.value.localeCompare(b.value))
+}
+
+// Hjelpefunksjon for å få norske navn på varianttyper
+const getVariantDisplayName = (variant: string | undefined) => {
+    switch (variant) {
+        case 'CHECKBOX':
+            return 'Checkbox'
+        case 'RADIO':
+            return 'Radio'
+        case 'SELECT':
+            return 'Select'
+        default:
+            return 'Radio'
+    }
+}
 
 interface VilkårFormProps {
     control: Control<HovedspørsmålForm>
@@ -87,18 +128,10 @@ const AlternativSection = ({
 
     return (
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4" style={{ marginLeft: `${indent}px` }}>
-            <div className="mb-4 space-y-4">
+            <div className="mb-4 space-y-2">
                 <div className="flex items-start gap-4">
-                    {/* Vis bare kodeinput hvis alternativet IKKE har underspørsmål */}
-                    {!harUnderspørsmål && (
-                        <Controller
-                            name={`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>}
-                            control={control}
-                            render={({ field }) => (
-                                <TextField {...field} label="Kode" size="small" value={field.value || ''} />
-                            )}
-                        />
-                    )}
+                    {/* Vis combobox for kodevalg hvis alternativet IKKE har underspørsmål */}
+
                     <Controller
                         name={`${alternativPath}.navn` as FieldPath<HovedspørsmålForm>}
                         control={control}
@@ -117,44 +150,72 @@ const AlternativSection = ({
                         Fjern
                     </Button>
                 </div>
+                <Controller
+                    name={`${alternativPath}.harUnderspørsmål` as FieldPath<HovedspørsmålForm>}
+                    control={control}
+                    render={({ field }) => (
+                        <Checkbox
+                            {...field}
+                            size="small"
+                            checked={field.value || false}
+                            onChange={(e) => {
+                                const hasSubquestions = e.target.checked
+                                field.onChange(hasSubquestions)
+
+                                if (hasSubquestions) {
+                                    // Sjekk om koden er en gyldig UUID
+                                    const isUuid =
+                                        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+                                            currentKode || '',
+                                        )
+
+                                    // Generer UUID hvis kode ikke eksisterer eller ikke er en UUID
+                                    if (!currentKode || currentKode === '' || !isUuid) {
+                                        setValue?.(`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>, uuidv4())
+                                    }
+                                } else {
+                                    // Tøm underspørsmål når checkbox deaktiveres
+                                    setValue?.(`${alternativPath}.underspørsmål` as FieldPath<HovedspørsmålForm>, [])
+                                }
+                            }}
+                        >
+                            Har underspørsmål
+                        </Checkbox>
+                    )}
+                />
+                {!harUnderspørsmål && (
+                    <Controller
+                        name={`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>}
+                        control={control}
+                        render={({ field }) => {
+                            const allOptions = getAllCodesFromKodeverk()
+                            const selectedOptions = field.value
+                                ? allOptions.filter((opt) => opt.value === field.value)
+                                : []
+
+                            return (
+                                <UNSAFE_Combobox
+                                    label="Kode"
+                                    size="small"
+                                    options={allOptions}
+                                    selectedOptions={selectedOptions}
+                                    onToggleSelected={(option, isSelected) => {
+                                        if (isSelected) {
+                                            // option er string-verdien (value fra objektet)
+                                            field.onChange(option)
+                                        } else {
+                                            field.onChange('')
+                                        }
+                                    }}
+                                    isMultiSelect={false}
+                                />
+                            )
+                        }}
+                    />
+                )}
 
                 {/* Checkbox for å kontrollere om alternativet har underspørsmål */}
                 <div className="flex items-center gap-4">
-                    <Controller
-                        name={`${alternativPath}.harUnderspørsmål` as FieldPath<HovedspørsmålForm>}
-                        control={control}
-                        render={({ field }) => (
-                            <Checkbox
-                                {...field}
-                                checked={field.value || false}
-                                onChange={(e) => {
-                                    const hasSubquestions = e.target.checked
-                                    field.onChange(hasSubquestions)
-
-                                    if (hasSubquestions) {
-                                        // Sjekk om koden er en gyldig UUID
-                                        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(currentKode || '')
-                                        
-                                        // Generer UUID hvis kode ikke eksisterer eller ikke er en UUID
-                                        if (!currentKode || currentKode === '' || !isUuid) {
-                                            setValue?.(
-                                                `${alternativPath}.kode` as FieldPath<HovedspørsmålForm>,
-                                                uuidv4(),
-                                            )
-                                        }
-                                    } else {
-                                        // Tøm underspørsmål når checkbox deaktiveres
-                                        setValue?.(
-                                            `${alternativPath}.underspørsmål` as FieldPath<HovedspørsmålForm>,
-                                            [],
-                                        )
-                                    }
-                                }}
-                            >
-                                Har underspørsmål
-                            </Checkbox>
-                        )}
-                    />
                     {harUnderspørsmål && (
                         <span className="text-sm text-gray-600">Kode: {currentKode || 'Genereres automatisk'}</span>
                     )}
@@ -195,8 +256,11 @@ const AlternativSection = ({
                             size="small"
                             onClick={() => {
                                 // Sjekk om koden er en gyldig UUID
-                                const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(currentKode || '')
-                                
+                                const isUuid =
+                                    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+                                        currentKode || '',
+                                    )
+
                                 // Generer UUID for alternativet hvis ikke allerede en UUID
                                 if (!currentKode || currentKode === '' || !isUuid) {
                                     setValue?.(`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>, uuidv4())
@@ -246,7 +310,7 @@ const UnderspørsmålSection = ({
     })
 
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-4" style={{ marginLeft: `${indent}px` }}>
+        <div className="bg-white" style={{ marginLeft: `${indent}px` }}>
             <div className="mb-4 space-y-4">
                 {/* Vis kode som readonly */}
                 {currentKode && (
@@ -254,7 +318,7 @@ const UnderspørsmålSection = ({
                         <strong>Kode:</strong> {currentKode}
                     </div>
                 )}
-                
+
                 <div className="flex items-start gap-4">
                     <Controller
                         name={`${underspørsmålPath}.navn` as FieldPath<HovedspørsmålForm>}
@@ -389,7 +453,7 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
     }
 
     return (
-        <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6">
+        <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
                 <Controller
                     name={`vilkar.${index}.beskrivelse` as const}
@@ -455,11 +519,8 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
                                 <ExpansionCard aria-label="Underspørsmål">
                                     <ExpansionCard.Header>
                                         <ExpansionCard.Title>
-                                            {field.navn || field.kode || 'Nytt underspørsmål'}
+                                            {field.navn || `${getVariantDisplayName(field.variant)} gruppe`}
                                         </ExpansionCard.Title>
-                                        <ExpansionCard.Description>
-                                            {field.kode && field.navn ? `Kode: ${field.kode}` : ''}
-                                        </ExpansionCard.Description>
                                     </ExpansionCard.Header>
                                     <ExpansionCard.Content>
                                         <UnderspørsmålSection
