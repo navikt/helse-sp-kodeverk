@@ -79,11 +79,11 @@ const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCard
             <div
                 {...attributes}
                 {...listeners}
-                className="mt-6 cursor-grab rounded p-2 hover:bg-gray-100"
+                className="hover:bg-gray-100 mt-6 cursor-grab rounded p-2"
                 role="button"
                 tabIndex={0}
             >
-                <DragVerticalIcon className="h-5 w-5 text-gray-400" />
+                <DragVerticalIcon className="text-gray-400 h-5 w-5" />
             </div>
             <div className="flex-1">
                 <ExpansionCard {...props}>{children}</ExpansionCard>

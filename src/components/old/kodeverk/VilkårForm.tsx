@@ -50,7 +50,7 @@ const ResultatBegrunnelserSection = ({
         <Box padding="4" borderWidth="1" borderRadius="medium" className="bg-gray-50">
             <h4 className="text-md mb-4 font-medium">{title}</h4>
             {fields.map((field, resultIndex) => (
-                <div key={field.id} className="mb-6 rounded-lg border border-gray-200 bg-gray-100 p-4">
+                <div key={field.id} className="border-gray-200 bg-gray-100 mb-6 rounded-lg border p-4">
                     <div className="mb-4 flex items-start gap-4">
                         <Controller
                             name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.kode` as const}
@@ -84,7 +84,7 @@ const ResultatBegrunnelserSection = ({
                         </Button>
                     </div>
                     <div className="p-4">
-                        <h5 className="mb-3 text-sm font-medium text-gray-700">Vilkårshjemmel for begrunnelse</h5>
+                        <h5 className="text-gray-700 mb-3 text-sm font-medium">Vilkårshjemmel for begrunnelse</h5>
                         <VilkårshjemmelForm
                             control={control}
                             index={vilkårIndex}
@@ -180,8 +180,8 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                 />
             </div>
 
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
-                <h4 className="text-md mb-4 font-medium text-gray-700">Hovedvilkårshjemmel</h4>
+            <div className="border-gray-200 bg-gray-50 rounded-md border p-4">
+                <h4 className="text-md text-gray-700 mb-4 font-medium">Hovedvilkårshjemmel</h4>
                 <VilkårshjemmelForm control={control} index={index} errors={errors} />
             </div>
 

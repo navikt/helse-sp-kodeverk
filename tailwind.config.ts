@@ -1,9 +1,8 @@
 import type { Config } from 'tailwindcss'
-import navikt from '@navikt/ds-tailwind'
+import dsTailwind from '@navikt/ds-tailwind/darkside-tw3'
 
 const config: Config = {
-    presets: [navikt],
-    content: ['./src/**/*.{js,ts,jsx,tsx}'],
-    plugins: [],
+    presets: [dsTailwind],
+    content: ['./src/**'],
 }
 export default config

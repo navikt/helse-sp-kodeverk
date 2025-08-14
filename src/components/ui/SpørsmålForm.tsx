@@ -127,7 +127,7 @@ const AlternativSection = ({
     const indent = level * 20
 
     return (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4" style={{ marginLeft: `${indent}px` }}>
+        <div className="border-gray-200 bg-gray-50 rounded-lg border p-4" style={{ marginLeft: `${indent}px` }}>
             <div className="mb-4 space-y-2">
                 <div className="flex items-start gap-4">
                     {/* Vis combobox for kodevalg hvis alternativet IKKE har underspørsmål */}
@@ -217,7 +217,7 @@ const AlternativSection = ({
                 {/* Checkbox for å kontrollere om alternativet har underspørsmål */}
                 <div className="flex items-center gap-4">
                     {harUnderspørsmål && (
-                        <span className="text-sm text-gray-600">Kode: {currentKode || 'Genereres automatisk'}</span>
+                        <span className="text-gray-600 text-sm">Kode: {currentKode || 'Genereres automatisk'}</span>
                     )}
                 </div>
             </div>
@@ -228,7 +228,7 @@ const AlternativSection = ({
                     {/* Nested underspørsmål for this alternativ */}
                     {nestedUnderspørsmålFields.length > 0 && (
                         <div className="mt-6">
-                            <h6 className="mb-3 text-sm font-medium text-gray-700">
+                            <h6 className="text-gray-700 mb-3 text-sm font-medium">
                                 Underspørsmål for dette alternativet
                             </h6>
                             <div className="space-y-4">
@@ -314,7 +314,7 @@ const UnderspørsmålSection = ({
             <div className="mb-4 space-y-4">
                 {/* Vis kode som readonly */}
                 {currentKode && (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-gray-600 text-sm">
                         <strong>Kode:</strong> {currentKode}
                     </div>
                 )}
@@ -402,11 +402,11 @@ const SortableUndersporsmalCard = ({ id, children }: { id: string; children: Rea
             <div
                 {...attributes}
                 {...listeners}
-                className="mt-2 cursor-grab rounded p-2 hover:bg-gray-100"
+                className="hover:bg-gray-100 mt-2 cursor-grab rounded p-2"
                 role="button"
                 tabIndex={0}
             >
-                <DragVerticalIcon className="h-5 w-5 text-gray-400" />
+                <DragVerticalIcon className="text-gray-400 h-5 w-5" />
             </div>
             <div className="flex-1">{children}</div>
         </div>

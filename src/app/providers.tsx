@@ -9,6 +9,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import 'dayjs/locale/nb'
 import dayjs from 'dayjs'
 
+import { ThemeProvider } from '@components/ThemeProvider'
+
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isBetween)
@@ -31,5 +33,9 @@ export function Providers({ children }: PropsWithChildren): ReactElement {
             }),
     )
 
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    return (
+        <ThemeProvider>
+            <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        </ThemeProvider>
+    )
 }

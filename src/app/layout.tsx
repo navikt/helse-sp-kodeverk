@@ -1,3 +1,4 @@
+import '@navikt/ds-tokens/darkside-css'
 import '../styles/globals.css'
 import type { Metadata } from 'next'
 import React, { PropsWithChildren, ReactElement } from 'react'
@@ -17,15 +18,15 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<PropsWithChildren>): Promise<ReactElement> {
     return (
-        <html lang="nb">
+        <html lang="nb" suppressHydrationWarning>
             <Preload />
             <body>
-                <Page contentBlockPadding="none">
-                    <Providers>
+                <Providers>
+                    <Page contentBlockPadding="none">
                         <Header />
                         {children}
-                    </Providers>
-                </Page>
+                    </Page>
+                </Providers>
             </body>
         </html>
     )
