@@ -1,7 +1,7 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray, useWatch, FieldArrayWithId } from 'react-hook-form'
-import { Button, TextField, Modal, Heading, Box } from '@navikt/ds-react'
+import { Button, TextField, Modal, Heading } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
@@ -47,23 +47,37 @@ const ResultatBegrunnelserSection = ({
     }
 
     return (
-        <Box padding="4" borderWidth="1" borderRadius="medium" className="bg-gray-50">
+        <div className="border-gray-200 bg-gray-100 rounded-lg border p-4">
             <h4 className="text-md mb-4 font-medium">{title}</h4>
             {fields.map((field, resultIndex) => (
                 <div key={field.id} className="border-gray-200 bg-gray-100 mb-6 rounded-lg border p-4">
-                    <div className="mb-4 flex items-start gap-4">
-                        <Controller
-                            name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.kode` as const}
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    label="Kode"
-                                    error={errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.kode?.message}
-                                    value={field.value || ''}
-                                />
-                            )}
-                        />
+                    <div className="mb-4 space-y-4">
+                        <div className="flex items-end gap-4">
+                            <Controller
+                                name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.kode` as const}
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="Kode"
+                                        error={
+                                            errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.kode?.message
+                                        }
+                                        value={field.value || ''}
+                                        className="flex-1"
+                                    />
+                                )}
+                            />
+                            <Button
+                                icon={<TrashIcon />}
+                                type="button"
+                                variant="tertiary"
+                                onClick={() => onRemove(resultIndex)}
+                            >
+                                Fjern
+                            </Button>
+                        </div>
+
                         <Controller
                             name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.beskrivelse` as const}
                             control={control}
@@ -71,7 +85,6 @@ const ResultatBegrunnelserSection = ({
                                 <TextField
                                     {...field}
                                     label="Tekst"
-                                    className="w-100"
                                     error={
                                         errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.beskrivelse?.message
                                     }
@@ -79,9 +92,6 @@ const ResultatBegrunnelserSection = ({
                                 />
                             )}
                         />
-                        <Button type="button" variant="tertiary" onClick={() => onRemove(resultIndex)} className="mt-6">
-                            Fjern
-                        </Button>
                     </div>
                     <div className="p-4">
                         <h5 className="text-gray-700 mb-3 text-sm font-medium">Vilkårshjemmel for begrunnelse</h5>
@@ -110,7 +120,7 @@ const ResultatBegrunnelserSection = ({
             >
                 Legg til
             </Button>
-        </Box>
+        </div>
     )
 }
 
@@ -152,7 +162,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-4">
                 <Controller
                     name={`vilkar.${index}.vilkårskode` as const}
                     control={control}
@@ -160,6 +170,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         <TextField
                             {...field}
                             label="Vilkårskode"
+                            size="small"
                             error={errors?.vilkar?.[index]?.vilkårskode?.message}
                             value={field.value || ''}
                         />
@@ -172,7 +183,8 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                     render={({ field }) => (
                         <TextField
                             {...field}
-                            label="Tekst"
+                            label="Beskrivelse"
+                            size="small"
                             error={errors?.vilkar?.[index]?.beskrivelse?.message}
                             value={field.value || ''}
                         />
