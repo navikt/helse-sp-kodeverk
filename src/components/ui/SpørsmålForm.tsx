@@ -132,8 +132,11 @@ const AlternativSection = ({
                                     field.onChange(hasSubquestions)
 
                                     if (hasSubquestions) {
-                                        // Generer UUID når checkbox aktiveres
-                                        if (!currentKode || currentKode === '') {
+                                        // Sjekk om koden er en gyldig UUID
+                                        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(currentKode || '')
+                                        
+                                        // Generer UUID hvis kode ikke eksisterer eller ikke er en UUID
+                                        if (!currentKode || currentKode === '' || !isUuid) {
                                             setValue?.(
                                                 `${alternativPath}.kode` as FieldPath<HovedspørsmålForm>,
                                                 uuidv4(),
@@ -191,13 +194,16 @@ const AlternativSection = ({
                             icon={<PlusIcon />}
                             size="small"
                             onClick={() => {
-                                // Generer UUID for alternativet hvis ikke allerede satt
-                                if (!currentKode || currentKode === '') {
+                                // Sjekk om koden er en gyldig UUID
+                                const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(currentKode || '')
+                                
+                                // Generer UUID for alternativet hvis ikke allerede en UUID
+                                if (!currentKode || currentKode === '' || !isUuid) {
                                     setValue?.(`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>, uuidv4())
                                 }
 
                                 appendNestedUnderspørsmål({
-                                    kode: '',
+                                    kode: uuidv4(),
                                     navn: null,
                                     variant: 'RADIO',
                                     alternativer: [],
@@ -233,43 +239,53 @@ const UnderspørsmålSection = ({
 
     const indent = level * 20
 
+    // Watch current kode value for display
+    const currentKode = useWatch({
+        control,
+        name: `${underspørsmålPath}.kode` as FieldPath<HovedspørsmålForm>,
+    })
+
     return (
         <div className="rounded-lg border border-gray-200 bg-white p-4" style={{ marginLeft: `${indent}px` }}>
-            <div className="mb-4 flex items-start gap-4">
-                <Controller
-                    name={`${underspørsmålPath}.kode` as FieldPath<HovedspørsmålForm>}
-                    control={control}
-                    render={({ field }) => <TextField {...field} label="Kode" size="small" value={field.value || ''} />}
-                />
-                <Controller
-                    name={`${underspørsmålPath}.navn` as FieldPath<HovedspørsmålForm>}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Navn"
-                            size="small"
-                            className="flex-1"
-                            value={field.value || ''}
-                            onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
-                        />
-                    )}
-                />
-                <Controller
-                    name={`${underspørsmålPath}.variant` as FieldPath<HovedspørsmålForm>}
-                    control={control}
-                    render={({ field }) => (
-                        <Select {...field} label="Variant" size="small" value={field.value || ''}>
-                            <option value="">Velg variant</option>
-                            <option value="CHECKBOX">Checkbox</option>
-                            <option value="RADIO">Radio</option>
-                            <option value="SELECT">Select</option>
-                        </Select>
-                    )}
-                />
-                <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
-                    Fjern
-                </Button>
+            <div className="mb-4 space-y-4">
+                {/* Vis kode som readonly */}
+                {currentKode && (
+                    <div className="text-sm text-gray-600">
+                        <strong>Kode:</strong> {currentKode}
+                    </div>
+                )}
+                
+                <div className="flex items-start gap-4">
+                    <Controller
+                        name={`${underspørsmålPath}.navn` as FieldPath<HovedspørsmålForm>}
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                label="Navn"
+                                size="small"
+                                className="flex-1"
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
+                            />
+                        )}
+                    />
+                    <Controller
+                        name={`${underspørsmålPath}.variant` as FieldPath<HovedspørsmålForm>}
+                        control={control}
+                        render={({ field }) => (
+                            <Select {...field} label="Variant" size="small" value={field.value || ''}>
+                                <option value="">Velg variant</option>
+                                <option value="CHECKBOX">Checkbox</option>
+                                <option value="RADIO">Radio</option>
+                                <option value="SELECT">Select</option>
+                            </Select>
+                        )}
+                    />
+                    <Button type="button" variant="tertiary" onClick={onRemove} className="mt-6">
+                        Fjern
+                    </Button>
+                </div>
             </div>
 
             <div className="mt-6">
@@ -418,7 +434,7 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
                         size="small"
                         onClick={() =>
                             appendUnderspørsmål({
-                                kode: '',
+                                kode: uuidv4(),
                                 navn: null,
                                 variant: 'RADIO',
                                 alternativer: [],
