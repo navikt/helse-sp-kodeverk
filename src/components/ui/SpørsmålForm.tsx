@@ -168,15 +168,28 @@ const AlternativSection = ({
                         control={control}
                         render={({ field }) => {
                             const kodeOptions = allKodeOptions
-                            const selectedOptions = field.value
-                                ? kodeOptions.filter((opt) => opt.value === field.value)
+                            const currentValue = field.value
+
+                            // Sjekk om valgt kode finnes i kodeverket
+                            const isValidKode =
+                                !currentValue ||
+                                currentValue === '' ||
+                                kodeOptions.some((opt) => opt.value === currentValue)
+
+                            // Hvis koden ikke finnes i kodeverket, vis den som et alternativ med spesiell markering
+                            const displayOptions = isValidKode
+                                ? kodeOptions
+                                : [...kodeOptions, { value: currentValue, label: `${currentValue} - UKJENT KODE` }]
+
+                            const selectedOptions = currentValue
+                                ? displayOptions.filter((opt) => opt.value === currentValue)
                                 : []
 
                             return (
                                 <UNSAFE_Combobox
                                     label="Kode"
                                     size="small"
-                                    options={kodeOptions}
+                                    options={displayOptions}
                                     selectedOptions={selectedOptions}
                                     onToggleSelected={(option, isSelected) => {
                                         if (isSelected) {
@@ -187,6 +200,9 @@ const AlternativSection = ({
                                         }
                                     }}
                                     isMultiSelect={false}
+                                    error={
+                                        !isValidKode ? `Koden "${currentValue}" finnes ikke i kodeverket` : undefined
+                                    }
                                 />
                             )
                         }}
