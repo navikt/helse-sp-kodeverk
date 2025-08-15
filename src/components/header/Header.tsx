@@ -16,20 +16,24 @@ export function Header(): ReactElement {
     const pathname = usePathname()
     return (
         <InternalHeader className="h-14">
-            <InternalHeaderTitle as={NextLink} href="/">
+            <InternalHeaderTitle
+                as={NextLink}
+                href="/"
+                className={pathname === '/' ? 'bg-ax-bg-accent-strong-pressed' : ''}
+            >
                 Spillerom kodeverk admin
             </InternalHeaderTitle>
             <InternalHeaderButton
                 as={NextLink}
                 href="/kodeverk"
-                className={pathname === '/kodeverk' ? 'bg-surface-subtle' : ''}
+                className={pathname === '/kodeverk' ? 'bg-ax-bg-accent-strong-pressed' : ''}
             >
                 Kodeverk
             </InternalHeaderButton>
             <InternalHeaderButton
                 as={NextLink}
                 href="/saksbehandlergrensesnitt"
-                className={pathname === '/saksbehandlergrensesnitt' ? 'bg-surface-subtle' : ''}
+                className={pathname === '/saksbehandlergrensesnitt' ? 'bg-ax-bg-accent-strong-pressed' : ''}
             >
                 Saksbehandlergrensesnitt
             </InternalHeaderButton>
