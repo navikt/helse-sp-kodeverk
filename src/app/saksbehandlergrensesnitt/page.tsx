@@ -198,10 +198,11 @@ const Page = () => {
     }
 
     // Watch alle vilkår for å sjekke etter ukjente koder
-    const allVilkar = useWatch({ control, name: 'vilkar' }) || []
+    const watchedVilkar = useWatch({ control, name: 'vilkar' })
 
     // Memoized funksjon for å sjekke etter ukjente koder
     const vilkarWithUnknownCodes = useMemo(() => {
+        const allVilkar = watchedVilkar || []
         if (!kodeverkData || !allVilkar) return new Set<number>()
 
         const alleKjenteKoder = new Set<string>()
@@ -215,19 +216,26 @@ const Page = () => {
         }
 
         // Rekursiv funksjon for å sjekke alternativer
-        const checkAlternativer = (alternativer: any[]): boolean => {
+        const checkAlternativer = (alternativer: unknown[]): boolean => {
             for (const alternativ of alternativer || []) {
+                // Type guard for alternativ
+                if (typeof alternativ !== 'object' || alternativ === null) continue
+                const alt = alternativ as Record<string, unknown>
+
                 // Sjekk kun alternativer som IKKE har underspørsmål
-                if (!alternativ.harUnderspørsmål && alternativ.kode) {
-                    if (!alleKjenteKoder.has(alternativ.kode)) {
+                if (!alt.harUnderspørsmål && typeof alt.kode === 'string') {
+                    if (!alleKjenteKoder.has(alt.kode)) {
                         return true
                     }
                 }
                 // Rekursivt sjekk underspørsmål
-                if (alternativ.underspørsmål) {
-                    for (const underspørsmål of alternativ.underspørsmål) {
-                        if (checkAlternativer(underspørsmål.alternativer || [])) {
-                            return true
+                if (Array.isArray(alt.underspørsmål)) {
+                    for (const underspørsmål of alt.underspørsmål) {
+                        if (typeof underspørsmål === 'object' && underspørsmål !== null) {
+                            const undersp = underspørsmål as Record<string, unknown>
+                            if (Array.isArray(undersp.alternativer) && checkAlternativer(undersp.alternativer)) {
+                                return true
+                            }
                         }
                     }
                 }
@@ -238,7 +246,7 @@ const Page = () => {
         const vilkarWithIssues = new Set<number>()
 
         // Sjekk alle vilkår
-        allVilkar.forEach((vilkar: any, index: number) => {
+        allVilkar.forEach((vilkar: Hovedspørsmål | undefined, index: number) => {
             if (!vilkar) return
 
             // Sjekk alle underspørsmål
@@ -251,7 +259,7 @@ const Page = () => {
         })
 
         return vilkarWithIssues
-    }, [kodeverkData, allVilkar])
+    }, [kodeverkData, watchedVilkar])
 
     if (isLoading) {
         return <div className="p-6">Laster...</div>

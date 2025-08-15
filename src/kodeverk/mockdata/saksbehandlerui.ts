@@ -2,12 +2,12 @@ import { type HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 
 export const saksbehandlerUi: HovedspørsmålArray = [
     {
-        kode: 'OPPTJENING',
+        kode: '1a2b3c4d-5e6f-7890-abcd-ef1234567890',
         beskrivelse: 'Opptjeningstid',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'OPPTJENING_OPPFYLT',
+                kode: '2b3c4d5e-6f78-90ab-cdef-123456789012',
                 navn: 'Oppfyller vilkår om opptjeningstid',
                 variant: 'RADIO',
                 alternativer: [
@@ -17,7 +17,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                         harUnderspørsmål: true,
                         underspørsmål: [
                             {
-                                kode: 'OPPTJENING_OPPFYLT_JA_ALTERNATIVER',
+                                kode: '3c4d5e6f-7890-abcd-ef12-345678901234',
                                 variant: 'RADIO',
                                 alternativer: [
                                     {
@@ -54,7 +54,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                         harUnderspørsmål: true,
                         underspørsmål: [
                             {
-                                kode: 'OPPTJENING_OPPFYLT_NEI_ALTERNATIVER',
+                                kode: '4d5e6f78-90ab-cdef-1234-56789012345a',
                                 variant: 'RADIO',
                                 alternativer: [
                                     {
@@ -79,7 +79,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                         harUnderspørsmål: true,
                         underspørsmål: [
                             {
-                                kode: 'OPPTJENING_OPPFYLT_UNNTAK_ALTERNATIVER',
+                                kode: '5e6f7890-abcd-ef12-3456-789012345abc',
                                 variant: 'RADIO',
                                 alternativer: [
                                     {
@@ -115,12 +115,12 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'INNTEKTSTAP_OG_MINSTEINNTEKT',
+        kode: '6f789012-3456-789a-bcde-f123456789ab',
         beskrivelse: 'Tap av pensjonsgivende inntekt og minsteinntekt',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'INNTEKTSTAP',
+                kode: '789012ab-cdef-1234-5678-9012345abcde',
                 navn: 'Tap av pensjonsgivende inntekt på grunn av arbeidsuførhet',
                 variant: 'RADIO',
                 alternativer: [
@@ -139,7 +139,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
             {
-                kode: 'HALVG',
+                kode: '890123cd-ef12-3456-789a-bcdef1234567',
                 navn: 'Sykepengegrunnlaget utgjør minst 50 prosent av grunnbeløpet',
                 variant: 'RADIO',
                 alternativer: [
@@ -158,7 +158,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
             {
-                kode: 'FYLT_70_GRUPPE',
+                kode: '901234ef-5678-9abc-def1-23456789abcd',
                 navn: 'Andre avslagsgrunner',
                 variant: 'CHECKBOX',
                 alternativer: [
@@ -179,22 +179,22 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'ARBEIDSUFØR',
+        kode: 'b23456cd-ef78-9abc-def1-23456789abef',
         beskrivelse: 'Arbeidsuførhet',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'ARBEIDSUFØRHET',
+                kode: 'c34567de-f890-abcd-ef12-3456789abcde',
                 navn: 'Er vilkåret om arbeidsuførhet oppfylt?',
                 variant: 'RADIO',
                 alternativer: [
                     {
-                        kode: 'ARBEIDSUFØRHET_JA',
+                        kode: '4b23567e-f012-345c-def0-abcdef012345',
                         navn: 'Ja',
-                        harUnderspørsmål: false,
+                        harUnderspørsmål: true,
                         underspørsmål: [
                             {
-                                kode: 'ARBEIDSUFØRHET_JA_ALTERNATIVER',
+                                kode: 'd45678ef-9012-3456-789a-bcdef123456f',
                                 variant: 'RADIO',
                                 alternativer: [
                                     {
@@ -274,12 +274,12 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                         ],
                     },
                     {
-                        kode: 'ARBEIDSUFØRHET_NEI',
+                        kode: '5c34678f-0123-456d-ef01-bcdef0123456',
                         navn: 'Nei',
-                        harUnderspørsmål: false,
+                        harUnderspørsmål: true,
                         underspørsmål: [
                             {
-                                kode: 'ARBEIDSUFØRHET_NEI_ALTERNATIVER',
+                                kode: 'e56789f0-1234-5678-9abc-def123456789',
                                 variant: 'RADIO',
                                 alternativer: [
                                     {
@@ -309,12 +309,12 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'KRAV_RETTIDIG_FRAMSATT',
+        kode: 'f6789012-3456-789a-bcde-f123456789ab',
         beskrivelse: 'Frist for framsetting av krav',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'KRAV_FRAMSATT_HELT_ELLER_DELVIS_I_TIDE',
+                kode: '0789123a-bcde-f456-789a-bcdef1234567',
                 navn: 'Er vilkåret oppfylt for hele eller deler av perioden?',
                 variant: 'RADIO',
                 alternativer: [
@@ -324,7 +324,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                         harUnderspørsmål: true,
                         underspørsmål: [
                             {
-                                kode: 'KRAV_FRAMSATT_I_TIDE_HELE_PERIODEN_JA_BEGRUNNELSE',
+                                kode: '1890234b-cdef-5678-90ab-cdef12345678',
                                 navn: 'Velg begrunnelse',
                                 variant: 'RADIO',
                                 alternativer: [
@@ -351,12 +351,12 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                         ],
                     },
                     {
-                        kode: 'KRAV_FRAMSATT_I_TIDE_DELER_AV_PERIODEN_JA',
+                        kode: '6d457890-1234-567e-f012-cdef01234567',
                         navn: 'Ja, for deler av perioden',
-                        harUnderspørsmål: false,
+                        harUnderspørsmål: true,
                         underspørsmål: [
                             {
-                                kode: 'KRAV_FRAMSATT_I_TIDE_DELER_AV_PERIODEN_JA_BEGRUNNELSE',
+                                kode: '2901345c-def6-789a-bcde-f123456789ab',
                                 navn: 'Velg begrunnelse',
                                 variant: 'RADIO',
                                 alternativer: [
@@ -393,12 +393,12 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'MEDLEMSKAP',
+        kode: '3a12456d-ef78-90ab-cdef-123456789abc',
         beskrivelse: 'Medlemskap i folketrygden',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'MEDLEMSKAP_ALTERNATIVER',
+                kode: '4b23567e-f890-12ab-cdef-123456789bcd',
                 navn: 'Er den sykmeldte medlem i folketrygden?',
                 variant: 'RADIO',
                 alternativer: [
@@ -419,12 +419,12 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'FRISKMELDING_TIL_ARBEIDSFORMIDLING',
+        kode: '5c34678f-9012-34cd-ef12-3456789abcde',
         beskrivelse: 'Sykepenger ved friskmelding til arbeidsformidling',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'FRISKMELDING_TIL_ARBEIDSFORMIDLING_ALTERNATIVER',
+                kode: '6d457890-1234-56de-f123-456789abcdef',
                 navn: 'Er vilkårene oppfylt?',
                 variant: 'RADIO',
                 alternativer: [
@@ -445,30 +445,30 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'GRADERT_SYKMELDING',
+        kode: '7e5689a1-2345-67ef-1234-56789abcdef0',
         beskrivelse: 'Gradert sykmelding',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [],
     },
     {
-        kode: 'DOKUMENTASJON_AV_ARBEIDSUFØRHET',
+        kode: '8f679ab2-3456-78f0-1234-56789abcdef1',
         beskrivelse: 'Dokumentasjon av arbeidsuførhet',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [],
     },
     {
-        kode: 'OPPFØLGING',
+        kode: '9078abc3-4567-89f1-2345-6789abcdef12',
         beskrivelse: 'Oppfølging mv. i regi av Arbeids- og velferdsetaten',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [],
     },
     {
-        kode: 'MEDVIRKNING',
+        kode: 'a189bcd4-5678-9af2-3456-789abcdef123',
         beskrivelse: 'Medlemmets medvirkning',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'MEDVIRKNING_IKKE_OPPFYLT',
+                kode: 'b29acde5-6789-abf3-4567-89abcdef1234',
                 variant: 'CHECKBOX',
                 alternativer: [
                     {
@@ -488,30 +488,30 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'OPPHOLDSKRAV',
+        kode: 'c3abdef6-789a-bcf4-5678-9abcdef12345',
         beskrivelse: 'Oppholdskrav',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [],
     },
     {
-        kode: 'SYKEPENGEGRUNNLAG',
+        kode: 'd4bcef07-89ab-cdf5-6789-abcdef123456',
         beskrivelse: 'Sykepengegrunnlag',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [],
     },
     {
-        kode: 'SYKEPENGEDAGER',
+        kode: 'e5cdf018-9abc-def6-789a-bcdef1234567',
         beskrivelse: 'Sykepengedager',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [],
     },
     {
-        kode: 'SYKEPENGEDAGER_IGJEN',
+        kode: 'f6de0129-abcd-ef07-89ab-cdef12345678',
         beskrivelse: 'Antall sykepengedager',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'SYKEPENGEDAGER_IGJEN_ALTERNATIVER',
+                kode: '07ef123a-bcde-f018-9abc-def123456789',
                 navn: 'Har personen flere sykepengedager igjen?',
                 variant: 'RADIO',
                 alternativer: [
@@ -538,12 +538,12 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'GRADERTE_SYKEPENGER',
+        kode: '18f0234b-cdef-0129-abcd-ef123456789a',
         beskrivelse: 'Graderte sykepenger',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [
             {
-                kode: 'GRADERTE_SYKEPENGER_ARBEIDSUFØR',
+                kode: '2901345c-def0-123a-bcde-f123456789ab',
                 navn: 'Er personens evne til å utføre inntektsgivende arbeid nedsatt med minst 20 prosent?',
                 variant: 'RADIO',
                 alternativer: [
@@ -570,7 +570,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
         ],
     },
     {
-        kode: 'ARBEIDSREISER',
+        kode: '3a12456d-ef01-234b-cdef-123456789abc',
         beskrivelse: 'Tilskott til arbeidsreiser',
         kategori: 'generelle_bestemmelser',
         underspørsmål: [],
