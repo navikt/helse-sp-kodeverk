@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { File, Storage } from '@google-cloud/storage'
 
 import { ErrorResponse } from '@/auth/beskyttetApi'
-import { saksbehandlerUi } from '@/kodeverk/lokalSaksbehandlerui'
+import { saksbehandlerUi } from '@/kodeverk/mockdata/saksbehandlerui'
 import { kodeverkStore } from '@/mockapi/storage'
 import { HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 

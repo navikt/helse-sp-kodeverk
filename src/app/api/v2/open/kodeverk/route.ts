@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { File, Storage } from '@google-cloud/storage'
 
 import { ErrorResponse } from '@/auth/beskyttetApi'
-import { lokalUtviklingKodeverk } from '@/kodeverk/lokalUtviklingKodeverk'
+import { lokalUtviklingKodeverk } from '@/kodeverk/mockdata/vilkårKodeverk'
 import { kodeverkStore } from '@/mockapi/storage'
 import { Kodeverk } from '@schemas/kodeverk'
 

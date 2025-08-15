@@ -22,9 +22,9 @@ import { useMemo, useState } from 'react'
 import { Control, Controller, FieldErrors, useFieldArray, useWatch, UseFormSetValue, FieldPath } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 
-import { kategoriLabels } from '@/kodeverk/lokalSaksbehandlerui'
 import { HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
+import { kategoriLabels } from '@/kodeverk/kategorier'
 
 type KodeOption = { value: string; label: string }
 

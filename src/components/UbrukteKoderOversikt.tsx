@@ -4,7 +4,7 @@ import { ExpansionCard, Tag } from '@navikt/ds-react'
 import { useMemo } from 'react'
 
 import { useKodeverk } from '@/hooks/queries/useKodeverk'
-import { saksbehandlerUi } from '@/kodeverk/lokalSaksbehandlerui'
+import { saksbehandlerUi } from '@/kodeverk/mockdata/saksbehandlerui'
 
 interface UbruktKode {
     kode: string

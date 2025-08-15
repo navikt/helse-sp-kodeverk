@@ -1,7 +1,7 @@
 import { nextleton } from 'nextleton'
 
-import { lokalUtviklingKodeverk } from '@/kodeverk/lokalUtviklingKodeverk'
-import { saksbehandlerUi } from '@/kodeverk/lokalSaksbehandlerui'
+import { lokalUtviklingKodeverk } from '@/kodeverk/mockdata/vilkårKodeverk'
+import { saksbehandlerUi } from '@/kodeverk/mockdata/saksbehandlerui'
 
 export const kodeverkStore = nextleton('kodeverk', () => {
     return {
