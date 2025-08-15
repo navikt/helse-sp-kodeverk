@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
     DndContext,
@@ -26,6 +26,7 @@ import { DragVerticalIcon } from '@navikt/aksel-icons'
 
 import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
+import { useKodeverk } from '@/hooks/queries/useKodeverk'
 
 const fetchKodeverk = async (): Promise<HovedspørsmålForm> => {
     const response = await fetch('/api/v2/open/saksbehandlerui')
@@ -88,6 +89,7 @@ const Page = () => {
         queryKey: ['saksbehandlergrensesnitt'],
         queryFn: fetchKodeverk,
     })
+    const { data: kodeverkData } = useKodeverk()
 
     const {
         control,
@@ -195,6 +197,62 @@ const Page = () => {
         append(newVilkår)
     }
 
+    // Watch alle vilkår for å sjekke etter ukjente koder
+    const allVilkar = useWatch({ control, name: 'vilkar' }) || []
+
+    // Memoized funksjon for å sjekke etter ukjente koder
+    const vilkarWithUnknownCodes = useMemo(() => {
+        if (!kodeverkData || !allVilkar) return new Set<number>()
+
+        const alleKjenteKoder = new Set<string>()
+        for (const vilkar of kodeverkData.vilkar) {
+            for (const årsak of vilkar.oppfylt) {
+                alleKjenteKoder.add(årsak.kode)
+            }
+            for (const årsak of vilkar.ikkeOppfylt) {
+                alleKjenteKoder.add(årsak.kode)
+            }
+        }
+
+        // Rekursiv funksjon for å sjekke alternativer
+        const checkAlternativer = (alternativer: any[]): boolean => {
+            for (const alternativ of alternativer || []) {
+                // Sjekk kun alternativer som IKKE har underspørsmål
+                if (!alternativ.harUnderspørsmål && alternativ.kode) {
+                    if (!alleKjenteKoder.has(alternativ.kode)) {
+                        return true
+                    }
+                }
+                // Rekursivt sjekk underspørsmål
+                if (alternativ.underspørsmål) {
+                    for (const underspørsmål of alternativ.underspørsmål) {
+                        if (checkAlternativer(underspørsmål.alternativer || [])) {
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
+        }
+
+        const vilkarWithIssues = new Set<number>()
+
+        // Sjekk alle vilkår
+        allVilkar.forEach((vilkar: any, index: number) => {
+            if (!vilkar) return
+
+            // Sjekk alle underspørsmål
+            for (const underspørsmål of vilkar.underspørsmål || []) {
+                if (checkAlternativer(underspørsmål.alternativer || [])) {
+                    vilkarWithIssues.add(index)
+                    break
+                }
+            }
+        })
+
+        return vilkarWithIssues
+    }, [kodeverkData, allVilkar])
+
     if (isLoading) {
         return <div className="p-6">Laster...</div>
     }
@@ -233,22 +291,38 @@ const Page = () => {
                 </div>
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
-                        {fields.map((field, index) => (
-                            <SortableExpansionCard key={field.id} id={field.id} aria-label="Spørsmål" className="mb-4">
-                                <ExpansionCard.Header>
-                                    <ExpansionCard.Title>{field.beskrivelse || 'Nytt spørsmål'}</ExpansionCard.Title>
-                                </ExpansionCard.Header>
-                                <ExpansionCard.Content>
-                                    <SpørsmålForm
-                                        control={control}
-                                        index={index}
-                                        errors={errors}
-                                        onRemove={() => remove(index)}
-                                        setValue={setValue}
-                                    />
-                                </ExpansionCard.Content>
-                            </SortableExpansionCard>
-                        ))}
+                        {fields.map((field, index) => {
+                            const hasUnknownCodes = vilkarWithUnknownCodes.has(index)
+                            return (
+                                <SortableExpansionCard
+                                    key={field.id}
+                                    id={field.id}
+                                    aria-label="Spørsmål"
+                                    className="mb-4"
+                                >
+                                    <ExpansionCard.Header>
+                                        <ExpansionCard.Title>
+                                            {field.beskrivelse || 'Nytt spørsmål'}
+                                        </ExpansionCard.Title>
+                                        {hasUnknownCodes && (
+                                            <ExpansionCard.Description>
+                                                ⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke
+                                                finnes i kodeverket
+                                            </ExpansionCard.Description>
+                                        )}
+                                    </ExpansionCard.Header>
+                                    <ExpansionCard.Content>
+                                        <SpørsmålForm
+                                            control={control}
+                                            index={index}
+                                            errors={errors}
+                                            onRemove={() => remove(index)}
+                                            setValue={setValue}
+                                        />
+                                    </ExpansionCard.Content>
+                                </SortableExpansionCard>
+                            )
+                        })}
                     </SortableContext>
                 </DndContext>
             </form>
