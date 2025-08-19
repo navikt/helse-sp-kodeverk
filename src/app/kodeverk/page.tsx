@@ -8,9 +8,11 @@ import { useForm, useFieldArray, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
+import { HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
 import { ExcelExport } from '@/components/kodeverk/ExcelExport'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
+import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     const { lovverk, kapittel, paragraf, ledd, setning, bokstav } = hjemmel
@@ -120,9 +122,91 @@ const getVilkårErrors = (
     return { hasErrors: errorCount > 0, errorCount }
 }
 
+// Funksjon for å sjekke om et vilkår har begrunnelser som ikke finnes i saksbehandlergrensesnittet
+const getVilkårWithUnknownBegrunnelser = (
+    vilkår: (Vilkår & { id?: string })[],
+    saksbehandlerui: HovedspørsmålArray | undefined,
+): Set<number> => {
+    if (!saksbehandlerui || !vilkår) return new Set<number>()
+
+    // Samle alle tilgjengelige koder fra saksbehandlergrensesnittet
+    const alleTilgjengeligeKoder = new Set<string>()
+
+    // Rekursiv funksjon for å samle alle koder fra saksbehandlergrensesnittet
+    const samleKoder = (alternativer: unknown[]) => {
+        for (const alternativ of alternativer || []) {
+            if (typeof alternativ === 'object' && alternativ !== null) {
+                const alt = alternativ as Record<string, unknown>
+                if (typeof alt.kode === 'string') {
+                    alleTilgjengeligeKoder.add(alt.kode)
+                }
+                if (Array.isArray(alt.underspørsmål)) {
+                    for (const underspørsmål of alt.underspørsmål) {
+                        if (typeof underspørsmål === 'object' && underspørsmål !== null) {
+                            const undersp = underspørsmål as Record<string, unknown>
+                            if (Array.isArray(undersp.alternativer)) {
+                                samleKoder(undersp.alternativer)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Gå gjennom alle hovedspørsmål og samle koder
+    for (const hovedspørsmål of saksbehandlerui) {
+        for (const underspørsmål of hovedspørsmål.underspørsmål || []) {
+            if (Array.isArray(underspørsmål.alternativer)) {
+                samleKoder(underspørsmål.alternativer)
+            }
+        }
+    }
+
+    // Sjekk hvilke vilkår som har begrunnelser som ikke finnes
+    const vilkårWithIssues = new Set<number>()
+
+    vilkår.forEach((vilkår, index) => {
+        // Sjekk oppfylt begrunnelser
+        for (const begrunnelse of vilkår.oppfylt || []) {
+            if (!alleTilgjengeligeKoder.has(begrunnelse.kode)) {
+                vilkårWithIssues.add(index)
+                break
+            }
+        }
+
+        // Sjekk ikkeOppfylt begrunnelser
+        for (const begrunnelse of vilkår.ikkeOppfylt || []) {
+            if (!alleTilgjengeligeKoder.has(begrunnelse.kode)) {
+                vilkårWithIssues.add(index)
+                break
+            }
+        }
+    })
+
+    return vilkårWithIssues
+}
+
+// Funksjon for å sjekke om et vilkår har begrunnelser
+const getVilkårWithoutBegrunnelser = (vilkår: (Vilkår & { id?: string })[]): Set<number> => {
+    const vilkårWithoutBegrunnelser = new Set<number>()
+
+    vilkår.forEach((vilkår, index) => {
+        const hasOppfylt = vilkår.oppfylt && vilkår.oppfylt.length > 0
+        const hasIkkeOppfylt = vilkår.ikkeOppfylt && vilkår.ikkeOppfylt.length > 0
+
+        if (!hasOppfylt && !hasIkkeOppfylt) {
+            vilkårWithoutBegrunnelser.add(index)
+        }
+    })
+
+    return vilkårWithoutBegrunnelser
+}
+
 const Page = () => {
     const queryClient = useQueryClient()
     const { data: serverKodeverk, isLoading } = useKodeverk()
+    const { data: saksbehandleruiData } = useSaksbehandlerui()
 
     const {
         control,
@@ -141,6 +225,12 @@ const Page = () => {
 
     // Sorter vilkårene før visning
     const sortedFields = sortVilkår(fields as FieldWithId[])
+
+    // Sjekk etter vilkår med begrunnelser som ikke finnes i saksbehandlergrensesnittet
+    const vilkårWithUnknownBegrunnelser = getVilkårWithUnknownBegrunnelser(fields, saksbehandleruiData)
+
+    // Sjekk etter vilkår uten begrunnelser
+    const vilkårWithoutBegrunnelser = getVilkårWithoutBegrunnelser(fields)
 
     const [validationError, setValidationError] = useState<string | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
@@ -273,6 +363,8 @@ const Page = () => {
                     // Finn den opprinnelige indeksen i fields-arrayet
                     const originalIndex = fields.findIndex((f) => f.id === field.id)
                     const { hasErrors, errorCount } = getVilkårErrors(originalIndex, errors)
+                    const hasUnknownBegrunnelser = vilkårWithUnknownBegrunnelser.has(originalIndex)
+                    const hasNoBegrunnelser = vilkårWithoutBegrunnelser.has(originalIndex)
                     return (
                         <ExpansionCard
                             key={field.id}
@@ -288,6 +380,19 @@ const Page = () => {
                                 </ExpansionCard.Title>
                                 <ExpansionCard.Description>
                                     {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
+                                    {hasUnknownBegrunnelser && (
+                                        <>
+                                            <br></br>
+                                            ⚠️ Dette vilkåret inneholder begrunnelser som ikke finnes i
+                                            saksbehandlergrensesnittet
+                                        </>
+                                    )}
+                                    {hasNoBegrunnelser && (
+                                        <>
+                                            <br></br>
+                                            ⚠️ Dette vilkåret har ingen begrunnelser
+                                        </>
+                                    )}
                                 </ExpansionCard.Description>
                             </ExpansionCard.Header>
                             <ExpansionCard.Content>
