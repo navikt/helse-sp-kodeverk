@@ -19,21 +19,21 @@ export function Header(): ReactElement {
             <InternalHeaderTitle
                 as={NextLink}
                 href="/"
-                className={pathname === '/' ? 'bg-ax-bg-accent-strong-pressed' : ''}
+                className={pathname === '/' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >
                 Spillerom kodeverk admin
             </InternalHeaderTitle>
             <InternalHeaderButton
                 as={NextLink}
                 href="/kodeverk"
-                className={pathname === '/kodeverk' ? 'bg-ax-bg-accent-strong-pressed' : ''}
+                className={pathname === '/kodeverk' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >
                 Kodeverk
             </InternalHeaderButton>
             <InternalHeaderButton
                 as={NextLink}
                 href="/saksbehandlergrensesnitt"
-                className={pathname === '/saksbehandlergrensesnitt' ? 'bg-ax-bg-accent-strong-pressed' : ''}
+                className={pathname === '/saksbehandlergrensesnitt' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >
                 Saksbehandlergrensesnitt
             </InternalHeaderButton>
