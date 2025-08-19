@@ -355,39 +355,53 @@ const UnderspørsmålSection = ({
             </div>
 
             <div className="mt-6">
-                <h5 className="mb-3 text-sm font-medium">Alternativer</h5>
-                <div className="space-y-4">
-                    {alternativFields.map((field, alternativIndex) => (
-                        <AlternativSection
-                            key={`${underspørsmålPath}-alt-${field.id}`}
-                            control={control}
-                            vilkårIndex={vilkårIndex}
-                            alternativPath={`${underspørsmålPath}.alternativer.${alternativIndex}`}
-                            errors={errors}
-                            onRemove={() => removeAlternativ(alternativIndex)}
-                            level={level}
-                            setValue={setValue}
-                            allKodeOptions={allKodeOptions}
-                        />
-                    ))}
-                </div>
-                <Button
-                    type="button"
-                    variant="secondary"
-                    icon={<PlusIcon />}
+                <ExpansionCard
                     size="small"
-                    onClick={() =>
-                        appendAlternativ({
-                            kode: '', // Starter tom, vil bli satt til UUID hvis underspørsmål legges til
-                            navn: null,
-                            harUnderspørsmål: false,
-                            underspørsmål: [],
-                        })
-                    }
-                    className="mt-4"
+                    aria-labelledby={`alternativer-${underspørsmålPath}-header`}
+                    className={errors?.vilkar?.[vilkårIndex]?.underspørsmål ? 'border-2 border-ax-border-danger' : ''}
                 >
-                    Legg til alternativ
-                </Button>
+                    <ExpansionCard.Header>
+                        <ExpansionCard.Title as="h5" size="small" id={`alternativer-${underspørsmålPath}-header`}>
+                            {alternativFields.length === 0
+                                ? '0 svaralternativer'
+                                : `${alternativFields.length} svaralternativ${alternativFields.length === 1 ? '' : 'er'}`}
+                        </ExpansionCard.Title>
+                    </ExpansionCard.Header>
+                    <ExpansionCard.Content>
+                        <div className="space-y-4">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                icon={<PlusIcon />}
+                                size="small"
+                                onClick={() =>
+                                    appendAlternativ({
+                                        kode: '', // Starter tom, vil bli satt til UUID hvis underspørsmål legges til
+                                        navn: null,
+                                        harUnderspørsmål: false,
+                                        underspørsmål: [],
+                                    })
+                                }
+                                className="mt-4"
+                            >
+                                Legg til svaralternativ
+                            </Button>
+                            {alternativFields.map((field, alternativIndex) => (
+                                <AlternativSection
+                                    key={`${underspørsmålPath}-alt-${field.id}`}
+                                    control={control}
+                                    vilkårIndex={vilkårIndex}
+                                    alternativPath={`${underspørsmålPath}.alternativer.${alternativIndex}`}
+                                    errors={errors}
+                                    onRemove={() => removeAlternativ(alternativIndex)}
+                                    level={level}
+                                    setValue={setValue}
+                                    allKodeOptions={allKodeOptions}
+                                />
+                            ))}
+                        </div>
+                    </ExpansionCard.Content>
+                </ExpansionCard>
             </div>
         </div>
     )
@@ -533,7 +547,7 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
                     >
                         {underspørsmålFields.map((field, underspørsmålIndex) => (
                             <SortableUndersporsmalCard key={`underspørsmål-${field.id}`} id={field.id}>
-                                <ExpansionCard aria-label="Underspørsmål">
+                                <ExpansionCard aria-label="Underspørsmål" size="small">
                                     <ExpansionCard.Header>
                                         <ExpansionCard.Title>
                                             {field.navn || `${getVariantDisplayName(field.variant)} gruppe`}
