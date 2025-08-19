@@ -185,6 +185,9 @@ const AlternativSection = ({
                                 ? displayOptions.filter((opt) => opt.value === currentValue)
                                 : []
 
+                            // Sjekk for valideringsfeil - bruk en enklere tilnærming
+                            const fieldError = field.value === '' ? 'Kode er påkrevd' : undefined
+
                             return (
                                 <UNSAFE_Combobox
                                     label="Kode"
@@ -202,7 +205,8 @@ const AlternativSection = ({
                                     }}
                                     isMultiSelect={false}
                                     error={
-                                        !isValidKode ? `Koden "${currentValue}" finnes ikke i kodeverket` : undefined
+                                        fieldError ||
+                                        (!isValidKode ? `Koden "${currentValue}" finnes ikke i kodeverket` : undefined)
                                     }
                                 />
                             )
@@ -230,7 +234,7 @@ const AlternativSection = ({
                             <div className="space-y-4">
                                 {nestedUnderspørsmålFields.map((field, nestedIndex) => (
                                     <UnderspørsmålSection
-                                        key={field.id}
+                                        key={`${alternativPath}-nested-${field.id}`}
                                         control={control}
                                         vilkårIndex={vilkårIndex}
                                         underspørsmålPath={`${alternativPath}.underspørsmål.${nestedIndex}`}
@@ -355,7 +359,7 @@ const UnderspørsmålSection = ({
                 <div className="space-y-4">
                     {alternativFields.map((field, alternativIndex) => (
                         <AlternativSection
-                            key={field.id}
+                            key={`${underspørsmålPath}-alt-${field.id}`}
                             control={control}
                             vilkårIndex={vilkårIndex}
                             alternativPath={`${underspørsmålPath}.alternativer.${alternativIndex}`}
@@ -528,7 +532,7 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
                         strategy={verticalListSortingStrategy}
                     >
                         {underspørsmålFields.map((field, underspørsmålIndex) => (
-                            <SortableUndersporsmalCard key={field.id} id={field.id}>
+                            <SortableUndersporsmalCard key={`underspørsmål-${field.id}`} id={field.id}>
                                 <ExpansionCard aria-label="Underspørsmål">
                                     <ExpansionCard.Header>
                                         <ExpansionCard.Title>

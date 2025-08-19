@@ -154,7 +154,9 @@ const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCard
                 <DragVerticalIcon className="text-gray-400 h-5 w-5" />
             </div>
             <div className="flex-1">
-                <ExpansionCard {...props}>{children}</ExpansionCard>
+                <ExpansionCard size="small" {...props}>
+                    {children}
+                </ExpansionCard>
             </div>
         </div>
     )

@@ -1,7 +1,7 @@
 'use client'
 
 import { Control, FieldErrors, useFieldArray, useWatch, FieldArrayWithId } from 'react-hook-form'
-import { Button, TextField, Modal, Heading } from '@navikt/ds-react'
+import { Button, TextField, Modal, Heading, ExpansionCard } from '@navikt/ds-react'
 import { Controller } from 'react-hook-form'
 import { useState } from 'react'
 import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
@@ -9,6 +9,15 @@ import { PlusIcon, TrashIcon } from '@navikt/aksel-icons'
 import { KodeverkForm, Årsak, Vilkårshjemmel } from '@schemas/kodeverk'
 
 import { VilkårshjemmelForm } from './VilkårshjemmelForm'
+
+const formatParagraf = (hjemmel: Vilkårshjemmel) => {
+    const { lovverk, kapittel, paragraf, ledd, setning, bokstav } = hjemmel
+    let result = `${lovverk} §${kapittel}-${paragraf}`
+    if (ledd) result += ` ${ledd}. ledd`
+    if (setning) result += ` ${setning}. setning`
+    if (bokstav) result += ` bokstav ${bokstav}`
+    return result
+}
 
 interface VilkårFormProps {
     control: Control<KodeverkForm>
@@ -20,7 +29,6 @@ interface VilkårFormProps {
 type ResultatType = 'oppfylt' | 'ikkeOppfylt'
 
 interface ResultatBegrunnelserSectionProps {
-    title: string
     fields: FieldArrayWithId<KodeverkForm, `vilkar.${number}.${ResultatType}`, 'id'>[]
     onAppend: (value: Årsak) => void
     onRemove: (index: number) => void
@@ -29,10 +37,10 @@ interface ResultatBegrunnelserSectionProps {
     errors: FieldErrors<KodeverkForm>
     resultType: ResultatType
     mainVilkårshjemmel: Vilkårshjemmel | undefined
+    variant: 'oppfylt' | 'ikkeOppfylt'
 }
 
 const ResultatBegrunnelserSection = ({
-    title,
     fields,
     onAppend,
     onRemove,
@@ -41,85 +49,155 @@ const ResultatBegrunnelserSection = ({
     errors,
     resultType,
     mainVilkårshjemmel,
+    variant,
 }: ResultatBegrunnelserSectionProps) => {
     const getDefaultVilkårshjemmel = () => {
         return mainVilkårshjemmel ? { ...mainVilkårshjemmel } : undefined
     }
 
-    return (
-        <div className="border-gray-200 bg-gray-100 rounded-lg border p-4">
-            <h4 className="text-md mb-4 font-medium">{title}</h4>
-            {fields.map((field, resultIndex) => (
-                <div key={field.id} className="border-gray-200 bg-gray-100 mb-6 rounded-lg border p-4">
-                    <div className="mb-4 space-y-4">
-                        <div className="flex items-end gap-4">
-                            <Controller
-                                name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.kode` as const}
-                                control={control}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Kode"
-                                        error={
-                                            errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.kode?.message
-                                        }
-                                        value={field.value || ''}
-                                        className="flex-1"
-                                    />
-                                )}
-                            />
-                            <Button
-                                icon={<TrashIcon />}
-                                type="button"
-                                variant="tertiary"
-                                onClick={() => onRemove(resultIndex)}
-                            >
-                                Fjern
-                            </Button>
-                        </div>
+    // Watch all vilkårshjemmel values for begrunnelser
+    const begrunnelseVilkårshjemler = useWatch({
+        control,
+        name: `vilkar.${vilkårIndex}.${resultType}`,
+    })
 
-                        <Controller
-                            name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.beskrivelse` as const}
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    label="Tekst"
-                                    error={
-                                        errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.beskrivelse?.message
-                                    }
-                                    value={field.value || ''}
-                                />
-                            )}
-                        />
-                    </div>
-                    <div className="p-4">
-                        <h5 className="text-gray-700 mb-3 text-sm font-medium">Vilkårshjemmel for begrunnelse</h5>
-                        <VilkårshjemmelForm
-                            control={control}
-                            index={vilkårIndex}
-                            errors={errors}
-                            resultIndex={resultIndex}
-                            resultType={resultType}
-                        />
-                    </div>
-                </div>
-            ))}
-            <Button
-                type="button"
-                variant="secondary"
-                icon={<PlusIcon />}
+    const getTitle = () => {
+        const baseTitle = variant === 'oppfylt' ? 'Begrunnelser for oppfylt' : 'Begrunnelser for ikke oppfylt'
+        const countText =
+            fields.length === 0 ? 'Ingen begrunnelser' : `${fields.length} begrunnelse${fields.length === 1 ? '' : 'r'}`
+        return `${baseTitle} (${countText})`
+    }
+
+    // Sjekk om det er valideringsfeil i noen av underfeltene
+    const hasErrors = () => {
+        const resultErrors = errors?.vilkar?.[vilkårIndex]?.[resultType]
+        if (!resultErrors || !Array.isArray(resultErrors)) return false
+
+        return resultErrors.some((fieldError) => {
+            return fieldError?.kode?.message || fieldError?.beskrivelse?.message || fieldError?.vilkårshjemmel
+        })
+    }
+
+    return (
+        <div className="subtle-card">
+            <ExpansionCard
                 size="small"
-                onClick={() =>
-                    onAppend({
-                        kode: '',
-                        beskrivelse: '',
-                        vilkårshjemmel: getDefaultVilkårshjemmel(),
-                    })
+                aria-labelledby={`${resultType}-header`}
+                className={hasErrors() ? 'border-2 border-ax-border-danger' : ''}
+                style={
+                    {
+                        '--ax-bg-raised':
+                            variant === 'oppfylt' ? 'var(--ax-bg-success-softA)' : 'var(--ax-bg-danger-softA)',
+                    } as React.CSSProperties
                 }
             >
-                Legg til
-            </Button>
+                <ExpansionCard.Header>
+                    <ExpansionCard.Title as="h4" size="small" id={`${resultType}-header`}>
+                        {getTitle()}
+                    </ExpansionCard.Title>
+                </ExpansionCard.Header>
+                <ExpansionCard.Content>
+                    <>
+                        {fields.map((field, resultIndex) => (
+                            <div key={field.id} className="border-gray-200 bg-gray-100 mb-6 rounded-lg border p-4">
+                                <div className="mb-4 space-y-4">
+                                    <div className="flex items-end gap-4">
+                                        <Controller
+                                            name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.kode` as const}
+                                            control={control}
+                                            render={({ field }) => (
+                                                <TextField
+                                                    {...field}
+                                                    label="Kode"
+                                                    error={
+                                                        errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.kode
+                                                            ?.message
+                                                    }
+                                                    value={field.value || ''}
+                                                    className="flex-1"
+                                                />
+                                            )}
+                                        />
+                                        <Button
+                                            icon={<TrashIcon />}
+                                            type="button"
+                                            variant="tertiary"
+                                            onClick={() => onRemove(resultIndex)}
+                                        >
+                                            Fjern
+                                        </Button>
+                                    </div>
+
+                                    <Controller
+                                        name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.beskrivelse` as const}
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                label="Tekst"
+                                                error={
+                                                    errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]
+                                                        ?.beskrivelse?.message
+                                                }
+                                                value={field.value || ''}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <div>
+                                    <ExpansionCard
+                                        size="small"
+                                        aria-labelledby={`vilkårshjemmel-${resultIndex}-header`}
+                                        className={
+                                            errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.vilkårshjemmel
+                                                ? 'border-2 border-ax-border-danger'
+                                                : ''
+                                        }
+                                    >
+                                        <ExpansionCard.Header>
+                                            <ExpansionCard.Title
+                                                as="h5"
+                                                size="small"
+                                                id={`vilkårshjemmel-${resultIndex}-header`}
+                                            >
+                                                {(begrunnelseVilkårshjemler?.[resultIndex]?.vilkårshjemmel &&
+                                                    formatParagraf(
+                                                        begrunnelseVilkårshjemler[resultIndex].vilkårshjemmel,
+                                                    )) ||
+                                                    'Vilkårshjemmel for begrunnelse'}
+                                            </ExpansionCard.Title>
+                                        </ExpansionCard.Header>
+                                        <ExpansionCard.Content>
+                                            <VilkårshjemmelForm
+                                                control={control}
+                                                index={vilkårIndex}
+                                                errors={errors}
+                                                resultIndex={resultIndex}
+                                                resultType={resultType}
+                                            />
+                                        </ExpansionCard.Content>
+                                    </ExpansionCard>
+                                </div>
+                            </div>
+                        ))}
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            icon={<PlusIcon />}
+                            size="small"
+                            onClick={() =>
+                                onAppend({
+                                    kode: '',
+                                    beskrivelse: '',
+                                    vilkårshjemmel: getDefaultVilkårshjemmel(),
+                                })
+                            }
+                        >
+                            Legg til
+                        </Button>
+                    </>
+                </ExpansionCard.Content>
+            </ExpansionCard>
         </div>
     )
 }
@@ -192,15 +270,32 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                 />
             </div>
 
-            <div className="border-gray-200 bg-gray-50 rounded-md border p-4">
-                <h4 className="text-md text-gray-700 mb-4 font-medium">Hovedvilkårshjemmel</h4>
-                <VilkårshjemmelForm control={control} index={index} errors={errors} />
-            </div>
+            <ExpansionCard
+                size="small"
+                aria-labelledby="hovedvilkårshjemmel-header"
+                style={
+                    {
+                        '--ax-bg-raised': 'var(--ax-bg-accent-softA)',
+                    } as React.CSSProperties
+                }
+                className={errors?.vilkar?.[index]?.vilkårshjemmel ? 'border-2 border-ax-border-danger' : ''}
+            >
+                <ExpansionCard.Header>
+                    <ExpansionCard.Title as="h4" size="small" id="hovedvilkårshjemmel-header">
+                        Hovedvilkårshjemmel
+                    </ExpansionCard.Title>
+                    {mainVilkårshjemmel && (
+                        <ExpansionCard.Description>{formatParagraf(mainVilkårshjemmel)}</ExpansionCard.Description>
+                    )}
+                </ExpansionCard.Header>
+                <ExpansionCard.Content>
+                    <VilkårshjemmelForm control={control} index={index} errors={errors} />
+                </ExpansionCard.Content>
+            </ExpansionCard>
 
             <div className="space-y-4">
                 <div className="space-y-6">
                     <ResultatBegrunnelserSection
-                        title="Begrunnelser for oppfylt"
                         fields={oppfyltFields}
                         onAppend={appendOppfylt}
                         onRemove={removeOppfylt}
@@ -208,11 +303,11 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         vilkårIndex={index}
                         errors={errors}
                         resultType="oppfylt"
+                        variant="oppfylt"
                         mainVilkårshjemmel={mainVilkårshjemmel}
                     />
 
                     <ResultatBegrunnelserSection
-                        title="Begrunnelser for ikke oppfylt"
                         fields={ikkeOppfyltFields}
                         onAppend={appendIkkeOppfylt}
                         onRemove={removeIkkeOppfylt}
@@ -220,6 +315,7 @@ export const VilkårForm = ({ control, index, errors, onRemove }: VilkårFormPro
                         vilkårIndex={index}
                         errors={errors}
                         resultType="ikkeOppfylt"
+                        variant="ikkeOppfylt"
                         mainVilkårshjemmel={mainVilkårshjemmel}
                     />
                 </div>

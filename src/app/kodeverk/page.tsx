@@ -16,7 +16,7 @@ import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     const { lovverk, kapittel, paragraf, ledd, setning, bokstav } = hjemmel
-    let result = `${lovverk} kap. ${kapittel} § ${paragraf}`
+    let result = `${lovverk} §${kapittel}-${paragraf}`
     if (ledd) result += ` ${ledd}. ledd`
     if (setning) result += ` ${setning}. setning`
     if (bokstav) result += ` bokstav ${bokstav}`
@@ -367,6 +367,7 @@ const Page = () => {
                     const hasNoBegrunnelser = vilkårWithoutBegrunnelser.has(originalIndex)
                     return (
                         <ExpansionCard
+                            size="small"
                             key={field.id}
                             aria-label="Vilkår"
                             className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
