@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
-import { useForm, useFieldArray, useWatch } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
     DndContext,
@@ -27,6 +27,83 @@ import { DragVerticalIcon } from '@navikt/aksel-icons'
 import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
 import { useKodeverk } from '@/hooks/queries/useKodeverk'
+
+// Funksjon for å sjekke om et hovedspørsmål har valideringsfeil og returnere antall feil
+const getHovedspørsmålErrors = (
+    index: number,
+    errors: FieldErrors<HovedspørsmålForm>,
+): { hasErrors: boolean; errorCount: number } => {
+    const spørsmålErrors = errors?.vilkar?.[index]
+    if (!spørsmålErrors) return { hasErrors: false, errorCount: 0 }
+
+    let errorCount = 0
+
+    // Sjekk hovedfeltene
+    if (spørsmålErrors.kode?.message) errorCount++
+    if (spørsmålErrors.beskrivelse?.message) errorCount++
+    if (spørsmålErrors.kategori?.message) errorCount++
+
+    // Sjekk underspørsmål array
+    if (spørsmålErrors.underspørsmål) {
+        for (let i = 0; i < (spørsmålErrors.underspørsmål.length || 0); i++) {
+            const underspørsmålError = spørsmålErrors.underspørsmål[i]
+            if (underspørsmålError?.kode?.message) errorCount++
+            if (underspørsmålError?.alternativer) {
+                for (let j = 0; j < (underspørsmålError.alternativer.length || 0); j++) {
+                    const alternativError = underspørsmålError.alternativer[j]
+                    if (alternativError?.kode?.message) errorCount++
+                    if (alternativError?.navn?.message) errorCount++
+                    if (alternativError?.underspørsmål) {
+                        // Rekursivt sjekk nested underspørsmål
+                        const nestedErrors = getNestedUnderspørsmålErrors(alternativError.underspørsmål)
+                        errorCount += nestedErrors
+                    }
+                }
+            }
+        }
+    }
+
+    return { hasErrors: errorCount > 0, errorCount }
+}
+
+// Hjelpefunksjon for å sjekke nested underspørsmål
+const getNestedUnderspørsmålErrors = (underspørsmål: unknown): number => {
+    let errorCount = 0
+
+    if (Array.isArray(underspørsmål)) {
+        for (const spørsmål of underspørsmål) {
+            if (spørsmål && typeof spørsmål === 'object' && 'kode' in spørsmål && spørsmål.kode?.message) errorCount++
+            if (
+                spørsmål &&
+                typeof spørsmål === 'object' &&
+                'alternativer' in spørsmål &&
+                Array.isArray(spørsmål.alternativer)
+            ) {
+                for (const alternativ of spørsmål.alternativer) {
+                    if (
+                        alternativ &&
+                        typeof alternativ === 'object' &&
+                        'kode' in alternativ &&
+                        alternativ.kode?.message
+                    )
+                        errorCount++
+                    if (
+                        alternativ &&
+                        typeof alternativ === 'object' &&
+                        'navn' in alternativ &&
+                        alternativ.navn?.message
+                    )
+                        errorCount++
+                    if (alternativ && typeof alternativ === 'object' && 'underspørsmål' in alternativ) {
+                        errorCount += getNestedUnderspørsmålErrors(alternativ.underspørsmål)
+                    }
+                }
+            }
+        }
+    }
+
+    return errorCount
+}
 
 const fetchKodeverk = async (): Promise<HovedspørsmålForm> => {
     const response = await fetch('/api/v2/open/saksbehandlerui')
@@ -301,21 +378,30 @@ const Page = () => {
                     <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
                         {fields.map((field, index) => {
                             const hasUnknownCodes = vilkarWithUnknownCodes.has(index)
+                            const { hasErrors, errorCount } = getHovedspørsmålErrors(index, errors)
+                            const hasNoUnderspørsmål = !field.underspørsmål || field.underspørsmål.length === 0
+
                             return (
                                 <SortableExpansionCard
                                     key={field.id}
                                     id={field.id}
                                     aria-label="Spørsmål"
-                                    className="mb-4"
+                                    className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
                                 >
                                     <ExpansionCard.Header>
-                                        <ExpansionCard.Title>
+                                        <ExpansionCard.Title className="flex items-center gap-2">
                                             {field.beskrivelse || 'Nytt spørsmål'}
+                                            {hasErrors && (
+                                                <span className="text-red-500 text-sm font-medium">
+                                                    ({errorCount} feil)
+                                                </span>
+                                            )}
                                         </ExpansionCard.Title>
-                                        {hasUnknownCodes && (
+                                        {(hasUnknownCodes || hasNoUnderspørsmål) && (
                                             <ExpansionCard.Description>
-                                                ⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke
-                                                finnes i kodeverket
+                                                {hasUnknownCodes &&
+                                                    '⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke finnes i kodeverket'}
+                                                {hasNoUnderspørsmål && '⚠️ Dette spørsmålet har ingen underspørsmål'}
                                             </ExpansionCard.Description>
                                         )}
                                     </ExpansionCard.Header>

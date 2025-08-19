@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
-import { VilkårForm } from '@/components/old/kodeverk/VilkårForm'
-import { ExcelExport } from '@/components/old/kodeverk/ExcelExport'
+import { VilkårForm } from '@/components/kodeverk/VilkårForm'
+import { ExcelExport } from '@/components/kodeverk/ExcelExport'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
@@ -74,6 +74,50 @@ const sortVilkår = (vilkår: FieldWithId[]): FieldWithId[] => {
         const bokstavB = b.vilkårshjemmel.bokstav || ''
         return bokstavA.localeCompare(bokstavB)
     })
+}
+
+// Funksjon for å sjekke om et vilkår har valideringsfeil og returnere antall feil
+const getVilkårErrors = (
+    index: number,
+    errors: FieldErrors<KodeverkForm>,
+): { hasErrors: boolean; errorCount: number } => {
+    const vilkårErrors = errors?.vilkar?.[index]
+    if (!vilkårErrors) return { hasErrors: false, errorCount: 0 }
+
+    let errorCount = 0
+
+    // Sjekk hovedfeltene
+    if (vilkårErrors.vilkårskode?.message) errorCount++
+    if (vilkårErrors.beskrivelse?.message) errorCount++
+
+    // Sjekk vilkårshjemmel
+    const hjemmelErrors = vilkårErrors.vilkårshjemmel
+    if (hjemmelErrors?.lovverk?.message) errorCount++
+    if (hjemmelErrors?.lovverksversjon?.message) errorCount++
+    if (hjemmelErrors?.kapittel?.message) errorCount++
+    if (hjemmelErrors?.paragraf?.message) errorCount++
+
+    // Sjekk oppfylt array
+    if (vilkårErrors.oppfylt) {
+        for (let i = 0; i < (vilkårErrors.oppfylt.length || 0); i++) {
+            const oppfyltError = vilkårErrors.oppfylt[i]
+            if (oppfyltError?.kode?.message) errorCount++
+            if (oppfyltError?.beskrivelse?.message) errorCount++
+            if (oppfyltError?.vilkårshjemmel) errorCount++
+        }
+    }
+
+    // Sjekk ikkeOppfylt array
+    if (vilkårErrors.ikkeOppfylt) {
+        for (let i = 0; i < (vilkårErrors.ikkeOppfylt.length || 0); i++) {
+            const ikkeOppfyltError = vilkårErrors.ikkeOppfylt[i]
+            if (ikkeOppfyltError?.kode?.message) errorCount++
+            if (ikkeOppfyltError?.beskrivelse?.message) errorCount++
+            if (ikkeOppfyltError?.vilkårshjemmel) errorCount++
+        }
+    }
+
+    return { hasErrors: errorCount > 0, errorCount }
 }
 
 const Page = () => {
@@ -228,10 +272,20 @@ const Page = () => {
                 {sortedFields.map((field) => {
                     // Finn den opprinnelige indeksen i fields-arrayet
                     const originalIndex = fields.findIndex((f) => f.id === field.id)
+                    const { hasErrors, errorCount } = getVilkårErrors(originalIndex, errors)
                     return (
-                        <ExpansionCard key={field.id} aria-label="Vilkår" className="mb-4">
+                        <ExpansionCard
+                            key={field.id}
+                            aria-label="Vilkår"
+                            className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
+                        >
                             <ExpansionCard.Header>
-                                <ExpansionCard.Title>{field.beskrivelse || 'Nytt vilkår'}</ExpansionCard.Title>
+                                <ExpansionCard.Title className="flex items-center gap-2">
+                                    {field.beskrivelse || 'Nytt vilkår'}
+                                    {hasErrors && (
+                                        <span className="text-red-500 text-sm font-medium">({errorCount} feil)</span>
+                                    )}
+                                </ExpansionCard.Title>
                                 <ExpansionCard.Description>
                                     {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
                                 </ExpansionCard.Description>
