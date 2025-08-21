@@ -113,8 +113,6 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Ola Nordmann',
-        sistEndretDato: '2024-01-15T10:30:00Z',
     },
     {
         kode: '6f789012-3456-789a-bcde-f123456789ab',

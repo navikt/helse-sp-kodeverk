@@ -296,6 +296,7 @@ const Page = () => {
             vilkar: data.vilkar.map((vilkår, index) => {
                 // Sammenlign med original data for å sjekke om endringer er gjort
                 const originalVilkår = serverKodeverk?.vilkar?.[index]
+
                 const isVilkårEndret =
                     !originalVilkår ||
                     vilkår.beskrivelse !== originalVilkår.beskrivelse ||

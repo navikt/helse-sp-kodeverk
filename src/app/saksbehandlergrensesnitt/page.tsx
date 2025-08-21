@@ -266,6 +266,7 @@ const Page = () => {
             vilkar: data.vilkar.map((hovedspørsmål, index) => {
                 // Sammenlign med original data for å sjekke om endringer er gjort
                 const originalHovedspørsmål = serverKodeverk?.vilkar?.[index]
+
                 const isHovedspørsmålEndret =
                     !originalHovedspørsmål ||
                     hovedspørsmål.beskrivelse !== originalHovedspørsmål.beskrivelse ||
