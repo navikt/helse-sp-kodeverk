@@ -57,13 +57,15 @@ export const hovedspørsmålSchema = z.object({
     beskrivelse: z.string().min(5),
     kategori: kategoriEnum,
     underspørsmål: z.array(underspørsmålSchema),
+    sistEndretAv: maybeString,
+    sistEndretDato: z.string().datetime().optional(),
 })
 
 // Hele kodeverket
 export const hovedspørsmålArraySchema = z.array(hovedspørsmålSchema)
 
 export const hovedspørsmålFormSchema = z.object({
-    vilkar: hovedspørsmålArraySchema,
+    vilkar: z.array(hovedspørsmålSchema),
 })
 
 // Type exports

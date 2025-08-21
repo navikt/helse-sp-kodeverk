@@ -311,8 +311,111 @@ const UnderspørsmålSection = ({
         name: `${underspørsmålPath}.kode` as FieldPath<HovedspørsmålForm>,
     })
 
+    // Sjekk for feil i dette underspørsmålet
+    const getUnderspørsmålErrors = () => {
+        const pathParts = underspørsmålPath.split('.')
+        const vilkårIndex = parseInt(pathParts[1])
+        const underspørsmålIndex = parseInt(pathParts[3])
+
+        const underspørsmålErrors = errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[underspørsmålIndex]
+        if (!underspørsmålErrors) return { hasErrors: false, errorCount: 0, errorMessages: [] }
+
+        let errorCount = 0
+        const errorMessages: string[] = []
+
+        // Sjekk hovedfeltene for underspørsmålet
+        if (underspørsmålErrors.kode?.message) {
+            errorCount++
+            errorMessages.push(underspørsmålErrors.kode.message)
+        }
+        if (underspørsmålErrors.navn?.message) {
+            errorCount++
+            errorMessages.push(underspørsmålErrors.navn.message)
+        }
+        if (underspørsmålErrors.variant?.message) {
+            errorCount++
+            errorMessages.push(underspørsmålErrors.variant.message)
+        }
+
+        // Sjekk alternativer
+        if (underspørsmålErrors.alternativer) {
+            for (let i = 0; i < (underspørsmålErrors.alternativer.length || 0); i++) {
+                const alternativError = underspørsmålErrors.alternativer[i]
+                if (alternativError?.kode?.message) errorCount++
+                if (alternativError?.navn?.message) errorCount++
+                if (alternativError?.underspørsmål) {
+                    // Rekursivt sjekk nested underspørsmål
+                    const nestedErrors = getNestedUnderspørsmålErrors(alternativError.underspørsmål)
+                    errorCount += nestedErrors
+                }
+            }
+        }
+
+        return { hasErrors: errorCount > 0, errorCount, errorMessages }
+    }
+
+    // Hjelpefunksjon for å sjekke nested underspørsmål
+    const getNestedUnderspørsmålErrors = (underspørsmål: unknown): number => {
+        let errorCount = 0
+
+        if (Array.isArray(underspørsmål)) {
+            for (const spørsmål of underspørsmål) {
+                if (spørsmål && typeof spørsmål === 'object' && 'kode' in spørsmål && spørsmål.kode?.message)
+                    errorCount++
+                if (
+                    spørsmål &&
+                    typeof spørsmål === 'object' &&
+                    'alternativer' in spørsmål &&
+                    Array.isArray(spørsmål.alternativer)
+                ) {
+                    for (const alternativ of spørsmål.alternativer) {
+                        if (
+                            alternativ &&
+                            typeof alternativ === 'object' &&
+                            'kode' in alternativ &&
+                            alternativ.kode?.message
+                        )
+                            errorCount++
+                        if (
+                            alternativ &&
+                            typeof alternativ === 'object' &&
+                            'navn' in alternativ &&
+                            alternativ.navn?.message
+                        )
+                            errorCount++
+                        if (alternativ && typeof alternativ === 'object' && 'underspørsmål' in alternativ) {
+                            errorCount += getNestedUnderspørsmålErrors(alternativ.underspørsmål)
+                        }
+                    }
+                }
+            }
+        }
+
+        return errorCount
+    }
+
+    const { hasErrors, errorCount, errorMessages } = getUnderspørsmålErrors()
+
     return (
-        <div className="bg-white" style={{ marginLeft: `${indent}px` }}>
+        <div
+            className={`bg-white ${hasErrors ? 'rounded-lg border-2 border-ax-border-danger p-4' : ''}`}
+            style={{ marginLeft: `${indent}px` }}
+        >
+            {hasErrors && (
+                <div className="bg-red-50 border-red-200 mb-4 rounded-md border p-3">
+                    <div className="mb-2 flex items-center gap-2">
+                        <span className="text-red-600 font-medium">⚠️ Valideringsfeil ({errorCount} feil)</span>
+                    </div>
+                    {errorMessages.length > 0 && (
+                        <ul className="text-red-700 space-y-1 text-sm">
+                            {errorMessages.map((message, index) => (
+                                <li key={index}>• {message}</li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            )}
+
             <div className="mb-4 space-y-4">
                 {/* Vis kode som readonly */}
                 {currentKode && (
@@ -333,6 +436,11 @@ const UnderspørsmålSection = ({
                                 className="flex-1"
                                 value={field.value || ''}
                                 onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
+                                error={
+                                    errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[
+                                        parseInt(underspørsmålPath.split('.')[3])
+                                    ]?.navn?.message
+                                }
                             />
                         )}
                     />
@@ -340,7 +448,17 @@ const UnderspørsmålSection = ({
                         name={`${underspørsmålPath}.variant` as FieldPath<HovedspørsmålForm>}
                         control={control}
                         render={({ field }) => (
-                            <Select {...field} label="Variant" size="small" value={field.value || ''}>
+                            <Select
+                                {...field}
+                                label="Variant"
+                                size="small"
+                                value={field.value || ''}
+                                error={
+                                    errors?.vilkar?.[vilkårIndex]?.underspørsmål?.[
+                                        parseInt(underspørsmålPath.split('.')[3])
+                                    ]?.variant?.message
+                                }
+                            >
                                 <option value="">Velg variant</option>
                                 <option value="CHECKBOX">Checkbox</option>
                                 <option value="RADIO">Radio</option>

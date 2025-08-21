@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
 
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
-import { hovedspørsmålArraySchema } from '@/schemas/saksbehandlergrensesnitt'
+import { hovedspørsmålArraySchema } from '@schemas/saksbehandlergrensesnitt'
 import { kodeverkStore } from '@/mockapi/storage'
 
 const storage = new Storage()
@@ -18,7 +18,7 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
             const validationResult = hovedspørsmålArraySchema.safeParse(body)
             if (!validationResult.success) {
                 return NextResponse.json(
-                    { error: 'Invalid kodeverk format', details: validationResult.error.format() },
+                    { error: 'Invalid saksbehandlerui format', details: validationResult.error.format() },
                     { status: 400 },
                 )
             }
@@ -29,8 +29,8 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
                 return NextResponse.json({ success: true })
             }
 
-            // filename is current timestamp with v2 prefix
-            const fileName = `saksbehandlerui-${Date.now()}.json`
+            // filename is current timestamp
+            const fileName = `v3-saksbehandlerui-${Date.now()}.json`
             const bucket = storage.bucket(bucketName)
             const file = bucket.file(fileName)
 
@@ -44,11 +44,11 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
                     },
                 },
             })
-            // Here you would typically save the kodeverk to a database
+            // Here you would typically save the saksbehandlerui to a database
             // For now, we'll just return success
             return NextResponse.json({ success: true })
         } catch (error) {
-            return NextResponse.json({ error: 'Failed to save kodeverk' }, { status: 500 })
+            return NextResponse.json({ error: 'Failed to save saksbehandlerui' }, { status: 500 })
         }
     })
 }

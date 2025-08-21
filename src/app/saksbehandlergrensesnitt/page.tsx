@@ -26,7 +26,9 @@ import { DragVerticalIcon } from '@navikt/aksel-icons'
 
 import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
+import { MetadataVisning } from '@/components/MetadataVisning'
 import { useKodeverk } from '@/hooks/queries/useKodeverk'
+import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
 
 // Funksjon for å sjekke om et hovedspørsmål har valideringsfeil og returnere antall feil
 const getHovedspørsmålErrors = (
@@ -169,14 +171,9 @@ const Page = () => {
         queryFn: fetchKodeverk,
     })
     const { data: kodeverkData } = useKodeverk()
+    const { data: brukerinfo } = useBrukerinfo()
 
-    const {
-        control,
-        handleSubmit,
-        formState: { errors, isDirty },
-        reset,
-        setValue,
-    } = useForm<HovedspørsmålForm>({
+    const { control, handleSubmit, formState, reset, setValue } = useForm<HovedspørsmålForm>({
         resolver: zodResolver(hovedspørsmålFormSchema),
         defaultValues: { vilkar: [] },
     })
@@ -263,7 +260,31 @@ const Page = () => {
     }
 
     const onSubmit = (data: HovedspørsmålForm) => {
-        saveMutation.mutate(data)
+        // Oppdater metadata kun for hovedspørsmål som er endret
+        const cleanedData = {
+            ...data,
+            vilkar: data.vilkar.map((hovedspørsmål, index) => {
+                // Sammenlign med original data for å sjekke om endringer er gjort
+                const originalHovedspørsmål = serverKodeverk?.vilkar?.[index]
+                const isHovedspørsmålEndret =
+                    !originalHovedspørsmål ||
+                    hovedspørsmål.beskrivelse !== originalHovedspørsmål.beskrivelse ||
+                    hovedspørsmål.kode !== originalHovedspørsmål.kode ||
+                    hovedspørsmål.kategori !== originalHovedspørsmål.kategori ||
+                    JSON.stringify(hovedspørsmål.underspørsmål) !== JSON.stringify(originalHovedspørsmål.underspørsmål)
+
+                return {
+                    ...hovedspørsmål,
+                    // Oppdater metadata kun hvis hovedspørsmålet er endret
+                    ...(isHovedspørsmålEndret && {
+                        sistEndretAv: brukerinfo?.navn || 'unknown',
+                        sistEndretDato: new Date().toISOString(),
+                    }),
+                }
+            }),
+        }
+
+        saveMutation.mutate(cleanedData)
     }
 
     const addSpørsmål = () => {
@@ -351,7 +372,7 @@ const Page = () => {
                     <ErrorSummary.Item>{validationError}</ErrorSummary.Item>
                 </ErrorSummary>
             )}
-            {isDirty && (
+            {formState.isDirty && (
                 <div className="fixed right-4 bottom-4 z-50">
                     <Button onClick={handleSubmit(onSubmit)} loading={saveMutation.isPending} variant="primary">
                         Lagre endringer
@@ -380,7 +401,7 @@ const Page = () => {
                     <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
                         {fields.map((field, index) => {
                             const hasUnknownCodes = vilkarWithUnknownCodes.has(index)
-                            const { hasErrors, errorCount } = getHovedspørsmålErrors(index, errors)
+                            const { hasErrors, errorCount } = getHovedspørsmålErrors(index, formState.errors)
                             const hasNoUnderspørsmål = !field.underspørsmål || field.underspørsmål.length === 0
 
                             return (
@@ -404,6 +425,12 @@ const Page = () => {
                                                 {hasUnknownCodes &&
                                                     '⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke finnes i kodeverket'}
                                                 {hasNoUnderspørsmål && '⚠️ Dette spørsmålet har ingen underspørsmål'}
+                                                <MetadataVisning
+                                                    sistEndretAv={field.sistEndretAv}
+                                                    sistEndretDato={field.sistEndretDato}
+                                                    size="small"
+                                                    className="mt-2"
+                                                />
                                             </ExpansionCard.Description>
                                         )}
                                     </ExpansionCard.Header>
@@ -411,7 +438,7 @@ const Page = () => {
                                         <SpørsmålForm
                                             control={control}
                                             index={index}
-                                            errors={errors}
+                                            errors={formState.errors}
                                             onRemove={() => remove(index)}
                                             setValue={setValue}
                                         />

@@ -40,13 +40,15 @@ export const vilkårSchema = z.object({
     beskrivelse: z.string().min(5),
     oppfylt: z.array(årsakSchema),
     ikkeOppfylt: z.array(årsakSchema),
+    sistEndretAv: maybeString,
+    sistEndretDato: z.string().datetime().optional(),
 })
 
 // Hele kodeverket
 export const kodeverkSchema = z.array(vilkårSchema)
 
 export const kodeverkFormSchema = z.object({
-    vilkar: kodeverkSchema,
+    vilkar: z.array(vilkårSchema),
 })
 
 // Type exports

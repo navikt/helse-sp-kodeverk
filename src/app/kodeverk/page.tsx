@@ -11,8 +11,10 @@ import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/sc
 import { HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
 import { ExcelExport } from '@/components/kodeverk/ExcelExport'
+import { MetadataVisning } from '@/components/MetadataVisning'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
 import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
+import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     const { lovverk, kapittel, paragraf, ledd, setning, bokstav } = hjemmel
@@ -207,13 +209,9 @@ const Page = () => {
     const queryClient = useQueryClient()
     const { data: serverKodeverk, isLoading } = useKodeverk()
     const { data: saksbehandleruiData } = useSaksbehandlerui()
+    const { data: brukerinfo } = useBrukerinfo()
 
-    const {
-        control,
-        handleSubmit,
-        formState: { errors, isDirty },
-        reset,
-    } = useForm<KodeverkForm>({
+    const { control, handleSubmit, formState, reset } = useForm<KodeverkForm>({
         resolver: zodResolver(kodeverkFormSchema),
         defaultValues: { vilkar: [] },
     })
@@ -292,12 +290,29 @@ const Page = () => {
     }
 
     const onSubmit = (data: KodeverkForm) => {
-        // Fjern tomme IKKE_RELEVANT arrays
+        // Oppdater metadata kun for vilkår som er endret
         const cleanedData = {
             ...data,
-            vilkar: data.vilkar.map((vilkår) => ({
-                ...vilkår,
-            })),
+            vilkar: data.vilkar.map((vilkår, index) => {
+                // Sammenlign med original data for å sjekke om endringer er gjort
+                const originalVilkår = serverKodeverk?.vilkar?.[index]
+                const isVilkårEndret =
+                    !originalVilkår ||
+                    vilkår.beskrivelse !== originalVilkår.beskrivelse ||
+                    vilkår.vilkårskode !== originalVilkår.vilkårskode ||
+                    JSON.stringify(vilkår.vilkårshjemmel) !== JSON.stringify(originalVilkår.vilkårshjemmel) ||
+                    JSON.stringify(vilkår.oppfylt) !== JSON.stringify(originalVilkår.oppfylt) ||
+                    JSON.stringify(vilkår.ikkeOppfylt) !== JSON.stringify(originalVilkår.ikkeOppfylt)
+
+                return {
+                    ...vilkår,
+                    // Oppdater metadata kun hvis vilkåret er endret
+                    ...(isVilkårEndret && {
+                        sistEndretAv: brukerinfo?.navn || 'unknown',
+                        sistEndretDato: new Date().toISOString(),
+                    }),
+                }
+            }),
         }
 
         saveMutation.mutate(cleanedData)
@@ -333,7 +348,7 @@ const Page = () => {
                     <ErrorSummary.Item>{validationError}</ErrorSummary.Item>
                 </ErrorSummary>
             )}
-            {isDirty && (
+            {formState.isDirty && (
                 <div className="fixed right-4 bottom-4 z-50">
                     <Button onClick={handleSubmit(onSubmit)} loading={saveMutation.isPending} variant="primary">
                         Lagre endringer
@@ -362,7 +377,7 @@ const Page = () => {
                 {sortedFields.map((field) => {
                     // Finn den opprinnelige indeksen i fields-arrayet
                     const originalIndex = fields.findIndex((f) => f.id === field.id)
-                    const { hasErrors, errorCount } = getVilkårErrors(originalIndex, errors)
+                    const { hasErrors, errorCount } = getVilkårErrors(originalIndex, formState.errors)
                     const hasUnknownBegrunnelser = vilkårWithUnknownBegrunnelser.has(originalIndex)
                     const hasNoBegrunnelser = vilkårWithoutBegrunnelser.has(originalIndex)
                     return (
@@ -394,13 +409,19 @@ const Page = () => {
                                             ⚠️ Dette vilkåret har ingen begrunnelser
                                         </>
                                     )}
+                                    <MetadataVisning
+                                        sistEndretAv={field.sistEndretAv}
+                                        sistEndretDato={field.sistEndretDato}
+                                        size="small"
+                                        className="mt-2"
+                                    />
                                 </ExpansionCard.Description>
                             </ExpansionCard.Header>
                             <ExpansionCard.Content>
                                 <VilkårForm
                                     control={control}
                                     index={originalIndex}
-                                    errors={errors}
+                                    errors={formState.errors}
                                     onRemove={() => remove(originalIndex)}
                                 />
                             </ExpansionCard.Content>
