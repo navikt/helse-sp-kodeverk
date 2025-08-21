@@ -30,7 +30,7 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
             }
 
             // filename is current timestamp
-            const fileName = `v3-saksbehandlerui-${Date.now()}.json`
+            const fileName = `saksbehandlerui-${Date.now()}.json`
             const bucket = storage.bucket(bucketName)
             const file = bucket.file(fileName)
 
