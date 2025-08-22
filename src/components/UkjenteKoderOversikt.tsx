@@ -4,7 +4,7 @@ import { ExpansionCard, Tag } from '@navikt/ds-react'
 import { useMemo } from 'react'
 
 import { useKodeverk } from '@/hooks/queries/useKodeverk'
-import { saksbehandlerUi } from '@/kodeverk/mockdata/saksbehandlerui'
+import { useSaksbehandlerui } from '@/hooks/queries/useSaksbehandlerui'
 
 interface UkjentKode {
     kode: string
@@ -15,9 +15,10 @@ interface UkjentKode {
 
 const UkjenteKoderOversikt = () => {
     const { data: kodeverkData } = useKodeverk()
+    const { data: saksbehandlerUiData } = useSaksbehandlerui()
 
     const ukjenteKoder = useMemo(() => {
-        if (!kodeverkData) return []
+        if (!kodeverkData || !saksbehandlerUiData) return []
 
         const alleKjentekoder = new Set<string>()
 
@@ -88,7 +89,7 @@ const UkjenteKoderOversikt = () => {
         }
 
         // Gå gjennom alle hovedspørsmål i saksbehandlergrensesnittet
-        for (const hovedspørsmål of saksbehandlerUi) {
+        for (const hovedspørsmål of saksbehandlerUiData.data) {
             for (const underspørsmål of hovedspørsmål.underspørsmål) {
                 if (underspørsmål.alternativer) {
                     traverserAlternativer(
@@ -101,7 +102,7 @@ const UkjenteKoderOversikt = () => {
         }
 
         return ukjente.sort((a, b) => a.kode.localeCompare(b.kode))
-    }, [kodeverkData])
+    }, [kodeverkData, saksbehandlerUiData])
 
     if (ukjenteKoder.length === 0) {
         return null
