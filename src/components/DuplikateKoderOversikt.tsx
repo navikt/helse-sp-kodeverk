@@ -33,7 +33,7 @@ const DuplikateKoderOversikt = () => {
         >()
 
         // Samle alle koder fra kodeverket
-        for (const vilkar of kodeverkData.vilkar) {
+        for (const vilkar of kodeverkData.data.vilkar) {
             // Sjekk oppfylt-koder
             for (const årsak of vilkar.oppfylt) {
                 if (!kodeMap.has(årsak.kode)) {

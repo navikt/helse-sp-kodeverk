@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, useWatch, FieldErrors } from 'react-hook-form'
@@ -27,8 +26,12 @@ import { DragVerticalIcon } from '@navikt/aksel-icons'
 import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
 import { MetadataVisning } from '@/components/MetadataVisning'
+import { KonfliktModal } from '@/components/KonfliktModal'
 import { useKodeverk } from '@/hooks/queries/useKodeverk'
+import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
+import { useSaksbehandleruiMutation } from '@hooks/mutations/useSaksbehandleruiMutation'
+import { ProblemDetailsError } from '@utils/ProblemDetailsError'
 
 // Funksjon for å sjekke om et hovedspørsmål har valideringsfeil og returnere antall feil
 const getHovedspørsmålErrors = (
@@ -107,28 +110,6 @@ const getNestedUnderspørsmålErrors = (underspørsmål: unknown): number => {
     return errorCount
 }
 
-const fetchKodeverk = async (): Promise<HovedspørsmålForm> => {
-    const response = await fetch('/api/v2/open/saksbehandlerui')
-    if (!response.ok) {
-        throw new Error('Failed to fetch kodeverk')
-    }
-    const arr = await response.json()
-    return { vilkar: arr }
-}
-
-const saveKodeverk = async (kodeverk: HovedspørsmålForm): Promise<void> => {
-    const response = await fetch('/api/v2/saksbehandlerui', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(kodeverk.vilkar), // send kun array til API
-    })
-    if (!response.ok) {
-        throw new Error('Failed to save kodeverk')
-    }
-}
-
 interface SortableExpansionCardProps {
     id: string
     children: React.ReactNode
@@ -165,13 +146,10 @@ const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCard
 }
 
 const Page = () => {
-    const queryClient = useQueryClient()
-    const { data: serverKodeverk, isLoading } = useQuery({
-        queryKey: ['saksbehandlergrensesnitt'],
-        queryFn: fetchKodeverk,
-    })
+    const { data: serverKodeverk, isLoading } = useSaksbehandlerui()
     const { data: kodeverkData } = useKodeverk()
     const { data: brukerinfo } = useBrukerinfo()
+    const saveMutation = useSaksbehandleruiMutation()
 
     const { control, handleSubmit, formState, reset, setValue } = useForm<HovedspørsmålForm>({
         resolver: zodResolver(hovedspørsmålFormSchema),
@@ -203,42 +181,21 @@ const Page = () => {
     const [validationError, setValidationError] = useState<string | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
     const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
-
-    const saveMutation = useMutation({
-        mutationFn: saveKodeverk,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['saksbehandlergrensesnitt'] })
-            setValidationError(null)
-
-            // Hent de oppdaterte dataene og resett skjemaet eksplisitt
-            const updatedData = queryClient.getQueryData<HovedspørsmålForm>(['saksbehandlergrensesnitt'])
-            if (updatedData) {
-                reset(updatedData)
-            }
-
-            // Vis success-melding
-            setShowSuccess(true)
-
-            // Fjern eventuell eksisterende timer
-            if (successTimer) {
-                clearTimeout(successTimer)
-            }
-
-            // Sett ny timer for å skjule success-melding etter 4 sekunder
-            const timer = setTimeout(() => {
-                setShowSuccess(false)
-                setSuccessTimer(null)
-            }, 4000)
-            setSuccessTimer(timer)
-        },
-        onError: (error: Error) => {
-            setValidationError(error.message)
-        },
-    })
+    const [konfliktProblem, setKonfliktProblem] = useState<{
+        status: number
+        type: string
+        title?: string
+        detail?: string | null
+        instance?: string | null
+        lastModifiedBy?: string
+        lastModifiedAt?: string
+        expectedVersion?: string
+        currentVersion?: string
+    } | null>(null)
 
     useEffect(() => {
-        if (serverKodeverk) {
-            reset(serverKodeverk)
+        if (serverKodeverk?.data) {
+            reset({ vilkar: serverKodeverk.data })
         }
     }, [serverKodeverk, reset])
 
@@ -259,13 +216,17 @@ const Page = () => {
         }
     }
 
+    const handleCloseKonflikt = () => {
+        setKonfliktProblem(null)
+    }
+
     const onSubmit = (data: HovedspørsmålForm) => {
         // Oppdater metadata kun for hovedspørsmål som er endret
         const cleanedData = {
             ...data,
             vilkar: data.vilkar.map((hovedspørsmål, index) => {
                 // Sammenlign med original data for å sjekke om endringer er gjort
-                const originalHovedspørsmål = serverKodeverk?.vilkar?.[index]
+                const originalHovedspørsmål = serverKodeverk?.data?.[index]
 
                 const isHovedspørsmålEndret =
                     !originalHovedspørsmål ||
@@ -292,7 +253,40 @@ const Page = () => {
             }),
         }
 
-        saveMutation.mutate(cleanedData)
+        saveMutation.mutate(
+            {
+                data: cleanedData.vilkar,
+                etag: serverKodeverk?.etag,
+            },
+            {
+                onSuccess: () => {
+                    setValidationError(null)
+                    setKonfliktProblem(null)
+
+                    // Vis success-melding
+                    setShowSuccess(true)
+
+                    // Fjern eventuell eksisterende timer
+                    if (successTimer) {
+                        clearTimeout(successTimer)
+                    }
+
+                    // Sett ny timer for å skjule success-melding etter 4 sekunder
+                    const timer = setTimeout(() => {
+                        setShowSuccess(false)
+                        setSuccessTimer(null)
+                    }, 4000)
+                    setSuccessTimer(timer)
+                },
+                onError: (error: Error) => {
+                    if (error instanceof ProblemDetailsError && error.problem.status === 409) {
+                        setKonfliktProblem(error.problem)
+                    } else {
+                        setValidationError(error.message)
+                    }
+                },
+            },
+        )
     }
 
     const addSpørsmål = () => {
@@ -311,10 +305,10 @@ const Page = () => {
     // Memoized funksjon for å sjekke etter ukjente koder
     const vilkarWithUnknownCodes = useMemo(() => {
         const allVilkar = watchedVilkar || []
-        if (!kodeverkData || !allVilkar) return new Set<number>()
+        if (!kodeverkData?.data?.vilkar || !allVilkar) return new Set<number>()
 
         const alleKjenteKoder = new Set<string>()
-        for (const vilkar of kodeverkData.vilkar) {
+        for (const vilkar of kodeverkData.data.vilkar) {
             for (const årsak of vilkar.oppfylt) {
                 alleKjenteKoder.add(årsak.kode)
             }
@@ -393,6 +387,9 @@ const Page = () => {
                         Grensesnitt er lagret!
                     </Alert>
                 </div>
+            )}
+            {konfliktProblem && (
+                <KonfliktModal isOpen={!!konfliktProblem} onClose={handleCloseKonflikt} problem={konfliktProblem} />
             )}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-6 flex items-center justify-between">

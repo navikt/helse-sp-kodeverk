@@ -45,6 +45,25 @@ export async function postAndParse<T>(url: string, schema: z.ZodType<T>, body: u
     })
 }
 
+export async function postWithOptimisticLocking<T>(
+    url: string,
+    schema: z.ZodType<T>,
+    body: unknown,
+    etag?: string,
+): Promise<T> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+
+    if (etag) {
+        headers['If-Match'] = etag
+    }
+
+    return fetchAndParse(url, schema, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+    })
+}
+
 export async function putAndParse<T>(url: string, schema: z.ZodType<T>, body: unknown): Promise<T> {
     return fetchAndParse(url, schema, {
         method: 'PUT',

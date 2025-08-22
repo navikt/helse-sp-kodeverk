@@ -554,7 +554,7 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
     const allKodeOptions: KodeOption[] = useMemo(() => {
         if (!kodeverkData) return []
         const options: KodeOption[] = []
-        for (const vilkar of kodeverkData.vilkar) {
+        for (const vilkar of kodeverkData.data.vilkar) {
             for (const årsak of vilkar.oppfylt) {
                 options.push({ value: årsak.kode, label: `✅ ${årsak.kode} - ${årsak.beskrivelse}` })
             }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, FieldErrors } from 'react-hook-form'
@@ -12,9 +11,12 @@ import { HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
 import { ExcelExport } from '@/components/kodeverk/ExcelExport'
 import { MetadataVisning } from '@/components/MetadataVisning'
+import { KonfliktModal } from '@/components/KonfliktModal'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
 import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
+import { useKodeverkMutation } from '@hooks/mutations/useKodeverkMutation'
+import { ProblemDetailsError } from '@utils/ProblemDetailsError'
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     const { lovverk, kapittel, paragraf, ledd, setning, bokstav } = hjemmel
@@ -23,19 +25,6 @@ const formatParagraf = (hjemmel: Vilkårshjemmel) => {
     if (setning) result += ` ${setning}. setning`
     if (bokstav) result += ` bokstav ${bokstav}`
     return result
-}
-
-const saveKodeverk = async (kodeverk: KodeverkForm): Promise<void> => {
-    const response = await fetch('/api/v2/kodeverk', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(kodeverk.vilkar), // send kun array til API
-    })
-    if (!response.ok) {
-        throw new Error('Failed to save kodeverk')
-    }
 }
 
 // Type for fields med id fra useFieldArray
@@ -206,10 +195,10 @@ const getVilkårWithoutBegrunnelser = (vilkår: (Vilkår & { id?: string })[]): 
 }
 
 const Page = () => {
-    const queryClient = useQueryClient()
     const { data: serverKodeverk, isLoading } = useKodeverk()
     const { data: saksbehandleruiData } = useSaksbehandlerui()
     const { data: brukerinfo } = useBrukerinfo()
+    const saveMutation = useKodeverkMutation()
 
     const { control, handleSubmit, formState, reset } = useForm<KodeverkForm>({
         resolver: zodResolver(kodeverkFormSchema),
@@ -225,7 +214,7 @@ const Page = () => {
     const sortedFields = sortVilkår(fields as FieldWithId[])
 
     // Sjekk etter vilkår med begrunnelser som ikke finnes i saksbehandlergrensesnittet
-    const vilkårWithUnknownBegrunnelser = getVilkårWithUnknownBegrunnelser(fields, saksbehandleruiData)
+    const vilkårWithUnknownBegrunnelser = getVilkårWithUnknownBegrunnelser(fields, saksbehandleruiData?.data)
 
     // Sjekk etter vilkår uten begrunnelser
     const vilkårWithoutBegrunnelser = getVilkårWithoutBegrunnelser(fields)
@@ -233,42 +222,21 @@ const Page = () => {
     const [validationError, setValidationError] = useState<string | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
     const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
-
-    const saveMutation = useMutation({
-        mutationFn: saveKodeverk,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['kodeverk'] })
-            setValidationError(null)
-
-            // Hent de oppdaterte dataene og resett skjemaet eksplisitt
-            const updatedData = queryClient.getQueryData<KodeverkForm>(['kodeverk'])
-            if (updatedData) {
-                reset(updatedData)
-            }
-
-            // Vis success-melding
-            setShowSuccess(true)
-
-            // Fjern eventuell eksisterende timer
-            if (successTimer) {
-                clearTimeout(successTimer)
-            }
-
-            // Sett ny timer for å skjule success-melding etter 4 sekunder
-            const timer = setTimeout(() => {
-                setShowSuccess(false)
-                setSuccessTimer(null)
-            }, 4000)
-            setSuccessTimer(timer)
-        },
-        onError: (error: Error) => {
-            setValidationError(error.message)
-        },
-    })
+    const [konfliktProblem, setKonfliktProblem] = useState<{
+        status: number
+        type: string
+        title?: string
+        detail?: string | null
+        instance?: string | null
+        lastModifiedBy?: string
+        lastModifiedAt?: string
+        expectedVersion?: string
+        currentVersion?: string
+    } | null>(null)
 
     useEffect(() => {
         if (serverKodeverk) {
-            reset(serverKodeverk)
+            reset(serverKodeverk.data)
         }
     }, [serverKodeverk, reset])
 
@@ -289,13 +257,17 @@ const Page = () => {
         }
     }
 
+    const handleCloseKonflikt = () => {
+        setKonfliktProblem(null)
+    }
+
     const onSubmit = (data: KodeverkForm) => {
         // Oppdater metadata kun for vilkår som er endret
         const cleanedData = {
             ...data,
             vilkar: data.vilkar.map((vilkår, index) => {
                 // Sammenlign med original data for å sjekke om endringer er gjort
-                const originalVilkår = serverKodeverk?.vilkar?.[index]
+                const originalVilkår = serverKodeverk?.data?.vilkar?.[index]
 
                 const isVilkårEndret =
                     !originalVilkår ||
@@ -316,7 +288,40 @@ const Page = () => {
             }),
         }
 
-        saveMutation.mutate(cleanedData)
+        saveMutation.mutate(
+            {
+                data: cleanedData,
+                etag: serverKodeverk?.etag,
+            },
+            {
+                onSuccess: () => {
+                    setValidationError(null)
+                    setKonfliktProblem(null)
+
+                    // Vis success-melding
+                    setShowSuccess(true)
+
+                    // Fjern eventuell eksisterende timer
+                    if (successTimer) {
+                        clearTimeout(successTimer)
+                    }
+
+                    // Sett ny timer for å skjule success-melding etter 4 sekunder
+                    const timer = setTimeout(() => {
+                        setShowSuccess(false)
+                        setSuccessTimer(null)
+                    }, 4000)
+                    setSuccessTimer(timer)
+                },
+                onError: (error: Error) => {
+                    if (error instanceof ProblemDetailsError && error.problem.status === 409) {
+                        setKonfliktProblem(error.problem)
+                    } else {
+                        setValidationError(error.message)
+                    }
+                },
+            },
+        )
     }
 
     const addVilkår = () => {
@@ -362,6 +367,9 @@ const Page = () => {
                         Kodeverket er lagret!
                     </Alert>
                 </div>
+            )}
+            {konfliktProblem && (
+                <KonfliktModal isOpen={!!konfliktProblem} onClose={handleCloseKonflikt} problem={konfliktProblem} />
             )}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-6 flex items-center justify-between">

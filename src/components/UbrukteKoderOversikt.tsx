@@ -83,7 +83,7 @@ const UbrukteKoderOversikt = () => {
         // Finn koder i kodeverket som ikke brukes
         const ubrukte: UbruktKode[] = []
 
-        for (const vilkar of kodeverkData.vilkar) {
+        for (const vilkar of kodeverkData.data.vilkar) {
             // Sjekk oppfylt-koder
             for (const årsak of vilkar.oppfylt) {
                 if (!bruktekoder.has(årsak.kode)) {

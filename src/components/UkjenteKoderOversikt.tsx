@@ -22,7 +22,7 @@ const UkjenteKoderOversikt = () => {
         const alleKjentekoder = new Set<string>()
 
         // Samle alle kjente koder fra kodeverket
-        for (const vilkar of kodeverkData.vilkar) {
+        for (const vilkar of kodeverkData.data.vilkar) {
             for (const årsak of vilkar.oppfylt) {
                 alleKjentekoder.add(årsak.kode)
             }
