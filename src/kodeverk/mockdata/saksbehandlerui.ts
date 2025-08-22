@@ -177,8 +177,6 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Kari Hansen',
-        sistEndretDato: '2024-01-20T14:45:00Z',
     },
     {
         kode: 'b23456cd-ef78-9abc-def1-23456789abef',

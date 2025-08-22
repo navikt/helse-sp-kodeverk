@@ -274,13 +274,20 @@ const Page = () => {
                     hovedspørsmål.kategori !== originalHovedspørsmål.kategori ||
                     JSON.stringify(hovedspørsmål.underspørsmål) !== JSON.stringify(originalHovedspørsmål.underspørsmål)
 
-                return {
-                    ...hovedspørsmål,
-                    // Oppdater metadata kun hvis hovedspørsmålet er endret
-                    ...(isHovedspørsmålEndret && {
+                // Hvis hovedspørsmålet er endret, oppdater metadata
+                if (isHovedspørsmålEndret) {
+                    return {
+                        ...hovedspørsmål,
                         sistEndretAv: brukerinfo?.navn || 'unknown',
                         sistEndretDato: new Date().toISOString(),
-                    }),
+                    }
+                }
+
+                // Hvis ikke endret, behold eksisterende metadata
+                return {
+                    ...hovedspørsmål,
+                    sistEndretAv: originalHovedspørsmål?.sistEndretAv || hovedspørsmål.sistEndretAv,
+                    sistEndretDato: originalHovedspørsmål?.sistEndretDato || hovedspørsmål.sistEndretDato,
                 }
             }),
         }
@@ -421,19 +428,22 @@ const Page = () => {
                                                 </span>
                                             )}
                                         </ExpansionCard.Title>
-                                        {(hasUnknownCodes || hasNoUnderspørsmål) && (
-                                            <ExpansionCard.Description>
-                                                {hasUnknownCodes &&
-                                                    '⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke finnes i kodeverket'}
-                                                {hasNoUnderspørsmål && '⚠️ Dette spørsmålet har ingen underspørsmål'}
-                                                <MetadataVisning
-                                                    sistEndretAv={field.sistEndretAv}
-                                                    sistEndretDato={field.sistEndretDato}
-                                                    size="small"
-                                                    className="mt-2"
-                                                />
-                                            </ExpansionCard.Description>
-                                        )}
+                                        <ExpansionCard.Description>
+                                            {(hasUnknownCodes || hasNoUnderspørsmål) && (
+                                                <>
+                                                    {hasUnknownCodes &&
+                                                        '⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke finnes i kodeverket'}
+                                                    {hasNoUnderspørsmål &&
+                                                        '⚠️ Dette spørsmålet har ingen underspørsmål'}
+                                                </>
+                                            )}
+                                            <MetadataVisning
+                                                sistEndretAv={field.sistEndretAv}
+                                                sistEndretDato={field.sistEndretDato}
+                                                size="small"
+                                                className="mt-2"
+                                            />
+                                        </ExpansionCard.Description>
                                     </ExpansionCard.Header>
                                     <ExpansionCard.Content>
                                         <SpørsmålForm
