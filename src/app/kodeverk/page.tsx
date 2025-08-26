@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, FieldErrors } from 'react-hook-form'
@@ -12,6 +12,7 @@ import { VilkårForm } from '@/components/kodeverk/VilkårForm'
 import { ExcelExport } from '@/components/kodeverk/ExcelExport'
 import { MetadataVisning } from '@/components/MetadataVisning'
 import { KonfliktModal } from '@/components/KonfliktModal'
+import { Sidemeny } from '@/components/kodeverk/Sidemeny'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
 import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
@@ -213,6 +214,11 @@ const Page = () => {
     // Sorter vilkårene før visning
     const sortedFields = sortVilkår(fields as FieldWithId[])
 
+    // Refs for scroll til vilkår
+    const vilkårRefs = useRef<Record<string, HTMLDivElement | null>>({})
+    const [activeVilkårId, setActiveVilkårId] = useState<string | undefined>()
+    const [isSidemenyCollapsed, setIsSidemenyCollapsed] = useState(false)
+
     // Sjekk etter vilkår med begrunnelser som ikke finnes i saksbehandlergrensesnittet
     const vilkårWithUnknownBegrunnelser = getVilkårWithUnknownBegrunnelser(fields, saksbehandleruiData?.data)
 
@@ -343,101 +349,180 @@ const Page = () => {
         append(newVilkår)
     }
 
+    const handleVilkårClick = (vilkårId: string) => {
+        const element = vilkårRefs.current[vilkårId]
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            })
+            setActiveVilkårId(vilkårId)
+        }
+    }
+
+    // Observer for å oppdatere aktiv vilkår basert på scroll posisjon
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                // Sorter entries basert på deres posisjon i viewport
+                const sortedEntries = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => {
+                        const rectA = a.boundingClientRect
+                        const rectB = b.boundingClientRect
+                        return rectA.top - rectB.top
+                    })
+
+                if (sortedEntries.length > 0) {
+                    const vilkårId = sortedEntries[0].target.getAttribute('data-vilkår-id')
+                    if (vilkårId) {
+                        setActiveVilkårId(vilkårId)
+                    }
+                }
+            },
+            {
+                rootMargin: '-10% 0px -80% 0px',
+                threshold: 0,
+            },
+        )
+
+        // Observer alle vilkår elementer
+        Object.values(vilkårRefs.current).forEach((ref) => {
+            if (ref) {
+                observer.observe(ref)
+            }
+        })
+
+        // Sett første vilkår som aktivt hvis ingen er aktive
+        if (sortedFields.length > 0 && !activeVilkårId) {
+            setActiveVilkårId(sortedFields[0].id)
+        }
+
+        return () => observer.disconnect()
+    }, [sortedFields, activeVilkårId])
+
     if (isLoading) {
         return <div className="p-6">Laster...</div>
     }
 
     return (
-        <div className="p-6">
-            {validationError && (
-                <ErrorSummary heading="For å gå videre må du rette opp følgende:">
-                    <ErrorSummary.Item>{validationError}</ErrorSummary.Item>
-                </ErrorSummary>
-            )}
-            {formState.isDirty && (
-                <div className="fixed right-4 bottom-4 z-50">
-                    <Button onClick={handleSubmit(onSubmit)} loading={saveMutation.isPending} variant="primary">
-                        Lagre endringer
-                    </Button>
-                </div>
-            )}
-            {showSuccess && (
-                <div className="fixed right-4 bottom-4 z-50">
-                    <Alert variant="success" closeButton onClose={handleCloseSuccess}>
-                        Kodeverket er lagret!
-                    </Alert>
-                </div>
-            )}
-            {konfliktProblem && (
-                <KonfliktModal isOpen={!!konfliktProblem} onClose={handleCloseKonflikt} problem={konfliktProblem} />
-            )}
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="mb-6 flex items-center justify-between">
-                    <Heading level="1" size="large">
-                        Rediger Kodeverk
-                    </Heading>
-                    <div className="flex gap-4">
-                        <ExcelExport kodeverk={{ vilkar: fields }} />
-                        <Button type="button" onClick={addVilkår} variant="primary">
-                            Legg til vilkår
-                        </Button>
-                    </div>
-                </div>
-                {sortedFields.map((field) => {
-                    // Finn den opprinnelige indeksen i fields-arrayet
-                    const originalIndex = fields.findIndex((f) => f.id === field.id)
-                    const { hasErrors, errorCount } = getVilkårErrors(originalIndex, formState.errors)
-                    const hasUnknownBegrunnelser = vilkårWithUnknownBegrunnelser.has(originalIndex)
-                    const hasNoBegrunnelser = vilkårWithoutBegrunnelser.has(originalIndex)
-                    return (
-                        <ExpansionCard
-                            size="small"
-                            key={field.id}
-                            aria-label="Vilkår"
-                            className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
-                        >
-                            <ExpansionCard.Header>
-                                <ExpansionCard.Title className="flex items-center gap-2">
-                                    {field.beskrivelse || 'Nytt vilkår'}
-                                    {hasErrors && (
-                                        <span className="text-red-500 text-sm font-medium">({errorCount} feil)</span>
-                                    )}
-                                </ExpansionCard.Title>
-                                <ExpansionCard.Description>
-                                    {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
-                                    {hasUnknownBegrunnelser && (
-                                        <>
-                                            <br></br>
-                                            ⚠️ Dette vilkåret inneholder begrunnelser som ikke finnes i
-                                            saksbehandlergrensesnittet
-                                        </>
-                                    )}
-                                    {hasNoBegrunnelser && (
-                                        <>
-                                            <br></br>
-                                            ⚠️ Dette vilkåret har ingen begrunnelser
-                                        </>
-                                    )}
-                                    <MetadataVisning
-                                        sistEndretAv={field.sistEndretAv}
-                                        sistEndretDato={field.sistEndretDato}
+        <div className="flex h-screen">
+            {/* Sidemeny */}
+            <Sidemeny
+                vilkår={sortedFields}
+                onVilkårClick={handleVilkårClick}
+                activeVilkårId={activeVilkårId}
+                isCollapsed={isSidemenyCollapsed}
+                onToggleCollapse={() => setIsSidemenyCollapsed(!isSidemenyCollapsed)}
+            />
+
+            {/* Hovedinnhold */}
+            <div className="flex-1 overflow-y-auto">
+                <div className="p-6">
+                    {validationError && (
+                        <ErrorSummary heading="For å gå videre må du rette opp følgende:">
+                            <ErrorSummary.Item>{validationError}</ErrorSummary.Item>
+                        </ErrorSummary>
+                    )}
+                    {formState.isDirty && (
+                        <div className="fixed right-4 bottom-4 z-50">
+                            <Button onClick={handleSubmit(onSubmit)} loading={saveMutation.isPending} variant="primary">
+                                Lagre endringer
+                            </Button>
+                        </div>
+                    )}
+                    {showSuccess && (
+                        <div className="fixed right-4 bottom-4 z-50">
+                            <Alert variant="success" closeButton onClose={handleCloseSuccess}>
+                                Kodeverket er lagret!
+                            </Alert>
+                        </div>
+                    )}
+                    {konfliktProblem && (
+                        <KonfliktModal
+                            isOpen={!!konfliktProblem}
+                            onClose={handleCloseKonflikt}
+                            problem={konfliktProblem}
+                        />
+                    )}
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="mb-6 flex items-center justify-between">
+                            <Heading level="1" size="large">
+                                Rediger Kodeverk
+                            </Heading>
+                            <div className="flex gap-4">
+                                <ExcelExport kodeverk={{ vilkar: fields }} />
+                                <Button type="button" onClick={addVilkår} variant="primary">
+                                    Legg til vilkår
+                                </Button>
+                            </div>
+                        </div>
+                        {sortedFields.map((field) => {
+                            // Finn den opprinnelige indeksen i fields-arrayet
+                            const originalIndex = fields.findIndex((f) => f.id === field.id)
+                            const { hasErrors, errorCount } = getVilkårErrors(originalIndex, formState.errors)
+                            const hasUnknownBegrunnelser = vilkårWithUnknownBegrunnelser.has(originalIndex)
+                            const hasNoBegrunnelser = vilkårWithoutBegrunnelser.has(originalIndex)
+                            return (
+                                <div
+                                    key={field.id}
+                                    ref={(el) => {
+                                        vilkårRefs.current[field.id] = el
+                                    }}
+                                    data-vilkår-id={field.id}
+                                >
+                                    <ExpansionCard
                                         size="small"
-                                        className="mt-2"
-                                    />
-                                </ExpansionCard.Description>
-                            </ExpansionCard.Header>
-                            <ExpansionCard.Content>
-                                <VilkårForm
-                                    control={control}
-                                    index={originalIndex}
-                                    errors={formState.errors}
-                                    onRemove={() => remove(originalIndex)}
-                                />
-                            </ExpansionCard.Content>
-                        </ExpansionCard>
-                    )
-                })}
-            </form>
+                                        aria-label="Vilkår"
+                                        className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
+                                    >
+                                        <ExpansionCard.Header>
+                                            <ExpansionCard.Title className="flex items-center gap-2">
+                                                {field.beskrivelse || 'Nytt vilkår'}
+                                                {hasErrors && (
+                                                    <span className="text-red-500 text-sm font-medium">
+                                                        ({errorCount} feil)
+                                                    </span>
+                                                )}
+                                            </ExpansionCard.Title>
+                                            <ExpansionCard.Description>
+                                                {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
+                                                {hasUnknownBegrunnelser && (
+                                                    <>
+                                                        <br></br>
+                                                        ⚠️ Dette vilkåret inneholder begrunnelser som ikke finnes i
+                                                        saksbehandlergrensesnittet
+                                                    </>
+                                                )}
+                                                {hasNoBegrunnelser && (
+                                                    <>
+                                                        <br></br>
+                                                        ⚠️ Dette vilkåret har ingen begrunnelser
+                                                    </>
+                                                )}
+                                                <MetadataVisning
+                                                    sistEndretAv={field.sistEndretAv}
+                                                    sistEndretDato={field.sistEndretDato}
+                                                    size="small"
+                                                    className="mt-2"
+                                                />
+                                            </ExpansionCard.Description>
+                                        </ExpansionCard.Header>
+                                        <ExpansionCard.Content>
+                                            <VilkårForm
+                                                control={control}
+                                                index={originalIndex}
+                                                errors={formState.errors}
+                                                onRemove={() => remove(originalIndex)}
+                                            />
+                                        </ExpansionCard.Content>
+                                    </ExpansionCard>
+                                </div>
+                            )
+                        })}
+                    </form>
+                </div>
+            </div>
         </div>
     )
 }
