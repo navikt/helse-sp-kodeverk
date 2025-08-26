@@ -97,89 +97,128 @@ const ResultatBegrunnelserSection = ({
                     </ExpansionCard.Title>
                 </ExpansionCard.Header>
                 <ExpansionCard.Content>
-                    <>
-                        {fields.map((field, resultIndex) => (
-                            <div key={field.id} className="border-gray-200 bg-gray-100 mb-6 rounded-lg border p-4">
-                                <div className="mb-4 space-y-4">
-                                    <div className="flex items-end gap-4">
-                                        <Controller
-                                            name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.kode` as const}
-                                            control={control}
-                                            render={({ field }) => (
-                                                <TextField
-                                                    {...field}
-                                                    label="Kode"
-                                                    error={
-                                                        errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.kode
-                                                            ?.message
-                                                    }
-                                                    value={field.value || ''}
-                                                    className="flex-1"
-                                                />
-                                            )}
-                                        />
-                                        <Button
-                                            icon={<TrashIcon />}
-                                            type="button"
-                                            variant="tertiary"
-                                            onClick={() => onRemove(resultIndex)}
-                                        >
-                                            Fjern
-                                        </Button>
-                                    </div>
+                    <div className="space-y-2">
+                        {fields.map((field, resultIndex) => {
+                            const begrunnelse = begrunnelseVilkårshjemler?.[resultIndex]
+                            const vilkårshjemmel = begrunnelse?.vilkårshjemmel
+                            const kode = begrunnelse?.kode || ''
+                            const beskrivelse = begrunnelse?.beskrivelse || ''
 
-                                    <Controller
-                                        name={`vilkar.${vilkårIndex}.${resultType}.${resultIndex}.beskrivelse` as const}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField
-                                                {...field}
-                                                label="Tekst"
-                                                error={
-                                                    errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]
-                                                        ?.beskrivelse?.message
-                                                }
-                                                value={field.value || ''}
-                                            />
+                            return (
+                                <ExpansionCard
+                                    key={field.id}
+                                    size="small"
+                                    aria-labelledby={`begrunnelse-${resultIndex}-header`}
+                                    className={
+                                        errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]
+                                            ? 'border-2 border-ax-border-danger'
+                                            : ''
+                                    }
+                                >
+                                    <ExpansionCard.Header>
+                                        <ExpansionCard.Title
+                                            as="h5"
+                                            size="small"
+                                            id={`begrunnelse-${resultIndex}-header`}
+                                        >
+                                            {beskrivelse || kode || 'Ny begrunnelse'}
+                                        </ExpansionCard.Title>
+                                        {(kode || vilkårshjemmel) && (
+                                            <ExpansionCard.Description>
+                                                {vilkårshjemmel && (
+                                                    <span className="text-gray-600 block text-sm">
+                                                        {formatParagraf(vilkårshjemmel)}
+                                                    </span>
+                                                )}
+                                                {kode && <span className="text-gray-600 block text-sm">{kode}</span>}
+                                            </ExpansionCard.Description>
                                         )}
-                                    />
-                                </div>
-                                <div>
-                                    <ExpansionCard
-                                        size="small"
-                                        aria-labelledby={`vilkårshjemmel-${resultIndex}-header`}
-                                        className={
-                                            errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]?.vilkårshjemmel
-                                                ? 'border-2 border-ax-border-danger'
-                                                : ''
-                                        }
-                                    >
-                                        <ExpansionCard.Header>
-                                            <ExpansionCard.Title
-                                                as="h5"
-                                                size="small"
-                                                id={`vilkårshjemmel-${resultIndex}-header`}
-                                            >
-                                                {(begrunnelseVilkårshjemler?.[resultIndex]?.vilkårshjemmel &&
-                                                    formatParagraf(
-                                                        begrunnelseVilkårshjemler[resultIndex].vilkårshjemmel,
-                                                    )) ||
-                                                    'Vilkårshjemmel for begrunnelse'}
-                                            </ExpansionCard.Title>
-                                        </ExpansionCard.Header>
-                                        <ExpansionCard.Content>
-                                            <VilkårshjemmelForm
+                                    </ExpansionCard.Header>
+                                    <ExpansionCard.Content>
+                                        <div className="space-y-4">
+                                            <div className="flex items-end gap-4">
+                                                <Controller
+                                                    name={
+                                                        `vilkar.${vilkårIndex}.${resultType}.${resultIndex}.kode` as const
+                                                    }
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <TextField
+                                                            {...field}
+                                                            label="Kode"
+                                                            error={
+                                                                errors?.vilkar?.[vilkårIndex]?.[resultType]?.[
+                                                                    resultIndex
+                                                                ]?.kode?.message
+                                                            }
+                                                            value={field.value || ''}
+                                                            className="flex-1"
+                                                        />
+                                                    )}
+                                                />
+                                                <Button
+                                                    icon={<TrashIcon />}
+                                                    type="button"
+                                                    variant="tertiary"
+                                                    onClick={() => onRemove(resultIndex)}
+                                                >
+                                                    Fjern
+                                                </Button>
+                                            </div>
+
+                                            <Controller
+                                                name={
+                                                    `vilkar.${vilkårIndex}.${resultType}.${resultIndex}.beskrivelse` as const
+                                                }
                                                 control={control}
-                                                index={vilkårIndex}
-                                                errors={errors}
-                                                resultIndex={resultIndex}
-                                                resultType={resultType}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        {...field}
+                                                        label="Tekst"
+                                                        error={
+                                                            errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]
+                                                                ?.beskrivelse?.message
+                                                        }
+                                                        value={field.value || ''}
+                                                    />
+                                                )}
                                             />
-                                        </ExpansionCard.Content>
-                                    </ExpansionCard>
-                                </div>
-                            </div>
-                        ))}
+
+                                            <ExpansionCard
+                                                size="small"
+                                                aria-labelledby={`vilkårshjemmel-${resultIndex}-header`}
+                                                className={
+                                                    errors?.vilkar?.[vilkårIndex]?.[resultType]?.[resultIndex]
+                                                        ?.vilkårshjemmel
+                                                        ? 'border-2 border-ax-border-danger'
+                                                        : ''
+                                                }
+                                            >
+                                                <ExpansionCard.Header>
+                                                    <ExpansionCard.Title
+                                                        as="h6"
+                                                        size="small"
+                                                        id={`vilkårshjemmel-${resultIndex}-header`}
+                                                    >
+                                                        {(vilkårshjemmel && formatParagraf(vilkårshjemmel)) ||
+                                                            'Vilkårshjemmel for begrunnelse'}
+                                                    </ExpansionCard.Title>
+                                                </ExpansionCard.Header>
+                                                <ExpansionCard.Content>
+                                                    <VilkårshjemmelForm
+                                                        control={control}
+                                                        index={vilkårIndex}
+                                                        errors={errors}
+                                                        resultIndex={resultIndex}
+                                                        resultType={resultType}
+                                                    />
+                                                </ExpansionCard.Content>
+                                            </ExpansionCard>
+                                        </div>
+                                    </ExpansionCard.Content>
+                                </ExpansionCard>
+                            )
+                        })}
                         <Button
                             type="button"
                             variant="secondary"
@@ -195,7 +234,7 @@ const ResultatBegrunnelserSection = ({
                         >
                             Legg til
                         </Button>
-                    </>
+                    </div>
                 </ExpansionCard.Content>
             </ExpansionCard>
         </div>
