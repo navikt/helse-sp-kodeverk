@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
-import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -13,7 +12,9 @@ import { ExcelExport } from '@/components/kodeverk/ExcelExport'
 import { MetadataVisning } from '@/components/MetadataVisning'
 import { KonfliktModal } from '@/components/KonfliktModal'
 import { Sidemeny } from '@/components/kodeverk/Sidemeny'
+import { BekreftelsesModal } from '@/components/BekreftelsesModal'
 import { useKodeverk } from '@hooks/queries/useKodeverk'
+import { useBekreftelsesModal } from '@hooks/useBekreftelsesModal'
 import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
 import { useKodeverkMutation } from '@hooks/mutations/useKodeverkMutation'
@@ -218,6 +219,13 @@ const Page = () => {
     const vilkårRefs = useRef<Record<string, HTMLDivElement | null>>({})
     const [activeVilkårId, setActiveVilkårId] = useState<string | undefined>()
     const [isSidemenyCollapsed, setIsSidemenyCollapsed] = useState(false)
+    const {
+        isOpen: bekreftelsesModalOpen,
+        modalProps,
+        visBekreftelsesmodal,
+        handleBekreft,
+        handleAvbryt,
+    } = useBekreftelsesModal()
 
     // Sjekk etter vilkår med begrunnelser som ikke finnes i saksbehandlergrensesnittet
     const vilkårWithUnknownBegrunnelser = getVilkårWithUnknownBegrunnelser(fields, saksbehandleruiData?.data)
@@ -243,6 +251,11 @@ const Page = () => {
     useEffect(() => {
         if (serverKodeverk) {
             reset(serverKodeverk.data)
+            // Sett første vilkår som aktivt når data lastes fra server
+            if (serverKodeverk.data.vilkar && serverKodeverk.data.vilkar.length > 0) {
+                const sortedVilkår = sortVilkår(serverKodeverk.data.vilkar as FieldWithId[])
+                setActiveVilkårId(sortedVilkår[0].id)
+            }
         }
     }, [serverKodeverk, reset])
 
@@ -349,57 +362,47 @@ const Page = () => {
         append(newVilkår)
     }
 
-    const handleVilkårClick = (vilkårId: string) => {
-        const element = vilkårRefs.current[vilkårId]
-        if (element) {
-            element.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
+    const handleVilkårClick = async (vilkårId: string): Promise<boolean> => {
+        // Sjekk om form er dirty og bekreft navigasjon
+        if (formState.isDirty) {
+            const bekreftet = await visBekreftelsesmodal({
+                tittel: 'Ulagrede endringer',
+                melding:
+                    'Du har ulagrede endringer. Hvis du navigerer til et annet vilkår vil disse endringene gå tapt. Er du sikker på at du vil fortsette?',
             })
-            setActiveVilkårId(vilkårId)
+
+            if (!bekreftet) {
+                return false
+            }
+
+            // Reset form state hvis bruker bekrefter
+            reset(serverKodeverk?.data)
         }
+
+        setActiveVilkårId(vilkårId)
+        return true
     }
 
-    // Observer for å oppdatere aktiv vilkår basert på scroll posisjon
+    // Sett første vilkår som aktivt når data lastes
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                // Sorter entries basert på deres posisjon i viewport
-                const sortedEntries = entries
-                    .filter((entry) => entry.isIntersecting)
-                    .sort((a, b) => {
-                        const rectA = a.boundingClientRect
-                        const rectB = b.boundingClientRect
-                        return rectA.top - rectB.top
-                    })
-
-                if (sortedEntries.length > 0) {
-                    const vilkårId = sortedEntries[0].target.getAttribute('data-vilkår-id')
-                    if (vilkårId) {
-                        setActiveVilkårId(vilkårId)
-                    }
-                }
-            },
-            {
-                rootMargin: '-10% 0px -80% 0px',
-                threshold: 0,
-            },
-        )
-
-        // Observer alle vilkår elementer
-        Object.values(vilkårRefs.current).forEach((ref) => {
-            if (ref) {
-                observer.observe(ref)
-            }
-        })
-
-        // Sett første vilkår som aktivt hvis ingen er aktive
         if (sortedFields.length > 0 && !activeVilkårId) {
             setActiveVilkårId(sortedFields[0].id)
         }
-
-        return () => observer.disconnect()
     }, [sortedFields, activeVilkårId])
+
+    // Automatisk sett siste lagt til vilkår som aktivt
+    useEffect(() => {
+        if (fields.length > 0) {
+            const sortedVilkår = sortVilkår(fields as FieldWithId[])
+            // Finn det siste vilkåret som har tom beskrivelse (nytt vilkår)
+            const newVilkår = sortedVilkår.find(
+                (field) => field.beskrivelse === '' && field.vilkårskode === '' && field.vilkårshjemmel.lovverk === '',
+            )
+            if (newVilkår) {
+                setActiveVilkårId(newVilkår.id)
+            }
+        }
+    }, [fields]) // Når fields endres
 
     if (isLoading) {
         return <div className="p-6">Laster...</div>
@@ -445,6 +448,13 @@ const Page = () => {
                             problem={konfliktProblem}
                         />
                     )}
+                    <BekreftelsesModal
+                        isOpen={bekreftelsesModalOpen}
+                        tittel={modalProps?.tittel || ''}
+                        melding={modalProps?.melding || ''}
+                        onBekreft={handleBekreft}
+                        onAvbryt={handleAvbryt}
+                    />
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="mb-6 flex items-center justify-between">
                             <Heading level="1" size="large">
@@ -457,69 +467,76 @@ const Page = () => {
                                 </Button>
                             </div>
                         </div>
-                        {sortedFields.map((field) => {
+                        {(() => {
+                            const activeField = sortedFields.find((field) => field.id === activeVilkårId)
+                            if (!activeField) {
+                                return (
+                                    <div className="flex h-64 items-center justify-center">
+                                        <p className="text-gray-500">Velg et vilkår fra sidemenyen</p>
+                                    </div>
+                                )
+                            }
+
                             // Finn den opprinnelige indeksen i fields-arrayet
-                            const originalIndex = fields.findIndex((f) => f.id === field.id)
+                            const originalIndex = fields.findIndex((f) => f.id === activeField.id)
                             const { hasErrors, errorCount } = getVilkårErrors(originalIndex, formState.errors)
                             const hasUnknownBegrunnelser = vilkårWithUnknownBegrunnelser.has(originalIndex)
                             const hasNoBegrunnelser = vilkårWithoutBegrunnelser.has(originalIndex)
+
                             return (
                                 <div
-                                    key={field.id}
+                                    key={activeField.id}
                                     ref={(el) => {
-                                        vilkårRefs.current[field.id] = el
+                                        vilkårRefs.current[activeField.id] = el
                                     }}
-                                    data-vilkår-id={field.id}
+                                    data-vilkår-id={activeField.id}
+                                    className={`${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
                                 >
-                                    <ExpansionCard
-                                        size="small"
-                                        aria-label="Vilkår"
-                                        className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
-                                    >
-                                        <ExpansionCard.Header>
-                                            <ExpansionCard.Title className="flex items-center gap-2">
-                                                {field.beskrivelse || 'Nytt vilkår'}
-                                                {hasErrors && (
-                                                    <span className="text-red-500 text-sm font-medium">
-                                                        ({errorCount} feil)
-                                                    </span>
-                                                )}
-                                            </ExpansionCard.Title>
-                                            <ExpansionCard.Description>
-                                                {field.vilkårshjemmel ? formatParagraf(field.vilkårshjemmel) : ''}
-                                                {hasUnknownBegrunnelser && (
-                                                    <>
-                                                        <br></br>
-                                                        ⚠️ Dette vilkåret inneholder begrunnelser som ikke finnes i
-                                                        saksbehandlergrensesnittet
-                                                    </>
-                                                )}
-                                                {hasNoBegrunnelser && (
-                                                    <>
-                                                        <br></br>
-                                                        ⚠️ Dette vilkåret har ingen begrunnelser
-                                                    </>
-                                                )}
-                                                <MetadataVisning
-                                                    sistEndretAv={field.sistEndretAv}
-                                                    sistEndretDato={field.sistEndretDato}
-                                                    size="small"
-                                                    className="mt-2"
-                                                />
-                                            </ExpansionCard.Description>
-                                        </ExpansionCard.Header>
-                                        <ExpansionCard.Content>
-                                            <VilkårForm
-                                                control={control}
-                                                index={originalIndex}
-                                                errors={formState.errors}
-                                                onRemove={() => remove(originalIndex)}
-                                            />
-                                        </ExpansionCard.Content>
-                                    </ExpansionCard>
+                                    <div className="mb-4">
+                                        <h2 className="text-gray-900 flex items-center gap-2 text-xl font-semibold">
+                                            {activeField.beskrivelse || 'Nytt vilkår'}
+                                            {hasErrors && (
+                                                <span className="text-red-500 text-sm font-medium">
+                                                    ({errorCount} feil)
+                                                </span>
+                                            )}
+                                        </h2>
+                                        <div className="text-gray-600 mt-1 text-sm">
+                                            {activeField.vilkårshjemmel
+                                                ? formatParagraf(activeField.vilkårshjemmel)
+                                                : ''}
+                                        </div>
+                                        {hasUnknownBegrunnelser && (
+                                            <div className="bg-yellow-50 border-yellow-200 mt-2 rounded-md border p-3">
+                                                <span className="text-yellow-800 text-sm">
+                                                    ⚠️ Dette vilkåret inneholder begrunnelser som ikke finnes i
+                                                    saksbehandlergrensesnittet
+                                                </span>
+                                            </div>
+                                        )}
+                                        {hasNoBegrunnelser && (
+                                            <div className="bg-yellow-50 border-yellow-200 mt-2 rounded-md border p-3">
+                                                <span className="text-yellow-800 text-sm">
+                                                    ⚠️ Dette vilkåret har ingen begrunnelser
+                                                </span>
+                                            </div>
+                                        )}
+                                        <MetadataVisning
+                                            sistEndretAv={activeField.sistEndretAv}
+                                            sistEndretDato={activeField.sistEndretDato}
+                                            size="small"
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                    <VilkårForm
+                                        control={control}
+                                        index={originalIndex}
+                                        errors={formState.errors}
+                                        onRemove={() => remove(originalIndex)}
+                                    />
                                 </div>
                             )
-                        })}
+                        })()}
                     </form>
                 </div>
             </div>

@@ -7,7 +7,7 @@ import { Vilkår } from '@/schemas/kodeverk'
 
 interface SidemenyProps {
     vilkår: (Vilkår & { id: string })[]
-    onVilkårClick: (vilkårId: string) => void
+    onVilkårClick: (vilkårId: string) => Promise<boolean>
     activeVilkårId?: string
     isCollapsed: boolean
     onToggleCollapse: () => void
@@ -58,7 +58,9 @@ export const Sidemeny = ({ vilkår, onVilkårClick, activeVilkårId, isCollapsed
                                 className={`h-auto w-full justify-start px-3 py-3 text-left ${
                                     isActive ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-100 text-gray-900'
                                 }`}
-                                onClick={() => onVilkårClick(vilkår.id)}
+                                onClick={async () => {
+                                    await onVilkårClick(vilkår.id)
+                                }}
                             >
                                 <div className="flex flex-col items-start">
                                     <span className="text-sm leading-tight font-medium">
