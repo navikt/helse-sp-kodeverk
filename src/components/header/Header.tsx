@@ -61,6 +61,13 @@ export function Header(): ReactElement {
             </InternalHeaderButton>
             <InternalHeaderButton
                 as={NextLink}
+                href="/beregningsregler"
+                className={pathname === '/beregningsregler' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
+            >
+                Beregningsregler
+            </InternalHeaderButton>
+            <InternalHeaderButton
+                as={NextLink}
                 href="/saksbehandlergrensesnitt"
                 className={pathname === '/saksbehandlergrensesnitt' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >

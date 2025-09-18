@@ -1,23 +1,50 @@
 'use client'
 
-import { Control, FieldErrors } from 'react-hook-form'
 import { TextField } from '@navikt/ds-react'
-import { Controller } from 'react-hook-form'
-
-import { KodeverkForm } from '@schemas/kodeverk'
+import { Control, Controller, FieldErrors } from 'react-hook-form'
 
 interface VilkårshjemmelFormProps {
-    control: Control<KodeverkForm>
-    index: number
-    errors: FieldErrors<KodeverkForm>
+    control: Control<Record<string, unknown>>
+    index?: number
+    errors: FieldErrors<Record<string, unknown>>
     resultIndex?: number
     resultType?: 'oppfylt' | 'ikkeOppfylt'
+    basePath?: string
+}
+
+interface VilkårshjemmelError {
+    message?: string
+}
+
+interface ResultError {
+    vilkårshjemmel?: Record<string, VilkårshjemmelError>
+}
+
+interface VilkarIndexError {
+    vilkårshjemmel?: Record<string, VilkårshjemmelError>
+    oppfylt?: ResultError[]
+    ikkeOppfylt?: ResultError[]
+}
+
+interface FormErrors {
+    vilkar?: VilkarIndexError[]
+    [key: string]: unknown
 }
 
 type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'kapittel' | 'paragraf' | 'ledd' | 'setning' | 'bokstav'
 
-export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resultType }: VilkårshjemmelFormProps) => {
+export const VilkårshjemmelForm = ({
+    control,
+    index,
+    errors,
+    resultIndex,
+    resultType,
+    basePath,
+}: VilkårshjemmelFormProps) => {
     const getFieldName = (field: VilkårshjemmelField) => {
+        if (basePath) {
+            return `${basePath}.${field}` as const
+        }
         if (resultIndex !== undefined && resultType) {
             return `vilkar.${index}.${resultType}.${resultIndex}.vilkårshjemmel.${field}` as const
         }
@@ -25,11 +52,27 @@ export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resul
     }
 
     const getError = (field: VilkårshjemmelField) => {
-        if (resultIndex !== undefined && resultType) {
-            const resultErrors = errors?.vilkar?.[index]?.[resultType]?.[resultIndex]?.vilkårshjemmel
+        if (basePath) {
+            // For beregningsregler, naviger til feilen basert på basePath
+            const pathParts = basePath.split('.')
+            let currentError: Record<string, unknown> | undefined = errors as Record<string, unknown>
+            for (const part of pathParts) {
+                currentError = currentError?.[part] as Record<string, unknown> | undefined
+            }
+            return (currentError?.[field] as VilkårshjemmelError)?.message
+        }
+        if (resultIndex !== undefined && resultType && index !== undefined) {
+            // Dette er kun for kodeverk, ikke beregningsregler
+            const formErrors = errors as FormErrors
+            const resultErrors = formErrors?.vilkar?.[index]?.[resultType]?.[resultIndex]?.vilkårshjemmel
             return resultErrors?.[field]?.message
         }
-        return errors?.vilkar?.[index]?.vilkårshjemmel?.[field]?.message
+        // Dette er kun for kodeverk, ikke beregningsregler
+        if (index !== undefined) {
+            const formErrors = errors as FormErrors
+            return formErrors?.vilkar?.[index]?.vilkårshjemmel?.[field]?.message
+        }
+        return undefined
     }
 
     const fields: VilkårshjemmelField[] = [
@@ -48,7 +91,7 @@ export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resul
                 {fields.slice(0, 2).map((field) => (
                     <Controller
                         key={field}
-                        name={getFieldName(field)}
+                        name={getFieldName(field) as never}
                         control={control}
                         render={({ field: { value, ...fieldProps } }) => (
                             <TextField
@@ -66,7 +109,7 @@ export const VilkårshjemmelForm = ({ control, index, errors, resultIndex, resul
                 {fields.slice(2).map((field) => (
                     <Controller
                         key={field}
-                        name={getFieldName(field)}
+                        name={getFieldName(field) as never}
                         control={control}
                         render={({ field: { value, ...fieldProps } }) => (
                             <TextField

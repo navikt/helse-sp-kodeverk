@@ -458,12 +458,12 @@ const Page = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="mb-6 flex items-center justify-between">
                             <Heading level="1" size="large">
-                                Rediger Kodeverk
+                                Kodeverk
                             </Heading>
                             <div className="flex gap-4">
                                 <ExcelExport kodeverk={{ vilkar: fields }} />
                                 <Button type="button" onClick={addVilkår} variant="primary">
-                                    Legg til vilkår
+                                    Legg til
                                 </Button>
                             </div>
                         </div>
