@@ -1,12 +1,12 @@
 'use client'
 
 import { TextField } from '@navikt/ds-react'
-import { Control, Controller, FieldErrors } from 'react-hook-form'
+import { Control, Controller, FieldErrors, FieldValues } from 'react-hook-form'
 
-interface VilkårshjemmelFormProps {
-    control: Control<Record<string, unknown>>
+interface VilkårshjemmelFormProps<T extends FieldValues = Record<string, unknown>> {
+    control: Control<T>
     index?: number
-    errors: FieldErrors<Record<string, unknown>>
+    errors: FieldErrors<T>
     resultIndex?: number
     resultType?: 'oppfylt' | 'ikkeOppfylt'
     basePath?: string
@@ -33,14 +33,14 @@ interface FormErrors {
 
 type VilkårshjemmelField = 'lovverk' | 'lovverksversjon' | 'kapittel' | 'paragraf' | 'ledd' | 'setning' | 'bokstav'
 
-export const VilkårshjemmelForm = ({
+export const VilkårshjemmelForm = <T extends FieldValues = Record<string, unknown>>({
     control,
     index,
     errors,
     resultIndex,
     resultType,
     basePath,
-}: VilkårshjemmelFormProps) => {
+}: VilkårshjemmelFormProps<T>) => {
     const getFieldName = (field: VilkårshjemmelField) => {
         if (basePath) {
             return `${basePath}.${field}` as const
