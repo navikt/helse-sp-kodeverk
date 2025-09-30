@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Button, ErrorSummary, Heading, Alert, ToggleGroup, Textarea } from '@navikt/ds-react'
+import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, useWatch, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,6 +27,7 @@ import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from 
 import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
 import { MetadataVisning } from '@/components/MetadataVisning'
 import { KonfliktModal } from '@/components/KonfliktModal'
+import { JsonEditor } from '@/components/JsonEditor'
 import { useKodeverk } from '@/hooks/queries/useKodeverk'
 import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
@@ -192,14 +193,11 @@ const Page = () => {
         expectedVersion?: string
         currentVersion?: string
     } | null>(null)
-    const [editMode, setEditMode] = useState<'form' | 'json'>('form')
-    const [jsonText, setJsonText] = useState('')
-    const [jsonError, setJsonError] = useState<string | null>(null)
+    const [showJsonEditor, setShowJsonEditor] = useState(false)
 
     useEffect(() => {
         if (serverKodeverk?.data) {
             reset({ vilkar: serverKodeverk.data })
-            setJsonText(JSON.stringify(serverKodeverk.data, null, 2))
         }
     }, [serverKodeverk, reset])
 
@@ -224,59 +222,89 @@ const Page = () => {
         setKonfliktProblem(null)
     }
 
-    const handleModeChange = (mode: 'form' | 'json') => {
-        if (mode === 'json') {
-            // Konverter form data til JSON
-            const formData = formState.defaultValues
-            if (formData?.vilkar) {
-                setJsonText(JSON.stringify(formData.vilkar, null, 2))
+    const handleJsonSave = async (data: Hovedspørsmål[]) => {
+        // Oppdater metadata kun for hovedspørsmål som er endret
+        const cleanedData = data.map((hovedspørsmål, index) => {
+            // Sammenlign med original data for å sjekke om endringer er gjort
+            const originalHovedspørsmål = serverKodeverk?.data?.[index]
+
+            const isHovedspørsmålEndret =
+                !originalHovedspørsmål ||
+                hovedspørsmål.beskrivelse !== originalHovedspørsmål.beskrivelse ||
+                hovedspørsmål.kode !== originalHovedspørsmål.kode ||
+                hovedspørsmål.kategori !== originalHovedspørsmål.kategori ||
+                JSON.stringify(hovedspørsmål.underspørsmål) !== JSON.stringify(originalHovedspørsmål.underspørsmål)
+
+            // Hvis hovedspørsmålet er endret, oppdater metadata
+            if (isHovedspørsmålEndret) {
+                return {
+                    ...hovedspørsmål,
+                    sistEndretAv: brukerinfo?.navn || 'unknown',
+                    sistEndretDato: new Date().toISOString(),
+                }
             }
-        } else {
-            // Konverter JSON til form data
-            try {
-                const parsedData = JSON.parse(jsonText)
-                reset({ vilkar: parsedData })
-                setJsonError(null)
-            } catch (error) {
-                setJsonError('Ugyldig JSON-format')
+
+            // Hvis ikke endret, behold eksisterende metadata
+            return {
+                ...hovedspørsmål,
+                sistEndretAv: originalHovedspørsmål?.sistEndretAv || hovedspørsmål.sistEndretAv,
+                sistEndretDato: originalHovedspørsmål?.sistEndretDato || hovedspørsmål.sistEndretDato,
             }
-        }
-        setEditMode(mode)
+        })
+
+        // Lagre til server
+        return new Promise<void>((resolve, reject) => {
+            saveMutation.mutate(
+                {
+                    data: cleanedData,
+                    etag: serverKodeverk?.etag,
+                },
+                {
+                    onSuccess: () => {
+                        reset({ vilkar: cleanedData })
+                        setShowJsonEditor(false)
+                        setValidationError(null)
+                        setKonfliktProblem(null)
+
+                        // Vis success-melding
+                        setShowSuccess(true)
+
+                        // Fjern eventuell eksisterende timer
+                        if (successTimer) {
+                            clearTimeout(successTimer)
+                        }
+
+                        // Sett ny timer for å skjule success-melding etter 4 sekunder
+                        const timer = setTimeout(() => {
+                            setShowSuccess(false)
+                            setSuccessTimer(null)
+                        }, 4000)
+                        setSuccessTimer(timer)
+
+                        resolve()
+                    },
+                    onError: (error: Error) => {
+                        if (error instanceof ProblemDetailsError && error.problem.status === 409) {
+                            setKonfliktProblem(error.problem)
+                        } else {
+                            setValidationError(error.message)
+                        }
+                        reject(error)
+                    },
+                },
+            )
+        })
     }
 
-    const handleJsonChange = (value: string) => {
-        setJsonText(value)
-        setJsonError(null)
-
-        // Valider JSON i sanntid
-        try {
-            JSON.parse(value)
-        } catch (error) {
-            setJsonError('Ugyldig JSON-format')
-        }
+    const handleJsonCancel = () => {
+        setShowJsonEditor(false)
     }
 
-    const onSubmit = (data?: HovedspørsmålForm) => {
-        let dataToSubmit: HovedspørsmålForm
-
-        if (editMode === 'json') {
-            // Hvis vi er i JSON-modus, parse JSON og valider
-            try {
-                const parsedData = JSON.parse(jsonText)
-                dataToSubmit = { vilkar: parsedData }
-            } catch (error) {
-                setJsonError('Ugyldig JSON-format')
-                return
-            }
-        } else {
-            // Hvis vi er i form-modus, bruk form data
-            dataToSubmit = data || { vilkar: [] }
-        }
-
+    const onSubmit = (data: HovedspørsmålForm) => {
         // Oppdater metadata kun for hovedspørsmål som er endret
         const cleanedData = {
-            ...dataToSubmit,
-            vilkar: dataToSubmit.vilkar.map((hovedspørsmål, index) => {
+            ...data,
+            vilkar: data.vilkar.map((hovedspørsmål, index) => {
                 // Sammenlign med original data for å sjekke om endringer er gjort
                 const originalHovedspørsmål = serverKodeverk?.data?.[index]
 
@@ -314,7 +342,6 @@ const Page = () => {
                 onSuccess: () => {
                     setValidationError(null)
                     setKonfliktProblem(null)
-                    setJsonError(null)
 
                     // Vis success-melding
                     setShowSuccess(true)
@@ -420,6 +447,24 @@ const Page = () => {
         return <div className="p-6">Laster...</div>
     }
 
+    if (showJsonEditor) {
+        return (
+            <div className="p-6">
+                <div className="mb-6 flex items-center justify-between">
+                    <Heading level="1" size="large">
+                        JSON-redigering
+                    </Heading>
+                </div>
+                <JsonEditor
+                    initialData={serverKodeverk?.data || []}
+                    onSave={handleJsonSave}
+                    onCancel={handleJsonCancel}
+                    isLoading={saveMutation.isPending}
+                />
+            </div>
+        )
+    }
+
     return (
         <div className="p-6">
             {validationError && (
@@ -427,15 +472,9 @@ const Page = () => {
                     <ErrorSummary.Item>{validationError}</ErrorSummary.Item>
                 </ErrorSummary>
             )}
-            {jsonError && (
-                <ErrorSummary heading="JSON-feil:">
-                    <ErrorSummary.Item>{jsonError}</ErrorSummary.Item>
-                </ErrorSummary>
-            )}
-            {(formState.isDirty ||
-                (editMode === 'json' && jsonText !== JSON.stringify(serverKodeverk?.data || [], null, 2))) && (
+            {formState.isDirty && (
                 <div className="fixed right-4 bottom-4 z-50">
-                    <Button onClick={() => onSubmit()} loading={saveMutation.isPending} variant="primary">
+                    <Button onClick={handleSubmit(onSubmit)} loading={saveMutation.isPending} variant="primary">
                         Lagre endringer
                     </Button>
                 </div>
@@ -456,94 +495,68 @@ const Page = () => {
                         Rediger saksbehandlergrensesnitt
                     </Heading>
                     <div className="flex gap-4">
-                        <ToggleGroup
-                            value={editMode}
-                            onChange={(value) => handleModeChange(value as 'form' | 'json')}
-                            size="small"
-                        >
-                            <ToggleGroup.Item value="form">Form</ToggleGroup.Item>
-                            <ToggleGroup.Item value="json">JSON</ToggleGroup.Item>
-                        </ToggleGroup>
-                        {editMode === 'form' && (
-                            <Button type="button" onClick={addSpørsmål} variant="primary">
-                                Legg til spørsmål
-                            </Button>
-                        )}
+                        <Button type="button" onClick={() => setShowJsonEditor(true)} variant="secondary">
+                            JSON-redigering
+                        </Button>
+                        <Button type="button" onClick={addSpørsmål} variant="primary">
+                            Legg til spørsmål
+                        </Button>
                     </div>
                 </div>
-                {editMode === 'form' ? (
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                        <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
-                            {fields.map((field, index) => {
-                                const hasUnknownCodes = vilkarWithUnknownCodes.has(index)
-                                const { hasErrors, errorCount } = getHovedspørsmålErrors(index, formState.errors)
-                                const hasNoUnderspørsmål = !field.underspørsmål || field.underspørsmål.length === 0
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
+                        {fields.map((field, index) => {
+                            const hasUnknownCodes = vilkarWithUnknownCodes.has(index)
+                            const { hasErrors, errorCount } = getHovedspørsmålErrors(index, formState.errors)
+                            const hasNoUnderspørsmål = !field.underspørsmål || field.underspørsmål.length === 0
 
-                                return (
-                                    <SortableExpansionCard
-                                        key={field.id}
-                                        id={field.id}
-                                        aria-label="Spørsmål"
-                                        className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
-                                    >
-                                        <ExpansionCard.Header>
-                                            <ExpansionCard.Title className="flex items-center gap-2">
-                                                {field.beskrivelse || 'Nytt spørsmål'}
-                                                {hasErrors && (
-                                                    <span className="text-red-500 text-sm font-medium">
-                                                        ({errorCount} feil)
-                                                    </span>
-                                                )}
-                                            </ExpansionCard.Title>
-                                            <ExpansionCard.Description>
-                                                {(hasUnknownCodes || hasNoUnderspørsmål) && (
-                                                    <>
-                                                        {hasUnknownCodes &&
-                                                            '⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke finnes i kodeverket'}
-                                                        {hasNoUnderspørsmål &&
-                                                            '⚠️ Dette spørsmålet har ingen underspørsmål'}
-                                                    </>
-                                                )}
-                                                <MetadataVisning
-                                                    sistEndretAv={field.sistEndretAv}
-                                                    sistEndretDato={field.sistEndretDato}
-                                                    size="small"
-                                                    className="mt-2"
-                                                />
-                                            </ExpansionCard.Description>
-                                        </ExpansionCard.Header>
-                                        <ExpansionCard.Content>
-                                            <SpørsmålForm
-                                                control={control}
-                                                index={index}
-                                                errors={formState.errors}
-                                                onRemove={() => remove(index)}
-                                                setValue={setValue}
+                            return (
+                                <SortableExpansionCard
+                                    key={field.id}
+                                    id={field.id}
+                                    aria-label="Spørsmål"
+                                    className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
+                                >
+                                    <ExpansionCard.Header>
+                                        <ExpansionCard.Title className="flex items-center gap-2">
+                                            {field.beskrivelse || 'Nytt spørsmål'}
+                                            {hasErrors && (
+                                                <span className="text-red-500 text-sm font-medium">
+                                                    ({errorCount} feil)
+                                                </span>
+                                            )}
+                                        </ExpansionCard.Title>
+                                        <ExpansionCard.Description>
+                                            {(hasUnknownCodes || hasNoUnderspørsmål) && (
+                                                <>
+                                                    {hasUnknownCodes &&
+                                                        '⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke finnes i kodeverket'}
+                                                    {hasNoUnderspørsmål &&
+                                                        '⚠️ Dette spørsmålet har ingen underspørsmål'}
+                                                </>
+                                            )}
+                                            <MetadataVisning
+                                                sistEndretAv={field.sistEndretAv}
+                                                sistEndretDato={field.sistEndretDato}
+                                                size="small"
+                                                className="mt-2"
                                             />
-                                        </ExpansionCard.Content>
-                                    </SortableExpansionCard>
-                                )
-                            })}
-                        </SortableContext>
-                    </DndContext>
-                ) : (
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="json-editor" className="text-gray-700 mb-2 block text-sm font-medium">
-                                JSON-redigering
-                            </label>
-                            <Textarea
-                                id="json-editor"
-                                label="JSON-redigering"
-                                value={jsonText}
-                                onChange={(e) => handleJsonChange(e.target.value)}
-                                rows={20}
-                                className="font-mono text-sm"
-                                placeholder="Rediger JSON her..."
-                            />
-                        </div>
-                    </div>
-                )}
+                                        </ExpansionCard.Description>
+                                    </ExpansionCard.Header>
+                                    <ExpansionCard.Content>
+                                        <SpørsmålForm
+                                            control={control}
+                                            index={index}
+                                            errors={formState.errors}
+                                            onRemove={() => remove(index)}
+                                            setValue={setValue}
+                                        />
+                                    </ExpansionCard.Content>
+                                </SortableExpansionCard>
+                            )
+                        })}
+                    </SortableContext>
+                </DndContext>
             </form>
         </div>
     )
