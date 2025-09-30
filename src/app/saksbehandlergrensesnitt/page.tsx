@@ -455,7 +455,7 @@ const Page = () => {
                         JSON-redigering
                     </Heading>
                 </div>
-                <JsonEditor
+                <JsonEditor<Hovedspørsmål>
                     initialData={serverKodeverk?.data || []}
                     onSave={handleJsonSave}
                     onCancel={handleJsonCancel}

@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react'
 import { Textarea, ErrorSummary, Button } from '@navikt/ds-react'
 
-interface JsonEditorProps {
-    initialData: unknown[]
-    onSave: (data: unknown[]) => Promise<void>
+interface JsonEditorProps<T = unknown> {
+    initialData: T[]
+    onSave: (data: T[]) => Promise<void>
     onCancel: () => void
     isLoading?: boolean
 }
 
-export const JsonEditor = ({ initialData, onSave, onCancel, isLoading = false }: JsonEditorProps) => {
+export const JsonEditor = <T = unknown,>({ initialData, onSave, onCancel, isLoading = false }: JsonEditorProps<T>) => {
     const [jsonText, setJsonText] = useState('')
     const [jsonError, setJsonError] = useState<string | null>(null)
 
