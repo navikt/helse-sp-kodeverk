@@ -298,12 +298,30 @@ const UnderspørsmålSection = ({
         fields: alternativFields,
         append: appendAlternativ,
         remove: removeAlternativ,
+        move: moveAlternativ,
     } = useFieldArray({
         control,
         name: `${underspørsmålPath}.alternativer` as `vilkar.${number}.underspørsmål.${number}.alternativer`,
     })
 
     const indent = level * 20
+
+    // DnD-kit setup for alternativer
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        }),
+    )
+
+    const handleAlternativDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event
+        if (over && active.id !== over.id) {
+            const oldIndex = alternativFields.findIndex((field) => field.id === active.id)
+            const newIndex = alternativFields.findIndex((field) => field.id === over.id)
+            moveAlternativ(oldIndex, newIndex)
+        }
+    }
 
     // Watch current kode value for display
     const currentKode = useWatch({
@@ -504,19 +522,31 @@ const UnderspørsmålSection = ({
                             >
                                 Legg til svaralternativ
                             </Button>
-                            {alternativFields.map((field, alternativIndex) => (
-                                <AlternativSection
-                                    key={`${underspørsmålPath}-alt-${field.id}`}
-                                    control={control}
-                                    vilkårIndex={vilkårIndex}
-                                    alternativPath={`${underspørsmålPath}.alternativer.${alternativIndex}`}
-                                    errors={errors}
-                                    onRemove={() => removeAlternativ(alternativIndex)}
-                                    level={level}
-                                    setValue={setValue}
-                                    allKodeOptions={allKodeOptions}
-                                />
-                            ))}
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleAlternativDragEnd}
+                            >
+                                <SortableContext
+                                    items={alternativFields.map((field) => field.id)}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    {alternativFields.map((field, alternativIndex) => (
+                                        <SortableAlternativCard key={`alternativ-${field.id}`} id={field.id}>
+                                            <AlternativSection
+                                                control={control}
+                                                vilkårIndex={vilkårIndex}
+                                                alternativPath={`${underspørsmålPath}.alternativer.${alternativIndex}`}
+                                                errors={errors}
+                                                onRemove={() => removeAlternativ(alternativIndex)}
+                                                level={level}
+                                                setValue={setValue}
+                                                allKodeOptions={allKodeOptions}
+                                            />
+                                        </SortableAlternativCard>
+                                    ))}
+                                </SortableContext>
+                            </DndContext>
                         </div>
                     </ExpansionCard.Content>
                 </ExpansionCard>
@@ -527,6 +557,29 @@ const UnderspørsmålSection = ({
 
 // Legg til SortableUndersporsmalCard-komponent
 const SortableUndersporsmalCard = ({ id, children }: { id: string; children: React.ReactNode }) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    }
+    return (
+        <div ref={setNodeRef} style={style} className="flex items-start gap-2">
+            <div
+                {...attributes}
+                {...listeners}
+                className="hover:bg-gray-100 mt-2 cursor-grab rounded p-2"
+                role="button"
+                tabIndex={0}
+            >
+                <DragVerticalIcon className="text-gray-400 h-5 w-5" />
+            </div>
+            <div className="flex-1">{children}</div>
+        </div>
+    )
+}
+
+// Legg til SortableAlternativCard-komponent for svaralternativer
+const SortableAlternativCard = ({ id, children }: { id: string; children: React.ReactNode }) => {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
     const style = {
         transform: CSS.Transform.toString(transform),
