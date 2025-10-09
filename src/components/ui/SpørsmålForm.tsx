@@ -700,7 +700,11 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
                             description="Vises foran vilkåret i spillerom"
                             error={errors?.vilkar?.[index]?.paragrafTag?.message}
                             value={field.value || ''}
-                            onChange={(e) => field.onChange(e.target.value === '' ? undefined : e.target.value)}
+                            onChange={(e) => {
+                                const newValue = e.target.value
+                                // Siden paragrafTag er påkrevd, sett til tom string hvis feltet er tomt
+                                field.onChange(newValue)
+                            }}
                         />
                     )}
                 />
