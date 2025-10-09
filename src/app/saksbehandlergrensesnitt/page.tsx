@@ -233,6 +233,7 @@ const Page = () => {
                 hovedspørsmål.beskrivelse !== originalHovedspørsmål.beskrivelse ||
                 hovedspørsmål.kode !== originalHovedspørsmål.kode ||
                 hovedspørsmål.kategori !== originalHovedspørsmål.kategori ||
+                hovedspørsmål.paragrafTag !== originalHovedspørsmål.paragrafTag ||
                 JSON.stringify(hovedspørsmål.underspørsmål) !== JSON.stringify(originalHovedspørsmål.underspørsmål)
 
             // Hvis hovedspørsmålet er endret, oppdater metadata
@@ -374,6 +375,7 @@ const Page = () => {
             kode: crypto.randomUUID(),
             beskrivelse: '',
             kategori: 'generelle_bestemmelser',
+            paragrafTag: undefined,
             underspørsmål: [],
         }
         append(newVilkår)
@@ -519,6 +521,7 @@ const Page = () => {
                                 >
                                     <ExpansionCard.Header>
                                         <ExpansionCard.Title className="flex items-center gap-2">
+                                            {field.paragrafTag && `${field.paragrafTag} `}
                                             {field.beskrivelse || 'Nytt spørsmål'}
                                             {hasErrors && (
                                                 <span className="text-red-500 text-sm font-medium">

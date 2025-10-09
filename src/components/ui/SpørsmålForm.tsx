@@ -689,6 +689,22 @@ export const SpørsmålForm = ({ control, index, errors, onRemove, setValue }: V
                     )}
                 />
             </div>
+            <div className="grid grid-cols-1 gap-4">
+                <Controller
+                    name={`vilkar.${index}.paragrafTag` as const}
+                    control={control}
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="Paragraf-tag"
+                            description="Vises foran vilkåret i spillerom"
+                            error={errors?.vilkar?.[index]?.paragrafTag?.message}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value === '' ? undefined : e.target.value)}
+                        />
+                    )}
+                />
+            </div>
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
