@@ -375,7 +375,7 @@ const Page = () => {
             kode: crypto.randomUUID(),
             beskrivelse: '',
             kategori: 'generelle_bestemmelser',
-            paragrafTag: undefined,
+            paragrafTag: '',
             underspørsmål: [],
         }
         append(newVilkår)
