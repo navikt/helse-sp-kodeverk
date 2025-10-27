@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
+import { FilesIcon } from '@navikt/aksel-icons'
 import { useForm, useFieldArray, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -12,6 +13,7 @@ import { useBeregningsregler } from '@hooks/queries/useBeregningsregler'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
 import { useBeregningsregelMutation } from '@hooks/mutations/useBeregningsregelMutation'
 import { ProblemDetailsError } from '@utils/ProblemDetailsError'
+import { redactBeregningsreglerSistEndretAv, copyKodeverkToClipboard } from '@utils/redactSistEndretAv'
 
 // Funksjon for å sortere beregningsregler basert på vilkårshjemmel
 const sortBeregningsregler = (regler: Beregningsregel[]): Beregningsregel[] => {
@@ -101,6 +103,8 @@ const Page = () => {
     const [validationError, setValidationError] = useState<string | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
     const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
+    const [showCopySuccess, setShowCopySuccess] = useState(false)
+    const [copySuccessTimer, setCopySuccessTimer] = useState<NodeJS.Timeout | null>(null)
     const [konfliktProblem, setKonfliktProblem] = useState<{
         status: number
         type: string
@@ -130,8 +134,11 @@ const Page = () => {
             if (successTimer) {
                 clearTimeout(successTimer)
             }
+            if (copySuccessTimer) {
+                clearTimeout(copySuccessTimer)
+            }
         }
-    }, [successTimer])
+    }, [successTimer, copySuccessTimer])
 
     const handleCloseSuccess = () => {
         setShowSuccess(false)
@@ -139,6 +146,34 @@ const Page = () => {
             clearTimeout(successTimer)
             setSuccessTimer(null)
         }
+    }
+
+    const handleCloseCopySuccess = () => {
+        setShowCopySuccess(false)
+        if (copySuccessTimer) {
+            clearTimeout(copySuccessTimer)
+            setCopySuccessTimer(null)
+        }
+    }
+
+    const handleCopyKodeverk = async () => {
+        if (!serverBeregningsregler?.data) return
+
+        const redactedData = redactBeregningsreglerSistEndretAv(serverBeregningsregler.data.beregningsregler)
+        await copyKodeverkToClipboard(redactedData)
+        setShowCopySuccess(true)
+
+        // Fjern eventuell eksisterende timer
+        if (copySuccessTimer) {
+            clearTimeout(copySuccessTimer)
+        }
+
+        // Sett ny timer for å skjule copy-success-melding etter 3 sekunder
+        const timer = setTimeout(() => {
+            setShowCopySuccess(false)
+            setCopySuccessTimer(null)
+        }, 3000)
+        setCopySuccessTimer(timer)
     }
 
     const handleCloseKonflikt = () => {
@@ -248,6 +283,13 @@ const Page = () => {
                     </Alert>
                 </div>
             )}
+            {showCopySuccess && (
+                <div className="fixed right-4 bottom-4 z-50">
+                    <Alert variant="success" closeButton onClose={handleCloseCopySuccess}>
+                        Kodeverk kopiert til utklippstavlen!
+                    </Alert>
+                </div>
+            )}
             {konfliktProblem && (
                 <KonfliktModal isOpen={!!konfliktProblem} onClose={handleCloseKonflikt} problem={konfliktProblem} />
             )}
@@ -256,9 +298,14 @@ const Page = () => {
                     <Heading level="1" size="large">
                         Beregningsregler
                     </Heading>
-                    <Button type="button" onClick={addBeregningsregel} variant="primary">
-                        Legg til
-                    </Button>
+                    <div className="flex gap-4">
+                        <Button type="button" onClick={handleCopyKodeverk} variant="secondary" icon={<FilesIcon />}>
+                            Kopier som json
+                        </Button>
+                        <Button type="button" onClick={addBeregningsregel} variant="primary">
+                            Legg til
+                        </Button>
+                    </div>
                 </div>
                 <div>
                     {fields.map((field, index) => {

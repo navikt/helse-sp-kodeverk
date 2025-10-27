@@ -21,7 +21,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DragVerticalIcon } from '@navikt/aksel-icons'
+import { DragVerticalIcon, FilesIcon } from '@navikt/aksel-icons'
 
 import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
 import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
@@ -33,6 +33,7 @@ import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
 import { useSaksbehandleruiMutation } from '@hooks/mutations/useSaksbehandleruiMutation'
 import { ProblemDetailsError } from '@utils/ProblemDetailsError'
+import { redactSaksbehandlergrensesnittSistEndretAv, copyKodeverkToClipboard } from '@utils/redactSistEndretAv'
 
 // Funksjon for å sjekke om et hovedspørsmål har valideringsfeil og returnere antall feil
 const getHovedspørsmålErrors = (
@@ -182,6 +183,8 @@ const Page = () => {
     const [validationError, setValidationError] = useState<string | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
     const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
+    const [showCopySuccess, setShowCopySuccess] = useState(false)
+    const [copySuccessTimer, setCopySuccessTimer] = useState<NodeJS.Timeout | null>(null)
     const [konfliktProblem, setKonfliktProblem] = useState<{
         status: number
         type: string
@@ -207,8 +210,11 @@ const Page = () => {
             if (successTimer) {
                 clearTimeout(successTimer)
             }
+            if (copySuccessTimer) {
+                clearTimeout(copySuccessTimer)
+            }
         }
-    }, [successTimer])
+    }, [successTimer, copySuccessTimer])
 
     const handleCloseSuccess = () => {
         setShowSuccess(false)
@@ -216,6 +222,34 @@ const Page = () => {
             clearTimeout(successTimer)
             setSuccessTimer(null)
         }
+    }
+
+    const handleCloseCopySuccess = () => {
+        setShowCopySuccess(false)
+        if (copySuccessTimer) {
+            clearTimeout(copySuccessTimer)
+            setCopySuccessTimer(null)
+        }
+    }
+
+    const handleCopyKodeverk = async () => {
+        if (!serverKodeverk?.data) return
+
+        const redactedData = redactSaksbehandlergrensesnittSistEndretAv(serverKodeverk.data)
+        await copyKodeverkToClipboard(redactedData)
+        setShowCopySuccess(true)
+
+        // Fjern eventuell eksisterende timer
+        if (copySuccessTimer) {
+            clearTimeout(copySuccessTimer)
+        }
+
+        // Sett ny timer for å skjule copy-success-melding etter 3 sekunder
+        const timer = setTimeout(() => {
+            setShowCopySuccess(false)
+            setCopySuccessTimer(null)
+        }, 3000)
+        setCopySuccessTimer(timer)
     }
 
     const handleCloseKonflikt = () => {
@@ -488,6 +522,13 @@ const Page = () => {
                     </Alert>
                 </div>
             )}
+            {showCopySuccess && (
+                <div className="fixed right-4 bottom-4 z-50">
+                    <Alert variant="success" closeButton onClose={handleCloseCopySuccess}>
+                        Kodeverk kopiert til utklippstavlen!
+                    </Alert>
+                </div>
+            )}
             {konfliktProblem && (
                 <KonfliktModal isOpen={!!konfliktProblem} onClose={handleCloseKonflikt} problem={konfliktProblem} />
             )}
@@ -497,6 +538,9 @@ const Page = () => {
                         Rediger saksbehandlergrensesnitt
                     </Heading>
                     <div className="flex gap-4">
+                        <Button type="button" onClick={handleCopyKodeverk} variant="secondary" icon={<FilesIcon />}>
+                            Kopier som json
+                        </Button>
                         <Button type="button" onClick={() => setShowJsonEditor(true)} variant="secondary">
                             JSON-redigering
                         </Button>
