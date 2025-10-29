@@ -193,7 +193,9 @@ const Page = () => {
     }
 
     // Håndter filtervalg
-    const handleFilterToggle = (filterTekst: string) => {
+    const handleFilterToggle = (filterTekst: string, event: React.MouseEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
         setValgteFiltre((prev) =>
             prev.includes(filterTekst) ? prev.filter((f) => f !== filterTekst) : [...prev, filterTekst],
         )
@@ -342,7 +344,8 @@ const Page = () => {
                             <Chips.Toggle
                                 key={alternativ.filtereringstekst}
                                 selected={valgteFiltre.includes(alternativ.filtereringstekst)}
-                                onClick={() => handleFilterToggle(alternativ.filtereringstekst)}
+                                onClick={(event) => handleFilterToggle(alternativ.filtereringstekst, event)}
+                                type="button"
                             >
                                 {alternativ.visningstekst}
                             </Chips.Toggle>
