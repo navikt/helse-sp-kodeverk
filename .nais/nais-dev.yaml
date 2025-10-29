@@ -22,6 +22,10 @@ spec:
     http:
       path: /api/internal/preStop
       port: 3000
+  accessPolicy:
+    outbound:
+      external:
+        - host: raw.githubusercontent.com
   azure:
     application:
       enabled: true
