@@ -25,6 +25,7 @@ const filterAlternativer = [
     { visningstekst: 'Frilanser', filtereringstekst: 'FRILANSER' },
     { visningstekst: 'Inaktiv', filtereringstekst: 'INAKTIV' },
     { visningstekst: 'Dagpengemottaker', filtereringstekst: 'DAGPENGEMOTTAKER' },
+    { visningstekst: 'Ubrukt', filtereringstekst: 'UBRUKT' },
 ]
 
 // Funksjon for å sortere beregningsregler basert på vilkårshjemmel
@@ -212,6 +213,12 @@ const Page = () => {
     // Filtrer beregningsregler basert på valgte filtre (AND-logikk)
     const filtrerteBeregningsregler = fields.filter((field) => {
         if (valgteFiltre.length === 0) return true
+
+        // Spesialhåndtering for UBRUKT filter
+        if (valgteFiltre.includes('UBRUKT')) {
+            const erIBrukIBakrommet = erKodeIBrukIBakrommet(field.kode, (bakrommetKoder as string[]) ?? [])
+            return !erIBrukIBakrommet
+        }
 
         // AND-logikk: alle valgte filtre må matche
         return valgteFiltre.every((filterTekst) => field.kode.toUpperCase().includes(filterTekst))
