@@ -11,6 +11,7 @@ import { BeregningsregelExpansionCard } from '@/components/beregningsregler/Bere
 import { KonfliktModal } from '@/components/KonfliktModal'
 import { useBeregningsregler } from '@hooks/queries/useBeregningsregler'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
+import { useBakrommetBeregningskoder } from '@hooks/queries/useBakrommetBeregningskoder'
 import { useBeregningsregelMutation } from '@hooks/mutations/useBeregningsregelMutation'
 import { ProblemDetailsError } from '@utils/ProblemDetailsError'
 import { redactBeregningsreglerSistEndretAv, copyKodeverkToClipboard } from '@utils/redactSistEndretAv'
@@ -96,9 +97,16 @@ const getBeregningsregelErrors = (
     return { hasErrors: errorCount > 0, errorCount }
 }
 
+// Funksjon for å sjekke om en kode er i bruk i bakrommet
+const erKodeIBrukIBakrommet = (kode: string, bakrommetKoder: string[]): boolean => {
+    if (!bakrommetKoder || !kode) return false
+    return bakrommetKoder.includes(kode)
+}
+
 const Page = () => {
     const { data: serverBeregningsregler, isLoading } = useBeregningsregler()
     const { data: brukerinfo } = useBrukerinfo()
+    const { data: bakrommetKoder, isLoading: isLoadingBakrommet } = useBakrommetBeregningskoder()
     const saveMutation = useBeregningsregelMutation()
 
     const { control, handleSubmit, formState, reset } = useForm<BeregningsregelForm>({
@@ -287,7 +295,7 @@ const Page = () => {
         append(newBeregningsregel)
     }
 
-    if (isLoading) {
+    if (isLoading || isLoadingBakrommet) {
         return <div className="p-6">Laster...</div>
     }
 
@@ -358,6 +366,7 @@ const Page = () => {
                         // Finn den faktiske index i fields array
                         const actualIndex = fields.findIndex((f) => f.id === field.id)
                         const { hasErrors, errorCount } = getBeregningsregelErrors(actualIndex, formState.errors)
+                        const erIBrukIBakrommet = erKodeIBrukIBakrommet(field.kode, (bakrommetKoder as string[]) ?? [])
 
                         return (
                             <BeregningsregelExpansionCard
@@ -373,6 +382,7 @@ const Page = () => {
                                 sistEndretDato={field.sistEndretDato}
                                 hasErrors={hasErrors}
                                 errorCount={errorCount}
+                                erIBrukIBakrommet={erIBrukIBakrommet}
                             />
                         )
                     })}

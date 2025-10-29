@@ -1,6 +1,6 @@
 import React from 'react'
 import { Control, FieldErrors } from 'react-hook-form'
-import { ExpansionCard, TextField, Button, Fieldset } from '@navikt/ds-react'
+import { ExpansionCard, TextField, Button, Fieldset, Tag } from '@navikt/ds-react'
 import { TrashIcon } from '@navikt/aksel-icons'
 
 import { BeregningsregelForm } from '@/schemas/beregningsregler'
@@ -20,6 +20,7 @@ interface BeregningsregelExpansionCardProps {
     sistEndretDato?: string
     hasErrors: boolean
     errorCount: number
+    erIBrukIBakrommet?: boolean
 }
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
@@ -44,6 +45,7 @@ export const BeregningsregelExpansionCard = ({
     sistEndretDato,
     hasErrors,
     errorCount,
+    erIBrukIBakrommet = true,
 }: BeregningsregelExpansionCardProps) => {
     return (
         <ExpansionCard
@@ -69,6 +71,11 @@ export const BeregningsregelExpansionCard = ({
                             className="mt-2"
                         />
                     </span>
+                    {!erIBrukIBakrommet && kode && (
+                        <Tag variant="warning" size="small" className="mt-2">
+                            Denne koden er ikke i bruk i spillerom applikasjonen
+                        </Tag>
+                    )}
                 </ExpansionCard.Description>
             </ExpansionCard.Header>
             <ExpansionCard.Content>
