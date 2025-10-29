@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
+import { Button, ErrorSummary, Heading, Alert, Chips } from '@navikt/ds-react'
 import { FilesIcon } from '@navikt/aksel-icons'
 import { useForm, useFieldArray, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,6 +14,13 @@ import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
 import { useBeregningsregelMutation } from '@hooks/mutations/useBeregningsregelMutation'
 import { ProblemDetailsError } from '@utils/ProblemDetailsError'
 import { redactBeregningsreglerSistEndretAv, copyKodeverkToClipboard } from '@utils/redactSistEndretAv'
+
+// Filteralternativer for beregningsregler
+const filterAlternativer = [
+    { visningstekst: 'Arbeidstaker', filtereringstekst: 'ARBEIDSTAKER' },
+    { visningstekst: 'Selvstendig næringsdrivende', filtereringstekst: 'SELVSTENDIG' },
+    { visningstekst: 'Sykepengegrunnlag', filtereringstekst: 'SYKEPENGEGRUNNLAG' },
+]
 
 // Funksjon for å sortere beregningsregler basert på vilkårshjemmel
 const sortBeregningsregler = (regler: Beregningsregel[]): Beregningsregel[] => {
@@ -105,6 +112,7 @@ const Page = () => {
     const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
     const [showCopySuccess, setShowCopySuccess] = useState(false)
     const [copySuccessTimer, setCopySuccessTimer] = useState<NodeJS.Timeout | null>(null)
+    const [valgteFiltre, setValgteFiltre] = useState<string[]>([])
     const [konfliktProblem, setKonfliktProblem] = useState<{
         status: number
         type: string
@@ -179,6 +187,21 @@ const Page = () => {
     const handleCloseKonflikt = () => {
         setKonfliktProblem(null)
     }
+
+    // Håndter filtervalg
+    const handleFilterToggle = (filterTekst: string) => {
+        setValgteFiltre((prev) =>
+            prev.includes(filterTekst) ? prev.filter((f) => f !== filterTekst) : [...prev, filterTekst],
+        )
+    }
+
+    // Filtrer beregningsregler basert på valgte filtre (AND-logikk)
+    const filtrerteBeregningsregler = fields.filter((field) => {
+        if (valgteFiltre.length === 0) return true
+
+        // AND-logikk: alle valgte filtre må matche
+        return valgteFiltre.every((filterTekst) => field.kode.toUpperCase().includes(filterTekst))
+    })
 
     const onSubmit = (data: BeregningsregelForm) => {
         // Oppdater metadata kun for beregningsregler som er endret
@@ -307,17 +330,35 @@ const Page = () => {
                         </Button>
                     </div>
                 </div>
+
+                {/* Filter chips */}
+                <div className="mb-6">
+                    <Chips>
+                        {filterAlternativer.map((alternativ) => (
+                            <Chips.Toggle
+                                key={alternativ.filtereringstekst}
+                                selected={valgteFiltre.includes(alternativ.filtereringstekst)}
+                                onClick={() => handleFilterToggle(alternativ.filtereringstekst)}
+                            >
+                                {alternativ.visningstekst}
+                            </Chips.Toggle>
+                        ))}
+                    </Chips>
+                </div>
+
                 <div>
-                    {fields.map((field, index) => {
-                        const { hasErrors, errorCount } = getBeregningsregelErrors(index, formState.errors)
+                    {filtrerteBeregningsregler.map((field) => {
+                        // Finn den faktiske index i fields array
+                        const actualIndex = fields.findIndex((f) => f.id === field.id)
+                        const { hasErrors, errorCount } = getBeregningsregelErrors(actualIndex, formState.errors)
 
                         return (
                             <BeregningsregelExpansionCard
                                 key={field.id}
                                 control={control}
-                                index={index}
+                                index={actualIndex}
                                 errors={formState.errors}
-                                onRemove={() => remove(index)}
+                                onRemove={() => remove(actualIndex)}
                                 kode={field.kode}
                                 beskrivelse={field.beskrivelse}
                                 vilkårshjemmel={field.vilkårshjemmel}

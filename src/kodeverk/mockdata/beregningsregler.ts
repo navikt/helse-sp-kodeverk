@@ -2,7 +2,7 @@ import { type Beregningsregelverk } from '@/schemas/beregningsregler'
 
 export const lokalUtviklingBeregningsregler: Beregningsregelverk = [
     {
-        kode: 'ARBEIDSTAKER_100',
+        kode: 'ARBEIDSTAKER_DEKNINGSGRAD_100',
         beskrivelse: 'Til arbeidstakere ytes det sykepenger med 100 prosent av sykepengegrunnlaget',
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
@@ -13,35 +13,136 @@ export const lokalUtviklingBeregningsregler: Beregningsregelverk = [
             setning: null,
             bokstav: null,
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T09:21:27.772Z',
     },
     {
-        kode: 'FRILANSER_100',
-        beskrivelse: 'Til en frilanser ytes det sykepenger med 100 prosent av sykepengegrunnlaget',
+        kode: 'ARBEIDSTAKER_SYKEPENGEGRUNNLAG_HOVEDREGEL',
+        beskrivelse:
+            'Når trygden yter sykepenger, fastsettes sykepengegrunnlaget ut fra den aktuelle månedsinntekten (§§ 8-28 og 8-29), som omregnes til årsinntekt',
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
-            lovverksversjon: '1997-05-01',
+            lovverksversjon: '2019-01-01',
             kapittel: '8',
-            paragraf: '38',
+            paragraf: '30',
             ledd: '1',
-            setning: '1',
+            setning: null,
             bokstav: null,
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T09:20:40.251Z',
     },
     {
-        kode: 'ORDINAER_SELVSTENDIG_80',
-        beskrivelse: 'Til en selvstendig næringsdrivende ytes det sykepenger med 80 prosent av sykepengegrunnlaget',
+        kode: 'ARBEIDSTAKER_SYKEPENGEGRUNNLAG_SKJOENN_AVVIK',
+        beskrivelse: 'Skjønnsfastsatt sykepengegrunnlag for arbeidstakere,  grunnet 25 prosent avvik',
+        vilkårshjemmel: {
+            lovverk: 'Folkretrygdloven',
+            lovverksversjon: '2019-01-01',
+            kapittel: '8',
+            paragraf: '30',
+            ledd: '2',
+            setning: null,
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T09:21:55.474Z',
+    },
+    {
+        kode: 'ARBEIDSTAKER_SYKEPENGEGRUNNLAG_SKJOENN_URIKTIG',
+        beskrivelse:
+            'Skjønnsfastsatt sykepengegrunnlag for arbeidstakere, grunnet mangelfull eller uriktig rapportering til a-ordningen',
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            kapittel: '8',
+            paragraf: '30',
+            ledd: '3',
+            setning: null,
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T09:22:15.423Z',
+    },
+    {
+        kode: 'ARBEIDSTAKER_SYKEPENGEGRUNNLAG_TIDSBEGRENSET_FOER_SLUTTDATO',
+        beskrivelse:
+            'Sykepengegrunnlag for det tidsrommet arbeidsforholdet skulle ha vært, arbeidstaker i et tidsbegrenset arbeidsforhold på under seks måneder',
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            kapittel: '8',
+            paragraf: '30',
+            ledd: '4',
+            setning: '1 og 2',
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:15:57.079Z',
+    },
+    {
+        kode: 'ARBEIDSTAKER_SYKEPENGEGRUNNLAG_TIDSBEGRENSET_ETTER_SLUTTDATO',
+        beskrivelse:
+            'Skjønnsfastsatt sykepengegrunnlag utenfor tidsrom arbeidsforholdet skulle ha vært, arbeidstaker i et tidsbegrenset forhold på under seks måneder',
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            kapittel: '8',
+            paragraf: '30',
+            ledd: '4',
+            setning: '3',
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:16:02.932Z',
+    },
+    {
+        kode: 'SELVSTENDIG_SYKEPENGEGRUNNLAG_HOVEDREGEL',
+        beskrivelse:
+            'Sykepengegrunnlaget skal svare til den pensjonsgivende årsinntekten som beregnes på grunnlag av gjennomsnittet av den pensjonsgivende årsinntekten som er fastsatt for de tre siste årene',
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
             lovverksversjon: '1997-05-01',
             kapittel: '8',
             paragraf: '35',
-            ledd: '1',
+            ledd: '2',
             setning: '',
             bokstav: null,
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:18:30.237Z',
     },
     {
-        kode: 'ORDINAER_SELVSTENDIG_NAVFORSIKRING_100',
+        kode: 'SELVSTENDIG_SYKEPENGEGRUNNLAG_SKJOENN_VARIG_ENDRING',
+        beskrivelse: 'Skjønnsfastsatt sykepengegrunnlag for SN, grunnet 25 prosent avvik',
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            kapittel: '8',
+            paragraf: '35',
+            ledd: '3',
+            setning: null,
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:18:44.002Z',
+    },
+    {
+        kode: 'SELVSTENDIG_SYKEPENGEGRUNNLAG_SKJOENN_NYIARB',
+        beskrivelse: 'Skjønnsfastsatt sykepengegrunnlag for SN, grunnet ny i arbeidslivet',
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '2019-01-01',
+            kapittel: '8',
+            paragraf: '35',
+            ledd: '3',
+            setning: '2',
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:18:49.512Z',
+    },
+    {
+        kode: 'ORDINAER_SELVSTENDIG_NAVFORSIKRING_DEKNINGSGRAD_100',
         beskrivelse:
             'En selvstendig næringsdrivende kan mot særskilt premie tegne forsikring som kan omfatte sykepenger med 100 prosent av sykepengegrunnlaget fra 17. sykedag eller sykepenger med 100 prosent av sykepengegrunnlaget fra første sykedag',
         vilkårshjemmel: {
@@ -53,9 +154,11 @@ export const lokalUtviklingBeregningsregler: Beregningsregelverk = [
             setning: null,
             bokstav: 'b-c',
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:19:40.705Z',
     },
     {
-        kode: 'SELVSTENDIG_KOLLEKTIVFORSIKRING_100',
+        kode: 'SELVSTENDIG_KOLLEKTIVFORSIKRING_DEKNINGSGRAD_100',
         beskrivelse: 'Spesielle yrkesgrupper kan tegne kollektiv forsikring (jordbruker, reindriftsutøver og fisker)',
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
@@ -66,9 +169,41 @@ export const lokalUtviklingBeregningsregler: Beregningsregelverk = [
             setning: null,
             bokstav: null,
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:19:46.357Z',
     },
     {
-        kode: 'INAKTIV_65',
+        kode: 'FRILANSER_DEKNINGSGRAD_100',
+        beskrivelse: 'Til en frilanser ytes det sykepenger med 100 prosent av sykepengegrunnlaget',
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven',
+            lovverksversjon: '1997-05-01',
+            kapittel: '8',
+            paragraf: '38',
+            ledd: '1',
+            setning: '1',
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:17:15.704Z',
+    },
+    {
+        kode: 'KOMBINERT_ARBEIDSTAKER_SELVSTENDIG_SYKEPENGEGRUNNLAG',
+        beskrivelse: 'Sykepengegrunnlag kombinerte inntekter som arbeidstaker og selvstendig næringsgivende',
+        vilkårshjemmel: {
+            lovverk: 'Folketrygdloven ',
+            lovverksversjon: '2023-01-01',
+            kapittel: '8',
+            paragraf: '41',
+            ledd: '3',
+            setning: null,
+            bokstav: null,
+        },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:19:26.551Z',
+    },
+    {
+        kode: 'INAKTIV_DEKNINGSGRAD_65',
         beskrivelse:
             'For yrkesaktive medlemmer som midlertidig har vært ute av inntektsgivende arbeid og som fremdeles er ute av inntektsgivende arbeid utgjør sykepengene 65 prosent av sykepengegrunnlaget',
         vilkårshjemmel: {
@@ -80,9 +215,11 @@ export const lokalUtviklingBeregningsregler: Beregningsregelverk = [
             setning: '2',
             bokstav: null,
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:16:54.609Z',
     },
     {
-        kode: 'INAKTIV_100',
+        kode: 'INAKTIV_DEKNINGSGRAD_100',
         beskrivelse:
             'For yrkesaktive medlemmer som midlertidig har vært ute av inntektsgivende arbeid og som er i arbeid uten å fylle vilkåret i § 8-2 om fire ukers opptjeningstid utgjør sykepengene 100 prosent av sykepengegrunnlaget',
         vilkårshjemmel: {
@@ -94,9 +231,11 @@ export const lokalUtviklingBeregningsregler: Beregningsregelverk = [
             setning: '3',
             bokstav: null,
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:19:53.084Z',
     },
     {
-        kode: 'DAGPENGEMOTTAKER_100',
+        kode: 'DAGPENGEMOTTAKER_DEKNINGSGRAD_100',
         beskrivelse: 'Medlemmer med dagpenger under arbeidsløshet eller ventelønn m.m',
         vilkårshjemmel: {
             lovverk: 'Folketrygdloven',
@@ -107,5 +246,7 @@ export const lokalUtviklingBeregningsregler: Beregningsregelverk = [
             setning: '1',
             bokstav: null,
         },
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-10-29T12:19:58.935Z',
     },
 ]
