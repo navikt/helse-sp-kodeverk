@@ -17,9 +17,13 @@ import { redactBeregningsreglerSistEndretAv, copyKodeverkToClipboard } from '@ut
 
 // Filteralternativer for beregningsregler
 const filterAlternativer = [
+    { visningstekst: 'Dekningsgrad', filtereringstekst: 'DEKNINGSGRAD' },
+    { visningstekst: 'Sykepengegrunnlag', filtereringstekst: 'SYKEPENGEGRUNNLAG' },
     { visningstekst: 'Arbeidstaker', filtereringstekst: 'ARBEIDSTAKER' },
     { visningstekst: 'Selvstendig næringsdrivende', filtereringstekst: 'SELVSTENDIG' },
-    { visningstekst: 'Sykepengegrunnlag', filtereringstekst: 'SYKEPENGEGRUNNLAG' },
+    { visningstekst: 'Frilanser', filtereringstekst: 'FRILANSER' },
+    { visningstekst: 'Inaktiv', filtereringstekst: 'INAKTIV' },
+    { visningstekst: 'Dagpengemottaker', filtereringstekst: 'DAGPENGEMOTTAKER' },
 ]
 
 // Funksjon for å sortere beregningsregler basert på vilkårshjemmel
