@@ -24,7 +24,7 @@ const filterAlternativer = [
     { visningstekst: 'Selvstendig næringsdrivende', filtereringstekst: 'SELVSTENDIG' },
     { visningstekst: 'Frilanser', filtereringstekst: 'FRILANSER' },
     { visningstekst: 'Inaktiv', filtereringstekst: 'INAKTIV' },
-    { visningstekst: 'Dagpengemottaker', filtereringstekst: 'DAGPENGEMOTTAKER' },
+    { visningstekst: 'Arbeidsledig', filtereringstekst: 'ARBEIDSLEDIG' },
     { visningstekst: 'Ubrukt', filtereringstekst: 'UBRUKT' },
 ]
 
