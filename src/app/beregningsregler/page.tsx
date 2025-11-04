@@ -142,9 +142,13 @@ const Page = () => {
     useEffect(() => {
         if (serverBeregningsregler?.data) {
             // Sorter beregningsreglene basert på vilkårshjemmel før vi setter dem i formen
+            // Normaliser diskutertOgEndelig til alltid være boolean
             const sortedData = {
                 ...serverBeregningsregler.data,
-                beregningsregler: sortBeregningsregler(serverBeregningsregler.data.beregningsregler),
+                beregningsregler: sortBeregningsregler(serverBeregningsregler.data.beregningsregler).map((regel) => ({
+                    ...regel,
+                    diskutertOgEndelig: regel.diskutertOgEndelig ?? false,
+                })),
             }
             reset(sortedData)
         }

@@ -14,7 +14,7 @@ export const beregningsregelSchema = z.object({
     vilkårshjemmel: vilkårshjemmelSchema,
     sistEndretAv: maybeString,
     sistEndretDato: z.string().datetime().optional(),
-    diskutertOgEndelig: z.boolean().optional().default(false),
+    diskutertOgEndelig: z.boolean().optional(),
 })
 
 // Hele beregningsregelverket
