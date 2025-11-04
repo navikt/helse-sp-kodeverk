@@ -1,7 +1,7 @@
 import React from 'react'
-import { Control, FieldErrors } from 'react-hook-form'
-import { ExpansionCard, TextField, Button, Fieldset, Tag } from '@navikt/ds-react'
-import { TrashIcon } from '@navikt/aksel-icons'
+import { Control, FieldErrors, Controller, useWatch } from 'react-hook-form'
+import { ExpansionCard, TextField, Button, Fieldset, Tag, Checkbox } from '@navikt/ds-react'
+import { TrashIcon, CheckmarkIcon } from '@navikt/aksel-icons'
 
 import { BeregningsregelForm } from '@/schemas/beregningsregler'
 import { MetadataVisning } from '@/components/MetadataVisning'
@@ -47,6 +47,12 @@ export const BeregningsregelExpansionCard = ({
     errorCount,
     erIBrukIBakrommet = true,
 }: BeregningsregelExpansionCardProps) => {
+    const diskutertOgEndelig = useWatch({
+        control,
+        name: `beregningsregler.${index}.diskutertOgEndelig`,
+        defaultValue: false,
+    })
+
     return (
         <ExpansionCard
             size="small"
@@ -56,6 +62,9 @@ export const BeregningsregelExpansionCard = ({
             <ExpansionCard.Header>
                 <ExpansionCard.Title className="flex items-center gap-2">
                     {beskrivelse || 'Ny beregningsregel'}
+                    {diskutertOgEndelig && (
+                        <CheckmarkIcon className="text-green-500" aria-label="Diskutert og endelig" />
+                    )}
                     {hasErrors && <span className="text-red-500 text-sm font-medium">({errorCount} feil)</span>}
                 </ExpansionCard.Title>
                 <ExpansionCard.Description>
@@ -96,6 +105,15 @@ export const BeregningsregelExpansionCard = ({
                                     error={errors?.beregningsregler?.[index]?.beskrivelse?.message}
                                     className="max-w-2xl"
                                     placeholder="Beskriv beregningsregelen"
+                                />
+                                <Controller
+                                    control={control}
+                                    name={`beregningsregler.${index}.diskutertOgEndelig`}
+                                    render={({ field: { value, onChange } }) => (
+                                        <Checkbox checked={value || false} onChange={(e) => onChange(e.target.checked)}>
+                                            Diskutert og endelig
+                                        </Checkbox>
+                                    )}
                                 />
                             </div>
                         </Fieldset>
