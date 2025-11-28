@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import {useState, useEffect, useMemo, useRef} from 'react'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, useWatch, FieldErrors } from 'react-hook-form'
@@ -197,13 +197,13 @@ const Page = () => {
         currentVersion?: string
     } | null>(null)
     const [showJsonEditor, setShowJsonEditor] = useState(false)
-    const [hasInitialized, setHasInitialized] = useState(false)
+    const hasInitialized = useRef(false)
 
     // Initialiser formen kun én gang når dataene først lastes
     useEffect(() => {
-        if (serverKodeverk?.data && !hasInitialized) {
+        if (serverKodeverk?.data && !hasInitialized.current) {
             reset({ vilkar: serverKodeverk.data })
-            setHasInitialized(true)
+            hasInitialized.current = true
         }
     }, [serverKodeverk, reset, hasInitialized])
 
