@@ -142,14 +142,17 @@ const AlternativSection = ({
                                 field.onChange(hasSubquestions)
 
                                 if (hasSubquestions) {
-                                    // Sjekk om koden er en gyldig UUID
+                                    // Sjekk om koden er en gyldig UUID eller en kode fra kodeverket
                                     const isUuid =
+                                        currentKode &&
                                         /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-                                            currentKode || '',
+                                            currentKode,
                                         )
+                                    const isKodeverkKode =
+                                        currentKode && allKodeOptions.some((opt) => opt.value === currentKode)
 
-                                    // Generer UUID hvis kode ikke eksisterer eller ikke er en UUID
-                                    if (!currentKode || currentKode === '' || !isUuid) {
+                                    // Generer UUID kun hvis kode ikke eksisterer, ikke er en UUID, og ikke er en kode fra kodeverket
+                                    if (!currentKode || (!isKodeverkKode && !isUuid)) {
                                         setValue?.(`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>, uuidv4())
                                     }
                                 } else {
@@ -162,64 +165,88 @@ const AlternativSection = ({
                         </Checkbox>
                     )}
                 />
-                {!harUnderspørsmål && (
-                    <Controller
-                        name={`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>}
-                        control={control}
-                        render={({ field }) => {
-                            const kodeOptions = allKodeOptions
-                            const currentValue = field.value
+                <Controller
+                    name={`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>}
+                    control={control}
+                    render={({ field }) => {
+                        const kodeOptions = allKodeOptions
+                        const currentValue = field.value
 
-                            // Sjekk om valgt kode finnes i kodeverket
-                            const isValidKode =
-                                !currentValue ||
-                                currentValue === '' ||
-                                kodeOptions.some((opt) => opt.value === currentValue)
+                        // Sjekk om valgt kode finnes i kodeverket
+                        const isValidKode =
+                            !currentValue ||
+                            currentValue === '' ||
+                            kodeOptions.some((opt) => opt.value === currentValue)
 
-                            // Hvis koden ikke finnes i kodeverket, vis den som et alternativ med spesiell markering
-                            const displayOptions = isValidKode
-                                ? kodeOptions
-                                : [...kodeOptions, { value: currentValue, label: `⚠️ ${currentValue} - UKJENT KODE` }]
+                        // Sjekk om koden er en UUID
+                        const isUuid =
+                            currentValue &&
+                            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+                                currentValue,
+                            )
 
-                            const selectedOptions = currentValue
-                                ? displayOptions.filter((opt) => opt.value === currentValue)
-                                : []
+                        // Legg til "Autogenerert UUID" som alternativ hvis alternativet har underspørsmål
+                        const autogenerertOption = harUnderspørsmål
+                            ? [{ value: '__AUTOGENERERT__', label: '🔄 Autogenerert UUID' }]
+                            : []
 
-                            // Sjekk for valideringsfeil - bruk en enklere tilnærming
-                            const fieldError = field.value === '' ? 'Kode er påkrevd' : undefined
+                        // Hvis koden ikke finnes i kodeverket og ikke er en UUID, vis den som et alternativ med spesiell markering
+                        const displayOptions = isValidKode
+                            ? [...autogenerertOption, ...kodeOptions]
+                            : [
+                                  ...autogenerertOption,
+                                  ...kodeOptions,
+                                  { value: currentValue, label: `⚠️ ${currentValue} - UKJENT KODE` },
+                              ]
 
-                            return (
-                                <UNSAFE_Combobox
-                                    label="Kode"
-                                    size="small"
-                                    allowNewValues={true}
-                                    options={displayOptions}
-                                    selectedOptions={selectedOptions}
-                                    onToggleSelected={(option, isSelected) => {
-                                        if (isSelected) {
+                        // Hvis koden er en UUID og ikke finnes i kodeverket, vis den som "Autogenerert UUID"
+                        const selectedOptions =
+                            currentValue && isUuid && !isValidKode
+                                ? autogenerertOption
+                                : currentValue
+                                  ? displayOptions.filter((opt) => opt.value === currentValue)
+                                  : []
+
+                        // Sjekk for valideringsfeil
+                        const fieldError = field.value === '' ? 'Kode er påkrevd' : undefined
+
+                        return (
+                            <UNSAFE_Combobox
+                                label="Kode"
+                                size="small"
+                                allowNewValues={true}
+                                options={displayOptions}
+                                selectedOptions={selectedOptions}
+                                onToggleSelected={(option, isSelected) => {
+                                    if (isSelected) {
+                                        if (option === '__AUTOGENERERT__') {
+                                            // Generer ny UUID hvis brukeren velger autogenerert
+                                            const newUuid = uuidv4()
+                                            field.onChange(newUuid)
+                                        } else {
                                             // option er string-verdien (value fra objektet)
                                             field.onChange(option)
+                                        }
+                                    } else {
+                                        // Hvis alternativet har underspørsmål, generer UUID når kode fjernes
+                                        if (harUnderspørsmål) {
+                                            field.onChange(uuidv4())
                                         } else {
                                             field.onChange('')
                                         }
-                                    }}
-                                    isMultiSelect={false}
-                                    error={
-                                        fieldError ||
-                                        (!isValidKode ? `Koden "${currentValue}" finnes ikke i kodeverket` : undefined)
                                     }
-                                />
-                            )
-                        }}
-                    />
-                )}
-
-                {/* Checkbox for å kontrollere om alternativet har underspørsmål */}
-                <div className="flex items-center gap-4">
-                    {harUnderspørsmål && (
-                        <span className="text-gray-600 text-sm">Kode: {currentKode || 'Genereres automatisk'}</span>
-                    )}
-                </div>
+                                }}
+                                isMultiSelect={false}
+                                error={
+                                    fieldError ||
+                                    (!isValidKode && !isUuid
+                                        ? `Koden "${currentValue}" finnes ikke i kodeverket`
+                                        : undefined)
+                                }
+                            />
+                        )
+                    }}
+                />
             </div>
 
             {/* Vis underspørsmål og knapp kun hvis checkbox er aktivert */}
@@ -256,14 +283,17 @@ const AlternativSection = ({
                             icon={<PlusIcon />}
                             size="small"
                             onClick={() => {
-                                // Sjekk om koden er en gyldig UUID
+                                // Sjekk om koden er en gyldig UUID eller en kode fra kodeverket
                                 const isUuid =
+                                    currentKode &&
                                     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-                                        currentKode || '',
+                                        currentKode,
                                     )
+                                const isKodeverkKode =
+                                    currentKode && allKodeOptions.some((opt) => opt.value === currentKode)
 
-                                // Generer UUID for alternativet hvis ikke allerede en UUID
-                                if (!currentKode || currentKode === '' || !isUuid) {
+                                // Generer UUID kun hvis kode ikke eksisterer, ikke er en UUID, og ikke er en kode fra kodeverket
+                                if (!currentKode || (!isKodeverkKode && !isUuid)) {
                                     setValue?.(`${alternativPath}.kode` as FieldPath<HovedspørsmålForm>, uuidv4())
                                 }
 

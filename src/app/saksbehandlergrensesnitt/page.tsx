@@ -1,6 +1,6 @@
 'use client'
 
-import {useState, useEffect, useMemo, useRef} from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, useWatch, FieldErrors } from 'react-hook-form'
