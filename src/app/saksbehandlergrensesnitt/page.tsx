@@ -197,12 +197,15 @@ const Page = () => {
         currentVersion?: string
     } | null>(null)
     const [showJsonEditor, setShowJsonEditor] = useState(false)
+    const [hasInitialized, setHasInitialized] = useState(false)
 
+    // Initialiser formen kun én gang når dataene først lastes
     useEffect(() => {
-        if (serverKodeverk?.data) {
+        if (serverKodeverk?.data && !hasInitialized) {
             reset({ vilkar: serverKodeverk.data })
+            setHasInitialized(true)
         }
-    }, [serverKodeverk, reset])
+    }, [serverKodeverk, reset, hasInitialized])
 
     // Cleanup timer ved unmount
     useEffect(() => {
