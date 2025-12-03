@@ -48,7 +48,7 @@
         "react": "^19.2.1",
         "react-dom": "^19.2.1",
         "react-hook-form": "^7.57.0",
-        "remeda": "^2.21.3",
+        "remeda": "^2.32.0",
         "tailwind-merge": "^3.2.0",
         "uuid": "^11.1.0",
         "zod": "^3.25.51"
