@@ -26,6 +26,11 @@ spec:
     outbound:
       external:
         - host: raw.githubusercontent.com
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
   azure:
     application:
       enabled: true
