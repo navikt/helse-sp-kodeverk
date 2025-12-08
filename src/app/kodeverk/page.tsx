@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Vilkår, Vilkårshjemmel, kodeverkFormSchema, KodeverkForm } from '@/schemas/kodeverk'
 import { HovedspørsmålArray } from '@/schemas/saksbehandlergrensesnitt'
 import { VilkårForm } from '@/components/kodeverk/VilkårForm'
-import { ExcelExport } from '@/components/kodeverk/ExcelExport'
+import { JsonExport } from '@components/kodeverk/JsonExport'
 import { MetadataVisning } from '@/components/MetadataVisning'
 import { KonfliktModal } from '@/components/KonfliktModal'
 import { Sidemeny } from '@/components/kodeverk/Sidemeny'
@@ -517,7 +517,7 @@ const Page = () => {
                                 >
                                     Kopier som json
                                 </Button>
-                                <ExcelExport kodeverk={{ vilkar: fields }} />
+                                <JsonExport kodeverk={{ vilkar: fields }} />
                                 <Button type="button" onClick={addVilkår} variant="primary">
                                     Legg til
                                 </Button>

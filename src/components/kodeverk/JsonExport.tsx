@@ -3,7 +3,6 @@ import { DownloadIcon } from '@navikt/aksel-icons'
 
 import { KodeverkForm, Vilkår } from '@/schemas/kodeverk'
 
-
 function lastNedJson(kodeverk: KodeverkForm) {
     const cleanedKodeverk = {
         vilkar: kodeverk.vilkar.map((vilkår) => {
@@ -28,7 +27,7 @@ interface ExcelExportProps {
     kodeverk: KodeverkForm
 }
 
-export function ExcelExport({ kodeverk }: ExcelExportProps) {
+export function JsonExport({ kodeverk }: ExcelExportProps) {
     return (
         <div className="flex gap-4">
             <Button variant="secondary" onClick={() => lastNedJson(kodeverk)} icon={<DownloadIcon />}>
