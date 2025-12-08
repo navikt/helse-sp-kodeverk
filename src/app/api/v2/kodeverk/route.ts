@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
+import { logger } from '@navikt/next-logger'
 
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
 import { kodeverkSchema } from '@schemas/kodeverk'
@@ -76,6 +77,8 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
             // For now, we'll just return success
             return NextResponse.json({ success: true })
         } catch (error) {
+            logger.error(error, 'Feil ved lagring av kodeverk:')
+
             return NextResponse.json({ error: 'Failed to save kodeverk' }, { status: 500 })
         }
     })

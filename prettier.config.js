@@ -1,5 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const baseConfig = require('@navikt/eslint-config-teamsykmelding/prettier')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const baseConfig = require('@navikt/tsm-prettier')
 
 module.exports = {
     ...baseConfig,

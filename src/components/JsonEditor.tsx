@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Textarea, ErrorSummary, Button } from '@navikt/ds-react'
+import { logger } from '@navikt/next-logger'
 
 interface JsonEditorProps<T = unknown> {
     initialData: T[]
@@ -26,6 +27,7 @@ export const JsonEditor = <T = unknown,>({ initialData, onSave, onCancel, isLoad
         try {
             JSON.parse(value)
         } catch (error) {
+            logger.error(error, 'JsonEditor: Ugyldig JSON-format')
             setJsonError('Ugyldig JSON-format')
         }
     }
@@ -35,6 +37,8 @@ export const JsonEditor = <T = unknown,>({ initialData, onSave, onCancel, isLoad
             const parsedData = JSON.parse(jsonText)
             await onSave(parsedData)
         } catch (error) {
+            logger.error(error, 'JsonEditor: Ugyldig JSON-format')
+
             setJsonError('Ugyldig JSON-format')
         }
     }

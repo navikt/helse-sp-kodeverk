@@ -17,7 +17,9 @@ export function Header(): ReactElement {
     const pathname = usePathname()
 
     useEffect(() => {
-        setMounted(true)
+        queueMicrotask(() => {
+            setMounted(true)
+        })
     }, [])
 
     // Prevent hydration mismatch by not rendering theme-dependent content until mounted

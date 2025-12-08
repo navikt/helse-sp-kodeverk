@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { File, Storage } from '@google-cloud/storage'
+import { logger } from '@navikt/next-logger'
 
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
 import { lokalUtviklingBeregningsregler } from '@/kodeverk/mockdata/beregningsregler'
@@ -106,6 +107,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<object | 
 
             return NextResponse.json({ success: true })
         } catch (error) {
+            logger.error(error, 'Feil ved lagring av beregningsregler:')
             return NextResponse.json({ error: 'Failed to save beregningsregler' }, { status: 500 })
         }
     })

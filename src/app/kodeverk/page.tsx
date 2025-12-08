@@ -258,7 +258,9 @@ const Page = () => {
             // Sett første vilkår som aktivt når data lastes fra server
             if (serverKodeverk.data.vilkar && serverKodeverk.data.vilkar.length > 0) {
                 const sortedVilkår = sortVilkår(serverKodeverk.data.vilkar as FieldWithId[])
-                setActiveVilkårId(sortedVilkår[0].id)
+                queueMicrotask(() => {
+                    setActiveVilkårId(sortedVilkår[0].id)
+                })
             }
         }
     }, [serverKodeverk, reset])
@@ -421,7 +423,9 @@ const Page = () => {
     // Sett første vilkår som aktivt når data lastes
     useEffect(() => {
         if (sortedFields.length > 0 && !activeVilkårId) {
-            setActiveVilkårId(sortedFields[0].id)
+            queueMicrotask(() => {
+                setActiveVilkårId(sortedFields[0].id)
+            })
         }
     }, [sortedFields, activeVilkårId])
 
@@ -434,7 +438,9 @@ const Page = () => {
                 (field) => field.beskrivelse === '' && field.vilkårskode === '' && field.vilkårshjemmel.lovverk === '',
             )
             if (newVilkår) {
-                setActiveVilkårId(newVilkår.id)
+                queueMicrotask(() => {
+                    setActiveVilkårId(newVilkår.id)
+                })
             }
         }
     }, [fields]) // Når fields endres

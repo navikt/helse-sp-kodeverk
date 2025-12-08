@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Storage } from '@google-cloud/storage'
+import { logger } from '@navikt/next-logger'
 
 import { beskyttetApi, ErrorResponse } from '@/auth/beskyttetApi'
 import { hovedspørsmålArraySchema } from '@schemas/saksbehandlergrensesnitt'
@@ -76,6 +77,8 @@ export async function POST(request: Request): Promise<NextResponse<object | Erro
             // For now, we'll just return success
             return NextResponse.json({ success: true })
         } catch (error) {
+            logger.error(error, 'Feil ved lagring av saksbehandlerui:')
+
             return NextResponse.json({ error: 'Failed to save saksbehandlerui' }, { status: 500 })
         }
     })
