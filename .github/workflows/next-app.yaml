@@ -69,9 +69,6 @@ jobs:
   deploy-dev:
     if: ${{ !startsWith(github.ref_name, 'demo') }}
     name: Deploy to dev
-    environment:
-      name: development
-      url: ${{ steps.get-ingress.outputs.result }}
     runs-on: ubuntu-latest
     needs: [test-and-verify, build-dev]
     permissions:
@@ -79,10 +76,6 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - id: get-ingress
-        uses: mikefarah/yq@v4.49.2
-        with:
-          cmd: yq '.spec.ingresses[0]' .nais/nais-dev.yaml
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
