@@ -24,7 +24,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                                 alternativer: [
                                     {
                                         kode: 'KRAV_FRAMSATT_INNEN_TRE_MAANEDER',
-                                        navn: 'Søkt innen tre måneder',
+                                        navn: 'Søkt innen tre måneder før den måneden søknaden ble sendt (se på formulering)',
                                         harUnderspørsmål: false,
                                         underspørsmål: [],
                                     },
@@ -53,8 +53,8 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
-        sistEndretDato: '2025-10-09T06:16:09.864Z',
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-12-04T13:26:35.174Z',
     },
     {
         kode: 'e40375fa-d0a5-4a68-a90a-9e145a0a63b4',
@@ -82,7 +82,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:16:04.434Z',
     },
     {
@@ -198,7 +198,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:16:16.637Z',
     },
     {
@@ -265,7 +265,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:16:23.876Z',
     },
     {
@@ -392,7 +392,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:16:33.071Z',
     },
     {
@@ -421,7 +421,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:16:42.002Z',
     },
     {
@@ -450,7 +450,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:16:48.754Z',
     },
     {
@@ -479,7 +479,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:16:54.639Z',
     },
     {
@@ -560,7 +560,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:17:00.972Z',
     },
     {
@@ -589,7 +589,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:17:07.920Z',
     },
     {
@@ -618,7 +618,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:17:17.175Z',
     },
     {
@@ -647,7 +647,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:17:23.473Z',
     },
     {
@@ -708,7 +708,7 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:17:29.816Z',
     },
     {
@@ -737,16 +737,236 @@ export const saksbehandlerUi: HovedspørsmålArray = [
                 ],
             },
         ],
-        sistEndretAv: 'Andersen, Håvard Stigen',
+        sistEndretAv: 'Redacted Redactesen',
         sistEndretDato: '2025-10-09T06:17:37.193Z',
     },
     {
-        kode: 'c902f282-9886-414c-85a0-e5ce05ecab09',
+        kode: 'ba5019eb-ee9d-475d-8d08-3ff9fbfa9896',
         beskrivelse: 'Yrkesaktive medlemmer som midlertidig har vært ute av inntektsgivende arbeid',
         kategori: 'særskilte_grupper',
         paragrafTag: '§ 8-47',
-        underspørsmål: [],
-        sistEndretAv: 'Andersen, Håvard Stigen',
-        sistEndretDato: '2025-10-09T06:17:46.238Z',
+        underspørsmål: [
+            {
+                kode: '5635008c-b025-445c-ab6f-4e265f1f4d12',
+                navn: 'Oppfyller den sykmeldte vilkårene for å regnes som å ha vært midlertidig ute av inntektsgivende arbeid?',
+                variant: 'RADIO',
+                alternativer: [
+                    {
+                        kode: 'c4b9abbc-60d6-4fca-82c7-6d64ec0232f5',
+                        navn: 'Ja, og den sykmeldte er fremdeles ute av arbeid (bokstav a)',
+                        harUnderspørsmål: true,
+                        underspørsmål: [
+                            {
+                                kode: 'dde65df8-f81d-47c3-9a88-b5f4412f0b07',
+                                navn: null,
+                                variant: 'RADIO',
+                                alternativer: [
+                                    {
+                                        kode: 'UTE_AV_ARBEID_SISTE_JOBB',
+                                        navn: 'Den sykmeldte har vært ute av inntektsgivende arbeid i mindre enn en måned og har tidligere opptjening etter § 8-2',
+                                        harUnderspørsmål: false,
+                                        underspørsmål: [],
+                                    },
+                                    {
+                                        kode: '71e8fe8b-363d-4099-ae5d-6c40ebe27c15',
+                                        navn: 'Den sykmeldte har vært i aktivitet likestilt med arbeid, har vært ute av inntektsgivende arbeid i mindre enn en måned og har tidligere opptjening etter § 8-2',
+                                        harUnderspørsmål: true,
+                                        underspørsmål: [
+                                            {
+                                                kode: 'f3200d4a-c147-4bda-a8d6-080df5dfe9f3',
+                                                navn: null,
+                                                variant: 'RADIO',
+                                                alternativer: [
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_ANNEN_YTELSE',
+                                                        navn: 'Mottatt en ytelse til livsopphold etter kapitlene 4, 8, 9 eller 14',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_MLTJ',
+                                                        navn: 'Utført militærtjeneste',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_SKIP_FRITID',
+                                                        navn: 'Arbeidstaker på skip i utenriksfart som har avspasert opparbeidet fritid',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_FERIE',
+                                                        navn: 'Har hatt lovbestemt ferie',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_PERMISJON_AVTALE',
+                                                        navn: 'Har hatt lovbestemt permisjon etter arbeidsmiljøloven §§ 12-1 til 12-5 dersom vedkommende har avtale om å gjenoppta arbeidet etter permisjonen',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        kode: 'b9c870ef-e657-4d20-9b00-6d1ce8796609',
+                                        navn: 'Den sykmeldte har utvidet frist på grunn av sluttvederlag, etterlønn eller utdanningspermisjon',
+                                        harUnderspørsmål: true,
+                                        underspørsmål: [
+                                            {
+                                                kode: '6e60eb69-f714-44c5-855e-2570371f61a2',
+                                                navn: null,
+                                                variant: 'RADIO',
+                                                alternativer: [
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_SLUTTVEDERLAG_ETTERLONN',
+                                                        navn: 'Den sykmeldte mottar eller har mottatt sluttvederlag eller etterlønn (frist seks måneder)',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_UTDANNINGSPERMISJON',
+                                                        navn: 'Den sykmeldte var i utdanningspermisjon på sykmeldingstidspunktet og utdanningen ble avbrutt på grunn av sykdom (frist 12 måneder)',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        kode: '5ba0ae0a-c4c0-41e5-b633-03bd038c6e17',
+                        navn: 'Ja, og er i arbeid uten å oppfylle vilkåret i § 8-2 om fire ukers opptjeningstid (bokstav b)',
+                        harUnderspørsmål: true,
+                        underspørsmål: [
+                            {
+                                kode: '0948f74e-cbeb-48fb-be28-706573c88994',
+                                navn: null,
+                                variant: 'RADIO',
+                                alternativer: [
+                                    {
+                                        kode: 'I_ARBEID_UTEN_OPPTJENNING',
+                                        navn: 'Den sykmeldte har vært ute av inntektsgivende arbeid i mindre enn en måned, er i arbeid uten å oppfylle vilkåret i § 8-2 om fire ukers opptjening og har tidligere opptjening etter § 8-2',
+                                        harUnderspørsmål: false,
+                                        underspørsmål: [],
+                                    },
+                                    {
+                                        kode: 'ade941e1-6ab9-4ed8-b53e-4c65cbbcee4f',
+                                        navn: 'Den sykmeldte har vært i aktivitet likestilt med arbeid, har vært ute av inntektsgivende arbeid i mindre enn en måned og har tidligere opptjening etter § 8-2',
+                                        harUnderspørsmål: true,
+                                        underspørsmål: [
+                                            {
+                                                kode: '1bcfd5b7-fb14-4b9b-8434-f0da72748429',
+                                                navn: null,
+                                                variant: 'RADIO',
+                                                alternativer: [
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_ANNEN_YTELSE',
+                                                        navn: 'Mottatt en ytelse til livsopphold etter kapitlene 4, 8, 9 eller 14',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_MLTJ',
+                                                        navn: 'Utført militærtjeneste',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_SKIP_FRITID',
+                                                        navn: 'Arbeidstaker på skip i utenriksfart som har avspasert opparbeidet fritid',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_FERIE',
+                                                        navn: 'Har hatt lovbestemt ferie',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_PERMISJON_AVTALE',
+                                                        navn: 'Har hatt lovbestemt permisjon etter arbeidsmiljøloven §§ 12-1 til 12-5 dersom vedkommende har avtale om å gjenoppta arbeidet etter permisjonen',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        kode: '37c08c4e-f13e-402c-a5ae-e6be92e905a8',
+                                        navn: 'Den sykmeldte har utvidet frist på grunn av sluttvederlag, etterlønn eller utdanningspermisjon',
+                                        harUnderspørsmål: true,
+                                        underspørsmål: [
+                                            {
+                                                kode: '0b2a1aeb-4464-4650-8768-b89409ef09ab',
+                                                navn: null,
+                                                variant: 'RADIO',
+                                                alternativer: [
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_SLUTTVEDERLAG_ETTERLONN',
+                                                        navn: 'Den sykmeldte mottar eller har mottatt sluttvederlag eller etterlønn (frist seks måneder)',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                    {
+                                                        kode: 'UTE_AV_ARBEID_UTDANNINGSPERMISJON',
+                                                        navn: 'Den sykmeldte var i utdanningspermisjon på sykmeldingstidspunktet og utdanningen ble avbrutt på grunn av sykdom (frist 12 måneder)',
+                                                        harUnderspørsmål: false,
+                                                        underspørsmål: [],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        kode: '5da32ce9-7d7f-4107-adc4-00696524b18d',
+                        navn: 'Nei (avslag)',
+                        harUnderspørsmål: true,
+                        underspørsmål: [
+                            {
+                                kode: 'bb329b69-780e-49ec-9167-5769c1e1bbed',
+                                navn: null,
+                                variant: 'RADIO',
+                                alternativer: [
+                                    {
+                                        kode: 'UTE_AV_ARBEID_FOR_LENGE',
+                                        navn: 'Den sykmeldte har vært ute av inntektsgivende arbeid i mer enn en måned',
+                                        harUnderspørsmål: false,
+                                        underspørsmål: [],
+                                    },
+                                    {
+                                        kode: 'UTE_AV_ARBEID_MER_ENN_6MND',
+                                        navn: 'Den sykmeldte har mottatt eller mottar sluttvederlag eller etterlønn, men er utenfor fristen på opptil seks måneder',
+                                        harUnderspørsmål: false,
+                                        underspørsmål: [],
+                                    },
+                                    {
+                                        kode: 'UTE_AV_ARBEID_MER_ENN_1AAR',
+                                        navn: 'Den sykmeldte  var i utdanningspermisjon på sykmeldingstidspunktet, men er utenfor fristen på opptil tolv måneder',
+                                        harUnderspørsmål: false,
+                                        underspørsmål: [],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+        sistEndretAv: 'Redacted Redactesen',
+        sistEndretDato: '2025-12-10T11:32:52.904Z',
     },
 ]

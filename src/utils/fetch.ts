@@ -29,6 +29,34 @@ export async function fetchAndParse<T>(url: string, schema: z.ZodType<T>, option
         throw new ProblemDetailsError(maybeProblem.data)
     }
 
+    // Håndter { error, details } format fra valideringsfeil
+    if (typeof payload === 'object' && payload !== null && 'error' in payload && 'details' in payload) {
+        const errorPayload = payload as { error: unknown; details: unknown }
+        const errorMessage = typeof errorPayload.error === 'string' ? errorPayload.error : 'Valideringsfeil'
+        const details = errorPayload.details
+
+        // Prøv å hente feilmeldinger fra details._errors
+        let detailMessage = errorMessage
+        if (
+            typeof details === 'object' &&
+            details !== null &&
+            '_errors' in details &&
+            Array.isArray((details as { _errors: unknown })._errors)
+        ) {
+            const errors = (details as { _errors: string[] })._errors
+            if (errors.length > 0) {
+                detailMessage = errors.join('; ')
+            }
+        }
+
+        throw new ProblemDetailsError({
+            title: errorMessage,
+            status: res.status,
+            detail: detailMessage,
+            type: 'about:blank',
+        })
+    }
+
     throw new ProblemDetailsError({
         title: 'Ukjent feil',
         status: res.status,

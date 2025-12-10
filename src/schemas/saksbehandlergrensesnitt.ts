@@ -62,8 +62,111 @@ export const hovedspørsmålSchema = z.object({
     sistEndretDato: z.string().datetime().optional(),
 })
 
+// Hjelpefunksjon for å validere unike koder blant søsken alternativer
+function validerUnikeKoderISøskenAlternativer(
+    alternativer: Array<{ kode: string }> | undefined,
+    sti: string[] = [],
+): { success: true } | { success: false; feilmelding: string } {
+    if (!alternativer || alternativer.length === 0) {
+        return { success: true }
+    }
+
+    const koder = alternativer.map((alt) => alt.kode)
+    const duplikater = koder.filter((kode, index) => koder.indexOf(kode) !== index)
+    const unikeDuplikater = [...new Set(duplikater)]
+
+    if (unikeDuplikater.length > 0) {
+        const stiTekst = sti.length > 0 ? ` (sti: ${sti.join(' > ')})` : ''
+        return {
+            success: false,
+            feilmelding: `Duplikate koder funnet blant søsken alternativer: ${unikeDuplikater.join(', ')}${stiTekst}`,
+        }
+    }
+
+    return { success: true }
+}
+
+// Rekursiv validering av hele strukturen
+function validerAlleSøskenAlternativer(
+    data: z.infer<typeof hovedspørsmålSchema>[],
+): { success: true } | { success: false; feilmelding: string } {
+    function validerAlternativer(
+        alternativer: Array<{ kode: string; underspørsmål?: unknown[] }> | undefined,
+        sti: string[],
+    ): { success: true } | { success: false; feilmelding: string } {
+        if (!alternativer) {
+            return { success: true }
+        }
+
+        // Valider at søsken alternativer har unike koder
+        const validering = validerUnikeKoderISøskenAlternativer(alternativer, sti)
+        if (!validering.success) {
+            return validering
+        }
+
+        // Rekursivt valider underspørsmål i hvert alternativ
+        for (const alternativ of alternativer) {
+            if (alternativ.underspørsmål && Array.isArray(alternativ.underspørsmål)) {
+                for (const underspørsmål of alternativ.underspørsmål) {
+                    if (
+                        typeof underspørsmål === 'object' &&
+                        underspørsmål !== null &&
+                        'alternativer' in underspørsmål &&
+                        'kode' in underspørsmål &&
+                        typeof (underspørsmål as { kode: unknown }).kode === 'string'
+                    ) {
+                        const underspørsmålMedKode = underspørsmål as {
+                            kode: string
+                            alternativer?: Array<{ kode: string; underspørsmål?: unknown[] }>
+                        }
+                        const nySti = [...sti, alternativ.kode, underspørsmålMedKode.kode]
+                        const resultat = validerAlternativer(underspørsmålMedKode.alternativer, nySti)
+                        if (!resultat.success) {
+                            return resultat
+                        }
+                    }
+                }
+            }
+        }
+
+        return { success: true }
+    }
+
+    function validerUnderspørsmål(
+        underspørsmål: Array<{ kode: string; alternativer?: Array<{ kode: string; underspørsmål?: unknown[] }> }>,
+        sti: string[],
+    ): { success: true } | { success: false; feilmelding: string } {
+        for (const spørsmål of underspørsmål) {
+            const nySti = [...sti, spørsmål.kode]
+            const resultat = validerAlternativer(spørsmål.alternativer, nySti)
+            if (!resultat.success) {
+                return resultat
+            }
+        }
+        return { success: true }
+    }
+
+    // Valider hvert hovedspørsmål
+    for (const hovedspørsmål of data) {
+        const resultat = validerUnderspørsmål(hovedspørsmål.underspørsmål, [hovedspørsmål.kode])
+        if (!resultat.success) {
+            return resultat
+        }
+    }
+
+    return { success: true }
+}
+
 // Hele kodeverket
-export const hovedspørsmålArraySchema = z.array(hovedspørsmålSchema)
+export const hovedspørsmålArraySchema = z.array(hovedspørsmålSchema).superRefine((data, ctx) => {
+    const validering = validerAlleSøskenAlternativer(data)
+    if (!validering.success) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: validering.feilmelding,
+        })
+    }
+})
 
 export const hovedspørsmålFormSchema = z.object({
     vilkar: z.array(hovedspørsmålSchema),

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { Button, ErrorSummary, Heading, Alert } from '@navikt/ds-react'
+import { Button, Heading, Alert } from '@navikt/ds-react'
 import { ExpansionCard } from '@navikt/ds-react'
 import { useForm, useFieldArray, useWatch, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -181,6 +181,8 @@ const Page = () => {
     }
 
     const [validationError, setValidationError] = useState<string | null>(null)
+    const [showError, setShowError] = useState(false)
+    const [errorTimer, setErrorTimer] = useState<NodeJS.Timeout | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
     const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
     const [showCopySuccess, setShowCopySuccess] = useState(false)
@@ -216,8 +218,11 @@ const Page = () => {
             if (copySuccessTimer) {
                 clearTimeout(copySuccessTimer)
             }
+            if (errorTimer) {
+                clearTimeout(errorTimer)
+            }
         }
-    }, [successTimer, copySuccessTimer])
+    }, [successTimer, copySuccessTimer, errorTimer])
 
     const handleCloseSuccess = () => {
         setShowSuccess(false)
@@ -232,6 +237,15 @@ const Page = () => {
         if (copySuccessTimer) {
             clearTimeout(copySuccessTimer)
             setCopySuccessTimer(null)
+        }
+    }
+
+    const handleCloseError = () => {
+        setShowError(false)
+        setValidationError(null)
+        if (errorTimer) {
+            clearTimeout(errorTimer)
+            setErrorTimer(null)
         }
     }
 
@@ -325,7 +339,25 @@ const Page = () => {
                         if (error instanceof ProblemDetailsError && error.problem.status === 409) {
                             setKonfliktProblem(error.problem)
                         } else {
-                            setValidationError(error.message)
+                            const errorMessage =
+                                error instanceof ProblemDetailsError && error.problem.detail
+                                    ? error.problem.detail
+                                    : error.message
+                            setValidationError(errorMessage)
+                            setShowError(true)
+
+                            // Fjern eventuell eksisterende timer
+                            if (errorTimer) {
+                                clearTimeout(errorTimer)
+                            }
+
+                            // Sett ny timer for å skjule feilmelding etter 8 sekunder
+                            const timer = setTimeout(() => {
+                                setShowError(false)
+                                setValidationError(null)
+                                setErrorTimer(null)
+                            }, 8000)
+                            setErrorTimer(timer)
                         }
                         reject(error)
                     },
@@ -400,7 +432,25 @@ const Page = () => {
                     if (error instanceof ProblemDetailsError && error.problem.status === 409) {
                         setKonfliktProblem(error.problem)
                     } else {
-                        setValidationError(error.message)
+                        const errorMessage =
+                            error instanceof ProblemDetailsError && error.problem.detail
+                                ? error.problem.detail
+                                : error.message
+                        setValidationError(errorMessage)
+                        setShowError(true)
+
+                        // Fjern eventuell eksisterende timer
+                        if (errorTimer) {
+                            clearTimeout(errorTimer)
+                        }
+
+                        // Sett ny timer for å skjule feilmelding etter 8 sekunder
+                        const timer = setTimeout(() => {
+                            setShowError(false)
+                            setValidationError(null)
+                            setErrorTimer(null)
+                        }, 8000)
+                        setErrorTimer(timer)
                     }
                 },
             },
@@ -506,10 +556,12 @@ const Page = () => {
 
     return (
         <div className="p-6">
-            {validationError && (
-                <ErrorSummary heading="For å gå videre må du rette opp følgende:">
-                    <ErrorSummary.Item>{validationError}</ErrorSummary.Item>
-                </ErrorSummary>
+            {showError && validationError && (
+                <div className="fixed right-4 bottom-4 z-50">
+                    <Alert variant="error" closeButton onClose={handleCloseError}>
+                        {validationError}
+                    </Alert>
+                </div>
             )}
             {formState.isDirty && (
                 <div className="fixed right-4 bottom-4 z-50">
