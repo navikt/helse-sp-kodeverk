@@ -1,4 +1,4 @@
-import '@navikt/ds-tokens/darkside-css'
+import '@navikt/ds-tokens/css'
 import '../styles/globals.css'
 import type { Metadata } from 'next'
 import React, { PropsWithChildren, ReactElement } from 'react'
