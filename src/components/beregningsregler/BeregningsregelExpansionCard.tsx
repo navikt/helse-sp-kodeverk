@@ -20,7 +20,6 @@ interface BeregningsregelExpansionCardProps {
     sistEndretDato?: string
     hasErrors: boolean
     errorCount: number
-    erIBrukIBakrommet?: boolean
 }
 
 const formatParagraf = (hjemmel: Vilkårshjemmel) => {
@@ -45,7 +44,6 @@ export const BeregningsregelExpansionCard = ({
     sistEndretDato,
     hasErrors,
     errorCount,
-    erIBrukIBakrommet = true,
 }: BeregningsregelExpansionCardProps) => {
     const diskutertOgEndelig = useWatch({
         control,
@@ -82,11 +80,6 @@ export const BeregningsregelExpansionCard = ({
                             </Tag>
                         )}
                     </span>
-                    {!erIBrukIBakrommet && kode && (
-                        <Tag variant="warning" size="small" className="mt-2">
-                            Denne koden er ikke i bruk i spillerom applikasjonen
-                        </Tag>
-                    )}
                 </ExpansionCard.Description>
             </ExpansionCard.Header>
             <ExpansionCard.Content>

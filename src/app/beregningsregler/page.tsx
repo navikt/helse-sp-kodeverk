@@ -11,7 +11,6 @@ import { BeregningsregelExpansionCard } from '@/components/beregningsregler/Bere
 import { KonfliktModal } from '@/components/KonfliktModal'
 import { useBeregningsregler } from '@hooks/queries/useBeregningsregler'
 import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
-import { useBakrommetBeregningskoder } from '@hooks/queries/useBakrommetBeregningskoder'
 import { useBeregningsregelMutation } from '@hooks/mutations/useBeregningsregelMutation'
 import { ProblemDetailsError } from '@utils/ProblemDetailsError'
 import { redactBeregningsreglerSistEndretAv, copyKodeverkToClipboard } from '@utils/redactSistEndretAv'
@@ -25,7 +24,6 @@ const filterAlternativer = [
     { visningstekst: 'Frilanser', filtereringstekst: 'FRILANSER' },
     { visningstekst: 'Inaktiv', filtereringstekst: 'INAKTIV' },
     { visningstekst: 'Arbeidsledig', filtereringstekst: 'ARBEIDSLEDIG' },
-    { visningstekst: 'Ubrukt', filtereringstekst: 'UBRUKT' },
     { visningstekst: 'Uavklart', filtereringstekst: 'UAVKLART' },
 ]
 
@@ -99,16 +97,9 @@ const getBeregningsregelErrors = (
     return { hasErrors: errorCount > 0, errorCount }
 }
 
-// Funksjon for å sjekke om en kode er i bruk i bakrommet
-const erKodeIBrukIBakrommet = (kode: string, bakrommetKoder: string[]): boolean => {
-    if (!bakrommetKoder || !kode) return false
-    return bakrommetKoder.includes(kode)
-}
-
 const Page = () => {
     const { data: serverBeregningsregler, isLoading } = useBeregningsregler()
     const { data: brukerinfo } = useBrukerinfo()
-    const { data: bakrommetKoder, isLoading: isLoadingBakrommet } = useBakrommetBeregningskoder()
     const saveMutation = useBeregningsregelMutation()
 
     const { control, handleSubmit, formState, reset } = useForm<BeregningsregelForm>({
@@ -221,12 +212,6 @@ const Page = () => {
 
         // AND-logikk: alle valgte filtre må matche
         return valgteFiltre.every((filterTekst) => {
-            // Spesialhåndtering for UBRUKT filter
-            if (filterTekst === 'UBRUKT') {
-                const erIBrukIBakrommet = erKodeIBrukIBakrommet(field.kode, (bakrommetKoder as string[]) ?? [])
-                return !erIBrukIBakrommet
-            }
-
             // Spesialhåndtering for UAVKLART filter
             if (filterTekst === 'UAVKLART') {
                 return !field.diskutertOgEndelig
@@ -317,7 +302,7 @@ const Page = () => {
         append(newBeregningsregel)
     }
 
-    if (isLoading || isLoadingBakrommet) {
+    if (isLoading) {
         return <div className="p-6">Laster...</div>
     }
 
@@ -388,7 +373,6 @@ const Page = () => {
                         // Finn den faktiske index i fields array
                         const actualIndex = fields.findIndex((f) => f.id === field.id)
                         const { hasErrors, errorCount } = getBeregningsregelErrors(actualIndex, formState.errors)
-                        const erIBrukIBakrommet = erKodeIBrukIBakrommet(field.kode, (bakrommetKoder as string[]) ?? [])
 
                         return (
                             <BeregningsregelExpansionCard
@@ -404,7 +388,6 @@ const Page = () => {
                                 sistEndretDato={field.sistEndretDato}
                                 hasErrors={hasErrors}
                                 errorCount={errorCount}
-                                erIBrukIBakrommet={erIBrukIBakrommet}
                             />
                         )
                     })}
