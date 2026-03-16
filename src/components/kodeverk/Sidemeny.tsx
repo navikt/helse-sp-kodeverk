@@ -3,36 +3,32 @@
 import { Button } from '@navikt/ds-react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
 
-import { Vilkår } from '@/schemas/kodeverk'
+import type { Vilkårshjemmel } from '@/schemas/kodeverk'
+import { formatVilkårshjemmel } from '@/utils/formatVilkårshjemmel'
+
+interface SidemenyVilkår {
+    id: string
+    beskrivelse: string
+    vilkårshjemmel: Vilkårshjemmel
+}
 
 interface SidemenyProps {
-    vilkår: (Vilkår & { id: string })[]
-    onVilkårClick: (vilkårId: string) => Promise<boolean>
+    vilkår: SidemenyVilkår[]
+    onVilkårClick: (vilkårId: string) => void
     activeVilkårId?: string
     isCollapsed: boolean
     onToggleCollapse: () => void
 }
 
-const formatParagraf = (hjemmel: Vilkår['vilkårshjemmel']) => {
-    const { lovverk, kapittel, paragraf, ledd, setning, bokstav } = hjemmel
-    if (!lovverk || !kapittel || !paragraf) return ''
-
-    let result = `${lovverk} §${kapittel}-${paragraf}`
-    if (ledd) result += ` ${ledd}. ledd`
-    if (setning) result += ` ${setning}. setning`
-    if (bokstav) result += ` bokstav ${bokstav}`
-    return result
-}
-
 export const Sidemeny = ({ vilkår, onVilkårClick, activeVilkårId, isCollapsed, onToggleCollapse }: SidemenyProps) => {
     return (
         <div
-            className={`bg-gray-50 border-gray-200 sticky top-0 h-screen overflow-y-auto border-r transition-all duration-300 ${
+            className={`sticky top-0 h-screen overflow-y-auto border-r border-gray-200 bg-gray-50 transition-all duration-300 ${
                 isCollapsed ? 'w-12' : 'w-80'
             }`}
         >
-            <div className="border-gray-200 flex items-center justify-between border-b p-4">
-                {!isCollapsed && <h2 className="text-gray-900 text-lg font-semibold">Hovedvilkår</h2>}
+            <div className="flex items-center justify-between border-b border-gray-200 p-4">
+                {!isCollapsed && <h2 className="text-lg font-semibold text-gray-900">Hovedvilkår</h2>}
                 <Button
                     variant="tertiary"
                     size="small"
@@ -46,25 +42,23 @@ export const Sidemeny = ({ vilkår, onVilkårClick, activeVilkårId, isCollapsed
 
             {!isCollapsed && (
                 <nav className="space-y-1 p-4">
-                    {vilkår.map((vilkår) => {
-                        const isActive = activeVilkårId === vilkår.id
-                        const paragraf = formatParagraf(vilkår.vilkårshjemmel)
+                    {vilkår.map((item) => {
+                        const isActive = activeVilkårId === item.id
+                        const paragraf = formatVilkårshjemmel(item.vilkårshjemmel)
 
                         return (
                             <Button
-                                key={vilkår.id}
+                                key={item.id}
                                 variant={isActive ? 'primary' : 'tertiary'}
                                 size="small"
                                 className={`h-auto w-full justify-start px-3 py-3 text-left ${
-                                    isActive ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-100 text-gray-900'
+                                    isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-900 hover:bg-gray-100'
                                 }`}
-                                onClick={async () => {
-                                    await onVilkårClick(vilkår.id)
-                                }}
+                                onClick={() => onVilkårClick(item.id)}
                             >
                                 <div className="flex flex-col items-start">
-                                    <span className="text-sm leading-tight font-medium">
-                                        {vilkår.beskrivelse || 'Nytt vilkår'}
+                                    <span className="text-sm font-medium leading-tight">
+                                        {item.beskrivelse || 'Vilkår uten tittel'}
                                     </span>
                                     {paragraf && (
                                         <span

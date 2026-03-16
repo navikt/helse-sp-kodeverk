@@ -1,251 +1,93 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef } from 'react'
-import { Button, Heading, Alert } from '@navikt/ds-react'
-import { ExpansionCard } from '@navikt/ds-react'
-import { useForm, useFieldArray, useWatch, FieldErrors } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragEndEvent,
-} from '@dnd-kit/core'
-import {
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { DragVerticalIcon, FilesIcon } from '@navikt/aksel-icons'
+import { useEffect, useMemo, useState } from 'react'
+import { Button, Alert, ExpansionCard, Heading } from '@navikt/ds-react'
+import { FilesIcon } from '@navikt/aksel-icons'
 
-import { Hovedspørsmål, hovedspørsmålFormSchema, HovedspørsmålForm } from '@/schemas/saksbehandlergrensesnitt'
-import { SpørsmålForm } from '@/components/ui/SpørsmålForm'
 import { MetadataVisning } from '@/components/MetadataVisning'
-import { KonfliktModal } from '@/components/KonfliktModal'
-import { JsonEditor } from '@/components/JsonEditor'
-import { useKodeverk } from '@/hooks/queries/useKodeverk'
+import { SpørsmålVisning } from '@/components/saksbehandlergrensesnitt/SpørsmålVisning'
+import { useKodeverk, KodeverkWithEtag } from '@/hooks/queries/useKodeverk'
 import { useSaksbehandlerui } from '@hooks/queries/useSaksbehandlerui'
-import { useBrukerinfo } from '@hooks/queries/useBrukerinfo'
-import { useSaksbehandleruiMutation } from '@hooks/mutations/useSaksbehandleruiMutation'
-import { ProblemDetailsError } from '@utils/ProblemDetailsError'
+import { Hovedspørsmål } from '@/schemas/saksbehandlergrensesnitt'
 import { redactSaksbehandlergrensesnittSistEndretAv, copyKodeverkToClipboard } from '@utils/redactSistEndretAv'
 
-// Funksjon for å sjekke om et hovedspørsmål har valideringsfeil og returnere antall feil
-const getHovedspørsmålErrors = (
-    index: number,
-    errors: FieldErrors<HovedspørsmålForm>,
-): { hasErrors: boolean; errorCount: number } => {
-    const spørsmålErrors = errors?.vilkar?.[index]
-    if (!spørsmålErrors) return { hasErrors: false, errorCount: 0 }
+const kategoriTekster: Record<Hovedspørsmål['kategori'], string> = {
+    generelle_bestemmelser: 'Generelle bestemmelser',
+    arbeidstakere: 'Arbeidstakere',
+    selvstendig_næringsdrivende: 'Selvstendig næringsdrivende',
+    frilansere: 'Frilansere',
+    medlemmer_med_kombinerte_inntekter: 'Medlemmer med kombinerte inntekter',
+    særskilte_grupper: 'Særskilte grupper',
+    medlemmer_med_rett_til_andre_ytelser: 'Medlemmer med rett til andre ytelser',
+    opphold_i_institusjon: 'Opphold i institusjon',
+    yrkesskade: 'Yrkesskade',
+}
 
-    let errorCount = 0
+const collectKodeverkCodes = (kodeverk: KodeverkWithEtag | undefined): Set<string> => {
+    if (!kodeverk?.data?.vilkar) {
+        return new Set<string>()
+    }
 
-    // Sjekk hovedfeltene
-    if (spørsmålErrors.kode?.message) errorCount++
-    if (spørsmålErrors.beskrivelse?.message) errorCount++
-    if (spørsmålErrors.kategori?.message) errorCount++
+    const alleKjenteKoder = new Set<string>()
+    for (const vilkår of kodeverk.data.vilkar) {
+        for (const årsak of vilkår.oppfylt) {
+            alleKjenteKoder.add(årsak.kode)
+        }
+        for (const årsak of vilkår.ikkeOppfylt) {
+            alleKjenteKoder.add(årsak.kode)
+        }
+    }
+    return alleKjenteKoder
+}
 
-    // Sjekk underspørsmål array
-    if (spørsmålErrors.underspørsmål) {
-        for (let i = 0; i < (spørsmålErrors.underspørsmål.length || 0); i++) {
-            const underspørsmålError = spørsmålErrors.underspørsmål[i]
-            if (underspørsmålError?.kode?.message) errorCount++
-            if (underspørsmålError?.alternativer) {
-                for (let j = 0; j < (underspørsmålError.alternativer.length || 0); j++) {
-                    const alternativError = underspørsmålError.alternativer[j]
-                    if (alternativError?.kode?.message) errorCount++
-                    if (alternativError?.navn?.message) errorCount++
-                    if (alternativError?.underspørsmål) {
-                        // Rekursivt sjekk nested underspørsmål
-                        const nestedErrors = getNestedUnderspørsmålErrors(alternativError.underspørsmål)
-                        errorCount += nestedErrors
-                    }
+const containsUnknownAlternatives = (hovedspørsmål: Hovedspørsmål, kjenteKoder: Set<string>): boolean => {
+    const checkAlternativer = (
+        alternativer: NonNullable<Hovedspørsmål['underspørsmål'][number]['alternativer']>,
+    ): boolean => {
+        for (const alternativ of alternativer) {
+            const hasNested = Boolean(alternativ.underspørsmål?.length)
+            if (!hasNested && !kjenteKoder.has(alternativ.kode)) {
+                return true
+            }
+
+            for (const underspørsmål of alternativ.underspørsmål || []) {
+                if (underspørsmål.alternativer && checkAlternativer(underspørsmål.alternativer)) {
+                    return true
                 }
             }
         }
+
+        return false
     }
 
-    return { hasErrors: errorCount > 0, errorCount }
-}
-
-// Hjelpefunksjon for å sjekke nested underspørsmål
-const getNestedUnderspørsmålErrors = (underspørsmål: unknown): number => {
-    let errorCount = 0
-
-    if (Array.isArray(underspørsmål)) {
-        for (const spørsmål of underspørsmål) {
-            if (spørsmål && typeof spørsmål === 'object' && 'kode' in spørsmål && spørsmål.kode?.message) errorCount++
-            if (
-                spørsmål &&
-                typeof spørsmål === 'object' &&
-                'alternativer' in spørsmål &&
-                Array.isArray(spørsmål.alternativer)
-            ) {
-                for (const alternativ of spørsmål.alternativer) {
-                    if (
-                        alternativ &&
-                        typeof alternativ === 'object' &&
-                        'kode' in alternativ &&
-                        alternativ.kode?.message
-                    )
-                        errorCount++
-                    if (
-                        alternativ &&
-                        typeof alternativ === 'object' &&
-                        'navn' in alternativ &&
-                        alternativ.navn?.message
-                    )
-                        errorCount++
-                    if (alternativ && typeof alternativ === 'object' && 'underspørsmål' in alternativ) {
-                        errorCount += getNestedUnderspørsmålErrors(alternativ.underspørsmål)
-                    }
-                }
-            }
+    for (const underspørsmål of hovedspørsmål.underspørsmål) {
+        if (underspørsmål.alternativer && checkAlternativer(underspørsmål.alternativer)) {
+            return true
         }
     }
 
-    return errorCount
-}
-
-interface SortableExpansionCardProps {
-    id: string
-    children: React.ReactNode
-    'aria-label': string
-    className?: string
-}
-
-const SortableExpansionCard = ({ id, children, ...props }: SortableExpansionCardProps) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    }
-
-    return (
-        <div ref={setNodeRef} style={style} className="flex items-start gap-2">
-            <div
-                {...attributes}
-                {...listeners}
-                className="hover:bg-gray-100 mt-6 cursor-grab rounded p-2"
-                role="button"
-                tabIndex={0}
-            >
-                <DragVerticalIcon className="text-gray-400 h-5 w-5" />
-            </div>
-            <div className="flex-1">
-                <ExpansionCard size="small" {...props}>
-                    {children}
-                </ExpansionCard>
-            </div>
-        </div>
-    )
+    return false
 }
 
 const Page = () => {
     const { data: serverKodeverk, isLoading } = useSaksbehandlerui()
     const { data: kodeverkData } = useKodeverk()
-    const { data: brukerinfo } = useBrukerinfo()
-    const saveMutation = useSaksbehandleruiMutation()
-
-    const { control, handleSubmit, formState, reset, setValue } = useForm<HovedspørsmålForm>({
-        resolver: zodResolver(hovedspørsmålFormSchema),
-        defaultValues: { vilkar: [] },
-    })
-
-    const { fields, append, remove, move } = useFieldArray({
-        control,
-        name: 'vilkar',
-    })
-
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        }),
-    )
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event
-
-        if (over && active.id !== over.id) {
-            const oldIndex = fields.findIndex((field) => field.id === active.id)
-            const newIndex = fields.findIndex((field) => field.id === over.id)
-            move(oldIndex, newIndex)
-        }
-    }
-
-    const [validationError, setValidationError] = useState<string | null>(null)
-    const [showError, setShowError] = useState(false)
-    const [errorTimer, setErrorTimer] = useState<NodeJS.Timeout | null>(null)
-    const [showSuccess, setShowSuccess] = useState(false)
-    const [successTimer, setSuccessTimer] = useState<NodeJS.Timeout | null>(null)
     const [showCopySuccess, setShowCopySuccess] = useState(false)
-    const [copySuccessTimer, setCopySuccessTimer] = useState<NodeJS.Timeout | null>(null)
-    const [konfliktProblem, setKonfliktProblem] = useState<{
-        status: number
-        type: string
-        title?: string
-        detail?: string | null
-        instance?: string | null
-        lastModifiedBy?: string
-        lastModifiedAt?: string
-        expectedVersion?: string
-        currentVersion?: string
-    } | null>(null)
-    const [showJsonEditor, setShowJsonEditor] = useState(false)
-    const hasInitialized = useRef(false)
+    const [copySuccessTimer, setCopySuccessTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
 
-    // Initialiser formen kun én gang når dataene først lastes
-    useEffect(() => {
-        if (serverKodeverk?.data && !hasInitialized.current) {
-            reset({ vilkar: serverKodeverk.data })
-            hasInitialized.current = true
-        }
-    }, [serverKodeverk, reset, hasInitialized])
-
-    // Cleanup timer ved unmount
     useEffect(() => {
         return () => {
-            if (successTimer) {
-                clearTimeout(successTimer)
-            }
             if (copySuccessTimer) {
                 clearTimeout(copySuccessTimer)
             }
-            if (errorTimer) {
-                clearTimeout(errorTimer)
-            }
         }
-    }, [successTimer, copySuccessTimer, errorTimer])
-
-    const handleCloseSuccess = () => {
-        setShowSuccess(false)
-        if (successTimer) {
-            clearTimeout(successTimer)
-            setSuccessTimer(null)
-        }
-    }
+    }, [copySuccessTimer])
 
     const handleCloseCopySuccess = () => {
         setShowCopySuccess(false)
         if (copySuccessTimer) {
             clearTimeout(copySuccessTimer)
             setCopySuccessTimer(null)
-        }
-    }
-
-    const handleCloseError = () => {
-        setShowError(false)
-        setValidationError(null)
-        if (errorTimer) {
-            clearTimeout(errorTimer)
-            setErrorTimer(null)
         }
     }
 
@@ -256,12 +98,10 @@ const Page = () => {
         await copyKodeverkToClipboard(redactedData)
         setShowCopySuccess(true)
 
-        // Fjern eventuell eksisterende timer
         if (copySuccessTimer) {
             clearTimeout(copySuccessTimer)
         }
 
-        // Sett ny timer for å skjule copy-success-melding etter 3 sekunder
         const timer = setTimeout(() => {
             setShowCopySuccess(false)
             setCopySuccessTimer(null)
@@ -269,397 +109,96 @@ const Page = () => {
         setCopySuccessTimer(timer)
     }
 
-    const handleCloseKonflikt = () => {
-        setKonfliktProblem(null)
-    }
-
-    const handleJsonSave = async (data: Hovedspørsmål[]) => {
-        // Oppdater metadata kun for hovedspørsmål som er endret
-        const cleanedData = data.map((hovedspørsmål, index) => {
-            // Sammenlign med original data for å sjekke om endringer er gjort
-            const originalHovedspørsmål = serverKodeverk?.data?.[index]
-
-            const isHovedspørsmålEndret =
-                !originalHovedspørsmål ||
-                hovedspørsmål.beskrivelse !== originalHovedspørsmål.beskrivelse ||
-                hovedspørsmål.kode !== originalHovedspørsmål.kode ||
-                hovedspørsmål.kategori !== originalHovedspørsmål.kategori ||
-                hovedspørsmål.paragrafTag !== originalHovedspørsmål.paragrafTag ||
-                JSON.stringify(hovedspørsmål.underspørsmål) !== JSON.stringify(originalHovedspørsmål.underspørsmål)
-
-            // Hvis hovedspørsmålet er endret, oppdater metadata
-            if (isHovedspørsmålEndret) {
-                return {
-                    ...hovedspørsmål,
-                    sistEndretAv: brukerinfo?.navn || 'unknown',
-                    sistEndretDato: new Date().toISOString(),
-                }
-            }
-
-            // Hvis ikke endret, behold eksisterende metadata
-            return {
-                ...hovedspørsmål,
-                sistEndretAv: originalHovedspørsmål?.sistEndretAv || hovedspørsmål.sistEndretAv,
-                sistEndretDato: originalHovedspørsmål?.sistEndretDato || hovedspørsmål.sistEndretDato,
-            }
-        })
-
-        // Lagre til server
-        return new Promise<void>((resolve, reject) => {
-            saveMutation.mutate(
-                {
-                    data: cleanedData,
-                    etag: serverKodeverk?.etag,
-                },
-                {
-                    onSuccess: () => {
-                        reset({ vilkar: cleanedData })
-                        setShowJsonEditor(false)
-                        setValidationError(null)
-                        setKonfliktProblem(null)
-
-                        // Vis success-melding
-                        setShowSuccess(true)
-
-                        // Fjern eventuell eksisterende timer
-                        if (successTimer) {
-                            clearTimeout(successTimer)
-                        }
-
-                        // Sett ny timer for å skjule success-melding etter 4 sekunder
-                        const timer = setTimeout(() => {
-                            setShowSuccess(false)
-                            setSuccessTimer(null)
-                        }, 4000)
-                        setSuccessTimer(timer)
-
-                        resolve()
-                    },
-                    onError: (error: Error) => {
-                        if (error instanceof ProblemDetailsError && error.problem.status === 409) {
-                            setKonfliktProblem(error.problem)
-                        } else {
-                            const errorMessage =
-                                error instanceof ProblemDetailsError && error.problem.detail
-                                    ? error.problem.detail
-                                    : error.message
-                            setValidationError(errorMessage)
-                            setShowError(true)
-
-                            // Fjern eventuell eksisterende timer
-                            if (errorTimer) {
-                                clearTimeout(errorTimer)
-                            }
-
-                            // Sett ny timer for å skjule feilmelding etter 8 sekunder
-                            const timer = setTimeout(() => {
-                                setShowError(false)
-                                setValidationError(null)
-                                setErrorTimer(null)
-                            }, 8000)
-                            setErrorTimer(timer)
-                        }
-                        reject(error)
-                    },
-                },
-            )
-        })
-    }
-
-    const handleJsonCancel = () => {
-        setShowJsonEditor(false)
-    }
-
-    const onSubmit = (data: HovedspørsmålForm) => {
-        // Oppdater metadata kun for hovedspørsmål som er endret
-        const cleanedData = {
-            ...data,
-            vilkar: data.vilkar.map((hovedspørsmål, index) => {
-                // Sammenlign med original data for å sjekke om endringer er gjort
-                const originalHovedspørsmål = serverKodeverk?.data?.[index]
-
-                const isHovedspørsmålEndret =
-                    !originalHovedspørsmål ||
-                    hovedspørsmål.beskrivelse !== originalHovedspørsmål.beskrivelse ||
-                    hovedspørsmål.kode !== originalHovedspørsmål.kode ||
-                    hovedspørsmål.kategori !== originalHovedspørsmål.kategori ||
-                    JSON.stringify(hovedspørsmål.underspørsmål) !== JSON.stringify(originalHovedspørsmål.underspørsmål)
-
-                // Hvis hovedspørsmålet er endret, oppdater metadata
-                if (isHovedspørsmålEndret) {
-                    return {
-                        ...hovedspørsmål,
-                        sistEndretAv: brukerinfo?.navn || 'unknown',
-                        sistEndretDato: new Date().toISOString(),
-                    }
-                }
-
-                // Hvis ikke endret, behold eksisterende metadata
-                return {
-                    ...hovedspørsmål,
-                    sistEndretAv: originalHovedspørsmål?.sistEndretAv || hovedspørsmål.sistEndretAv,
-                    sistEndretDato: originalHovedspørsmål?.sistEndretDato || hovedspørsmål.sistEndretDato,
-                }
-            }),
-        }
-
-        saveMutation.mutate(
-            {
-                data: cleanedData.vilkar,
-                etag: serverKodeverk?.etag,
-            },
-            {
-                onSuccess: () => {
-                    setValidationError(null)
-                    setKonfliktProblem(null)
-
-                    // Vis success-melding
-                    setShowSuccess(true)
-
-                    // Fjern eventuell eksisterende timer
-                    if (successTimer) {
-                        clearTimeout(successTimer)
-                    }
-
-                    // Sett ny timer for å skjule success-melding etter 4 sekunder
-                    const timer = setTimeout(() => {
-                        setShowSuccess(false)
-                        setSuccessTimer(null)
-                    }, 4000)
-                    setSuccessTimer(timer)
-                },
-                onError: (error: Error) => {
-                    if (error instanceof ProblemDetailsError && error.problem.status === 409) {
-                        setKonfliktProblem(error.problem)
-                    } else {
-                        const errorMessage =
-                            error instanceof ProblemDetailsError && error.problem.detail
-                                ? error.problem.detail
-                                : error.message
-                        setValidationError(errorMessage)
-                        setShowError(true)
-
-                        // Fjern eventuell eksisterende timer
-                        if (errorTimer) {
-                            clearTimeout(errorTimer)
-                        }
-
-                        // Sett ny timer for å skjule feilmelding etter 8 sekunder
-                        const timer = setTimeout(() => {
-                            setShowError(false)
-                            setValidationError(null)
-                            setErrorTimer(null)
-                        }, 8000)
-                        setErrorTimer(timer)
-                    }
-                },
-            },
+    const kjenteKoder = useMemo(() => collectKodeverkCodes(kodeverkData), [kodeverkData])
+    const hovedspørsmålMedUkjenteKoder = useMemo(() => {
+        return new Set(
+            (serverKodeverk?.data || [])
+                .map((spørsmål, index) => (containsUnknownAlternatives(spørsmål, kjenteKoder) ? index : -1))
+                .filter((index) => index >= 0),
         )
-    }
-
-    const addSpørsmål = () => {
-        const newVilkår: Hovedspørsmål = {
-            kode: crypto.randomUUID(),
-            beskrivelse: '',
-            kategori: 'generelle_bestemmelser',
-            paragrafTag: '',
-            underspørsmål: [],
-        }
-        append(newVilkår)
-    }
-
-    // Watch alle vilkår for å sjekke etter ukjente koder
-    const watchedVilkar = useWatch({ control, name: 'vilkar' })
-
-    // Memoized funksjon for å sjekke etter ukjente koder
-    const vilkarWithUnknownCodes = useMemo(() => {
-        const allVilkar = watchedVilkar || []
-        if (!kodeverkData?.data?.vilkar || !allVilkar) return new Set<number>()
-
-        const alleKjenteKoder = new Set<string>()
-        for (const vilkar of kodeverkData.data.vilkar) {
-            for (const årsak of vilkar.oppfylt) {
-                alleKjenteKoder.add(årsak.kode)
-            }
-            for (const årsak of vilkar.ikkeOppfylt) {
-                alleKjenteKoder.add(årsak.kode)
-            }
-        }
-
-        // Rekursiv funksjon for å sjekke alternativer
-        const checkAlternativer = (alternativer: unknown[]): boolean => {
-            for (const alternativ of alternativer || []) {
-                // Type guard for alternativ
-                if (typeof alternativ !== 'object' || alternativ === null) continue
-                const alt = alternativ as Record<string, unknown>
-
-                // Sjekk kun alternativer som IKKE har underspørsmål
-                if (!alt.harUnderspørsmål && typeof alt.kode === 'string') {
-                    if (!alleKjenteKoder.has(alt.kode)) {
-                        return true
-                    }
-                }
-                // Rekursivt sjekk underspørsmål
-                if (Array.isArray(alt.underspørsmål)) {
-                    for (const underspørsmål of alt.underspørsmål) {
-                        if (typeof underspørsmål === 'object' && underspørsmål !== null) {
-                            const undersp = underspørsmål as Record<string, unknown>
-                            if (Array.isArray(undersp.alternativer) && checkAlternativer(undersp.alternativer)) {
-                                return true
-                            }
-                        }
-                    }
-                }
-            }
-            return false
-        }
-
-        const vilkarWithIssues = new Set<number>()
-
-        // Sjekk alle vilkår
-        allVilkar.forEach((vilkar: Hovedspørsmål | undefined, index: number) => {
-            if (!vilkar) return
-
-            // Sjekk alle underspørsmål
-            for (const underspørsmål of vilkar.underspørsmål || []) {
-                if (checkAlternativer(underspørsmål.alternativer || [])) {
-                    vilkarWithIssues.add(index)
-                    break
-                }
-            }
-        })
-
-        return vilkarWithIssues
-    }, [kodeverkData, watchedVilkar])
+    }, [kjenteKoder, serverKodeverk])
 
     if (isLoading) {
         return <div className="p-6">Laster...</div>
     }
 
-    if (showJsonEditor) {
-        return (
-            <div className="p-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <Heading level="1" size="large">
-                        JSON-redigering
-                    </Heading>
-                </div>
-                <JsonEditor<Hovedspørsmål>
-                    initialData={serverKodeverk?.data || []}
-                    onSave={handleJsonSave}
-                    onCancel={handleJsonCancel}
-                    isLoading={saveMutation.isPending}
-                />
-            </div>
-        )
-    }
-
     return (
         <div className="p-6">
-            {showError && validationError && (
-                <div className="fixed right-4 bottom-4 z-50">
-                    <Alert variant="error" closeButton onClose={handleCloseError}>
-                        {validationError}
-                    </Alert>
-                </div>
-            )}
-            {formState.isDirty && (
-                <div className="fixed right-4 bottom-4 z-50">
-                    <Button onClick={handleSubmit(onSubmit)} loading={saveMutation.isPending} variant="primary">
-                        Lagre endringer
-                    </Button>
-                </div>
-            )}
-            {showSuccess && (
-                <div className="fixed right-4 bottom-4 z-50">
-                    <Alert variant="success" closeButton onClose={handleCloseSuccess}>
-                        Grensesnitt er lagret!
-                    </Alert>
-                </div>
-            )}
             {showCopySuccess && (
-                <div className="fixed right-4 bottom-4 z-50">
+                <div className="fixed bottom-4 right-4 z-50">
                     <Alert variant="success" closeButton onClose={handleCloseCopySuccess}>
                         Kodeverk kopiert til utklippstavlen!
                     </Alert>
                 </div>
             )}
-            {konfliktProblem && (
-                <KonfliktModal isOpen={!!konfliktProblem} onClose={handleCloseKonflikt} problem={konfliktProblem} />
-            )}
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="mb-6 flex items-center justify-between">
-                    <Heading level="1" size="large">
-                        Rediger saksbehandlergrensesnitt
-                    </Heading>
-                    <div className="flex gap-4">
-                        <Button type="button" onClick={handleCopyKodeverk} variant="secondary" icon={<FilesIcon />}>
-                            Kopier som json
-                        </Button>
-                        <Button type="button" onClick={() => setShowJsonEditor(true)} variant="secondary">
-                            JSON-redigering
-                        </Button>
-                        <Button type="button" onClick={addSpørsmål} variant="primary">
-                            Legg til spørsmål
-                        </Button>
-                    </div>
-                </div>
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
-                        {fields.map((field, index) => {
-                            const hasUnknownCodes = vilkarWithUnknownCodes.has(index)
-                            const { hasErrors, errorCount } = getHovedspørsmålErrors(index, formState.errors)
-                            const hasNoUnderspørsmål = !field.underspørsmål || field.underspørsmål.length === 0
 
-                            return (
-                                <SortableExpansionCard
-                                    key={field.id}
-                                    id={field.id}
-                                    aria-label="Spørsmål"
-                                    className={`mb-4 ${hasErrors ? 'border-2 border-ax-border-danger' : ''}`}
-                                >
-                                    <ExpansionCard.Header>
-                                        <ExpansionCard.Title className="flex items-center gap-2">
-                                            {field.paragrafTag && `${field.paragrafTag} `}
-                                            {field.beskrivelse || 'Nytt spørsmål'}
-                                            {hasErrors && (
-                                                <span className="text-red-500 text-sm font-medium">
-                                                    ({errorCount} feil)
-                                                </span>
-                                            )}
-                                        </ExpansionCard.Title>
-                                        <ExpansionCard.Description>
-                                            {(hasUnknownCodes || hasNoUnderspørsmål) && (
-                                                <>
-                                                    {hasUnknownCodes &&
-                                                        '⚠️ Dette spørsmålet inneholder svaralternativer med koder som ikke finnes i kodeverket'}
-                                                    {hasNoUnderspørsmål &&
-                                                        '⚠️ Dette spørsmålet har ingen underspørsmål'}
-                                                </>
-                                            )}
-                                            <MetadataVisning
-                                                sistEndretAv={field.sistEndretAv}
-                                                sistEndretDato={field.sistEndretDato}
-                                                size="small"
-                                                className="mt-2"
-                                            />
-                                        </ExpansionCard.Description>
-                                    </ExpansionCard.Header>
-                                    <ExpansionCard.Content>
-                                        <SpørsmålForm
-                                            control={control}
-                                            index={index}
-                                            errors={formState.errors}
-                                            onRemove={() => remove(index)}
-                                            setValue={setValue}
+            <div className="mb-6 flex items-center justify-between gap-4">
+                <div>
+                    <Heading level="1" size="large">
+                        Saksbehandlergrensesnitt
+                    </Heading>
+                    <p className="mt-2 text-sm text-gray-600">
+                        Read-only visning av spørsmålstrukturen hentet fra bucket.
+                    </p>
+                </div>
+                <Button type="button" onClick={handleCopyKodeverk} variant="secondary" icon={<FilesIcon />}>
+                    Kopier som json
+                </Button>
+            </div>
+
+            <div className="mb-4 text-sm text-gray-600">Viser {(serverKodeverk?.data || []).length} hovedspørsmål.</div>
+
+            <div className="space-y-4">
+                {(serverKodeverk?.data || []).map((hovedspørsmål, index) => (
+                    <ExpansionCard
+                        key={hovedspørsmål.kode}
+                        size="small"
+                        aria-label={`Hovedspørsmål ${hovedspørsmål.kode}`}
+                    >
+                        <ExpansionCard.Header>
+                            <ExpansionCard.Title>{hovedspørsmål.beskrivelse}</ExpansionCard.Title>
+                            <ExpansionCard.Description>
+                                <span className="flex flex-col gap-1">
+                                    <span className="text-sm text-gray-600">Kode: {hovedspørsmål.kode}</span>
+                                    <span className="text-sm text-gray-600">
+                                        Kategori: {kategoriTekster[hovedspørsmål.kategori]}
+                                    </span>
+                                    <span className="text-sm text-gray-600">
+                                        Paragraf-tag: {hovedspørsmål.paragrafTag}
+                                    </span>
+                                    <MetadataVisning
+                                        sistEndretAv={hovedspørsmål.sistEndretAv}
+                                        sistEndretDato={hovedspørsmål.sistEndretDato}
+                                        size="small"
+                                        className="mt-2"
+                                    />
+                                </span>
+                            </ExpansionCard.Description>
+                        </ExpansionCard.Header>
+                        <ExpansionCard.Content>
+                            <div className="space-y-4">
+                                {hovedspørsmålMedUkjenteKoder.has(index) && (
+                                    <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+                                        Minst ett svaralternativ peker på en kode som ikke finnes i kodeverket.
+                                    </div>
+                                )}
+
+                                {hovedspørsmål.underspørsmål.length === 0 ? (
+                                    <p className="text-sm text-gray-500">Ingen underspørsmål registrert.</p>
+                                ) : (
+                                    hovedspørsmål.underspørsmål.map((spørsmål) => (
+                                        <SpørsmålVisning
+                                            key={`${hovedspørsmål.kode}-${spørsmål.kode}`}
+                                            spørsmål={spørsmål}
+                                            kjenteKoder={kjenteKoder}
                                         />
-                                    </ExpansionCard.Content>
-                                </SortableExpansionCard>
-                            )
-                        })}
-                    </SortableContext>
-                </DndContext>
-            </form>
+                                    ))
+                                )}
+                            </div>
+                        </ExpansionCard.Content>
+                    </ExpansionCard>
+                ))}
+            </div>
         </div>
     )
 }

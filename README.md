@@ -1,7 +1,7 @@
 # Sp Kodeverk
 
 ## Beskrivelse
-Frontend for å redigere kodeverk brukt i spillerom
+Frontend for å vise kodeverk brukt i Spillerom
 
 ## Kjør lokalt
 `npm run dev`
