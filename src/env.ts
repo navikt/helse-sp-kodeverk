@@ -26,28 +26,14 @@ export const erProd = browserEnv.NEXT_PUBLIC_RUNTIME_ENV === 'prod'
 export type ServerEnv = z.infer<typeof serverEnvSchema>
 export const serverEnvSchema = z.object({
     // Provided by nais
-    AZURE_APP_CLIENT_ID: z.string(),
-    AZURE_APP_CLIENT_SECRET: z.string(),
-    AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: z.string(),
-    AZURE_APP_WELL_KNOWN_URL: z.string(),
-    AZURE_APP_PRE_AUTHORIZED_APPS: z.string(),
-    BAKROMMET_SCOPE: z.string(),
-    BAKROMMET_HOST: z.string(),
-    MODIA_SCOPE: z.string(),
-    MODIA_BASE_URL: z.string(),
+    SANITY_DATASET: z.enum(['production', 'local-development']),
+    SANITY_READ_DATASETS_TOKEN: z.string(),
 })
 
 const getRawServerConfig = (): Partial<unknown> =>
     ({
-        AZURE_APP_CLIENT_ID: process.env.AZURE_APP_CLIENT_ID,
-        AZURE_APP_CLIENT_SECRET: process.env.AZURE_APP_CLIENT_SECRET,
-        AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: process.env.AZURE_OPENID_CONFIG_TOKEN_ENDPOINT,
-        AZURE_APP_WELL_KNOWN_URL: process.env.AZURE_APP_WELL_KNOWN_URL,
-        AZURE_APP_PRE_AUTHORIZED_APPS: process.env.AZURE_APP_PRE_AUTHORIZED_APPS,
-        BAKROMMET_SCOPE: process.env.BAKROMMET_SCOPE,
-        BAKROMMET_HOST: process.env.BAKROMMET_HOST,
-        MODIA_SCOPE: process.env.MODIA_SCOPE,
-        MODIA_BASE_URL: process.env.MODIA_BASE_URL,
+        SANITY_DATASET: process.env.SANITY_DATASET,
+        SANITY_READ_DATASETS_TOKEN: process.env.SANITY_READ_DATASETS_TOKEN,
     }) satisfies Record<keyof ServerEnv, string | undefined>
 
 export function getServerEnv(): ServerEnv & PublicEnv {
@@ -69,3 +55,5 @@ export function getServerEnv(): ServerEnv & PublicEnv {
         }
     }
 }
+export const sanityBaseUrl = () =>
+    'https://z9kr8ddn.api.sanity.io/v2023-08-01/data/query/' + getServerEnv().SANITY_DATASET
