@@ -59,21 +59,21 @@ export function Header(): ReactElement {
                 href="/kodeverk"
                 className={pathname === '/kodeverk' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >
-                Kodeverk
+                Spillerom kodeverk
             </InternalHeaderButton>
             <InternalHeaderButton
                 as={NextLink}
                 href="/beregningsregler"
                 className={pathname === '/beregningsregler' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >
-                Beregningsregler
+                Spillerom beregningsregler
             </InternalHeaderButton>
             <InternalHeaderButton
                 as={NextLink}
                 href="/saksbehandlergrensesnitt"
                 className={pathname === '/saksbehandlergrensesnitt' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >
-                Saksbehandlergrensesnitt
+                Spillerom saksbehandlergrensesnitt
             </InternalHeaderButton>
             <Spacer />
             {renderThemeButton()}
