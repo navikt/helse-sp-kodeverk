@@ -52,7 +52,7 @@ export function Header(): ReactElement {
                 href="/"
                 className={pathname === '/' ? 'bg-ax-bg-accent-moderate-pressed' : ''}
             >
-                Spillerom kodeverk admin
+                Sykepenger kodeverk
             </InternalHeaderTitle>
             <InternalHeaderButton
                 as={NextLink}
